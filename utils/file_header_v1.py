@@ -14,6 +14,8 @@ def load_file_header_v1(obj, rawUint32):
     #             uint32_t numSlices           = 0;
    #          uint32_t magic_end           = MAGIC_NUMBER;
 
+    MAGIC_NUMBER = 322379495
+    
     file_magic_number = rawUint32[0]
     assert file_magic_number == MAGIC_NUMBER, 'Data format error.'
 
