@@ -26,7 +26,6 @@ class MetaData():
         with h5py.File(metadatafile, 'r') as hdf_file:
         # Read the contents of the HDF5 file into the metaData dictionary
 
-            print('meta data:')
             metaData = dict(hdf_file)
             for _key in metaData.keys():
                 try:
