@@ -70,7 +70,50 @@ def averageStackMemoryGPU(path):
     print('average_'+os.path.basename(path))
     tifffile.imwrite('averageGPU_'+os.path.basename(path), avgStack)
     print('Stack Saved')
+    
 # Functions for generating an image stack from slice data without loading the tiff file into memory
+def averageStackCPU(path):
+    metadata = MetaData(path[:-4]+'.meta')
+    duration = metadata.acqDuration_s
+    xdim, ydim = metadata.AcquistionContainter.ParsePlan['rasterSizeXY'][0][0], metadata.AcquistionContainter.ParsePlan['rasterSizeXY'][1][0]
+    linesPerFrame = metadata.AcquistionContainter.ParsePlan['linesPerFrame']
+    lineRate = metadata.AcquistionContainter.ParsePlan['lineRateHz']
+    linesPerCycle = metadata.AcquistionContainter.ParsePlan['linesPerCycle']
+    frameRate = (lineRate[0]/ydim)[0]
+    frameNumber = int(frameRate*duration)
+    cyclePeriod_s = linesPerCycle / lineRate
+    
+
+    # Read image data and rechunk
+    with imread(path, aszarr=True) as zarr_store:
+        imagedata = da.from_zarr(zarr_store)
+
+
+        # Ensure the data is rechunked properly
+        imagedata = imagedata.rechunk((frameNumber, ydim, xdim))
+
+        z_slices = imagedata.shape[0] // frameNumber
+        remaining_frames = imagedata.shape[0] % frameNumber
+       
+        complete_slices_data = imagedata[:z_slices*frameNumber]
+        remaining_data = imagedata[z_slices*frameNumber:]
+
+        # Reshape the complete slices data
+        complete_slices_reshaped = complete_slices_data.reshape((z_slices, frameNumber, ydim, xdim))
+        avg_complete_slices = da.mean(complete_slices_reshaped, axis=1)
+
+        # Average the remaining data
+        avg_remaining = da.mean(remaining_data, axis=0)
+        avg_remaining = avg_remaining[None, ...]  # Add an additional dimension to match the shape of avg_complete_slices
+
+        # Concatenate the results
+        final_avg_stack = da.concatenate([avg_complete_slices, avg_remaining], axis=0)
+
+   
+        # Compute the result and save it
+        final_avg_stack_result = final_avg_stack.compute()
+        imwrite('averageCPU_' + path, final_avg_stack_result)
+
 
 def averageStack(path):
     metadata = MetaData(path[:-4]+'.meta')
