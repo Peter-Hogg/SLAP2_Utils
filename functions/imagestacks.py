@@ -72,6 +72,7 @@ def averageStackMemoryGPU(path):
     print('Stack Saved')
     
 # Functions for generating an image stack from slice data without loading the tiff file into memory
+# Functions for generating an image stack from slice data without loading the tiff file into memory
 def averageStackCPU(path):
     metadata = MetaData(path[:-4]+'.meta')
     duration = metadata.acqDuration_s
@@ -85,13 +86,14 @@ def averageStackCPU(path):
     
 
     # Read image data and rechunk
-    with imread(path, aszarr=True) as zarr_store:
+    with tifffile.imread(path, aszarr=True) as zarr_store:
         imagedata = da.from_zarr(zarr_store)
+        
 
 
         # Ensure the data is rechunked properly
         imagedata = imagedata.rechunk((frameNumber, ydim, xdim))
-
+        
         z_slices = imagedata.shape[0] // frameNumber
         remaining_frames = imagedata.shape[0] % frameNumber
        
@@ -101,18 +103,20 @@ def averageStackCPU(path):
         # Reshape the complete slices data
         complete_slices_reshaped = complete_slices_data.reshape((z_slices, frameNumber, ydim, xdim))
         avg_complete_slices = da.mean(complete_slices_reshaped, axis=1)
-
+        
         # Average the remaining data
         avg_remaining = da.mean(remaining_data, axis=0)
         avg_remaining = avg_remaining[None, ...]  # Add an additional dimension to match the shape of avg_complete_slices
+       
 
         # Concatenate the results
         final_avg_stack = da.concatenate([avg_complete_slices, avg_remaining], axis=0)
+        
 
    
         # Compute the result and save it
         final_avg_stack_result = final_avg_stack.compute()
-        imwrite('averageCPU_' + path, final_avg_stack_result)
+        tifffile.imwrite('averageCPU_' + os.path.basename(path), final_avg_stack_result)
 
 
 def averageStack(path):
