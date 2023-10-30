@@ -5,10 +5,11 @@ import scipy.io
 import h5py
 
 
-import utils.trace_pixel
-import utils.trace
-import subclasses.metadata
-import utils.file_header
+from utils.trace_pixel import TracePixel
+from utils.trace import Trace
+from subclasses.metadata import MetaData
+from utils.file_header import load_file_header_v2
+from datafile import Datafile
 
 
 
