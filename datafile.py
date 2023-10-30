@@ -4,8 +4,12 @@ import mmap
 import scipy.io
 import h5py
 
-from .subclasses.metadata import MetaData
-from .utils.file_header import load_file_header_v2
+#from .subclasses.metadata import MetaData
+#from .utils.file_header import load_file_header_v2 -> This is relative path and it works on how you set up but I just rewrite it
+
+import subclasses.metadata
+import utils.file_header
+
 
 class DataFile():
 
