@@ -2,6 +2,8 @@ import numpy as np
 from .trace_pixel import TracePixel
 
 
+
+
 class Trace:
     def __init__(self, hDataFile, zIdx=1, chIdx=1):
         self.hDataFile = hDataFile

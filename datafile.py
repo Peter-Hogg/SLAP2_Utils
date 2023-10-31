@@ -4,8 +4,11 @@ import mmap
 import scipy.io
 import h5py
 
-from .subclasses.metadata import MetaData
-from .utils.file_header import load_file_header_v2
+from subclasses.metadata import MetaData
+from utils.file_header import load_file_header_v2 
+
+
+
 
 class DataFile():
 
@@ -100,8 +103,11 @@ class DataFile():
 
 
         # May need to update this conditional in the future
-        if not 'referenceTimestamp' in list(header.keys()):
-            header.referenceTimestamp = np.uint64(0)
+        #if not 'referenceTimestamp' in list(header.keys()):
+        #    header.referenceTimestamp = np.uint64(0)
+        #    first_line_header = self.get_line_header(1, 1)
+        #    self.header.referenceTimestamp = first_line_header.timestamp
+        return header
             first_line_header = obj.get_line_header(1, 1)
             obj.header.referenceTimestamp = first_line_header.timestamp
         return header
