@@ -90,8 +90,7 @@ def translate_channel_mask(header):
 
 def translate_reference_timestamp(header):
     print(header)
-    print(header['referenceTimestamp_lower'])
-    print(header['referenceTimestamp_upper'])
+
 
     
     if 'referenceTimestamp_lower' in header and 'referenceTimestamp_upper' in header:
