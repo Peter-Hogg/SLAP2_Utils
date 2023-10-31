@@ -1,5 +1,5 @@
 import numpy as np
-from trace_pixel import TracePixel
+from .trace_pixel import TracePixel
 
 
 class Trace:
