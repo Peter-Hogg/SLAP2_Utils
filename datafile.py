@@ -4,8 +4,8 @@ import mmap
 import scipy.io
 import h5py
 
-from subclasses.metadata import MetaData
-from utils.file_header import load_file_header_v2 
+from .subclasses.metadata import MetaData
+from .utils.file_header import load_file_header_v2 
 
 
 
@@ -23,19 +23,23 @@ class DataFile():
         self.StreamId = None
         self.header = None
         self.lineHeaderIdxs = None
+        self.fastZs =  None
+        self.zPixelReplacementMaps = None
+        self.lineNumSuperPixels = None
+
         self._load_file()
-        
+
         
         """#Attributes to fill in
         numCycles
         lineHeaderIdxs;
         lineDataStartIdxs;
         lineDataNumElements;
-        fastZs
+        #fastZs
         lineSuperPixelIDs
         lineSuperPixelZIdxs
-        lineNumSuperPixels
-        zPixelReplacementMaps
+        #lineNumSuperPixels
+        #zPixelReplacementMaps
         zPixelReplacementMapsNonRedundant
         lineFastZIdxs
         totalNumLines
@@ -57,8 +61,25 @@ class DataFile():
             raise FileNotFoundError('Metadata file not found.')
         self.metaData = MetaData(self.metaDataFileName)
         print('MetaData Loaded')
+
+        def load_parse_plan(self, metaData):   
+            def filter_z_pixel_replacement_maps(z_maps):
+                # Using list comprehension for simplified logic
+                return [list(filter(lambda x: x[0] != x[1], map_)) for map_ in z_maps]
+            
         
+            self.fastZs = metaData.AcquisitionContainer.ParsePlan['zs'][:]
+            #self.lineSuperPixelIDs = [entry for entry in metaData.AcquisitionContainer.ParsePlan['acqParsePlan']]
+            #self.lineSuperPixelZIdxs = [entry['sliceIdx'] for entry in metaData.AcquisitionContainer.ParsePlan['acqParsePlan']]
+            self.zPixelReplacementMaps = metaData.AcquisitionContainer.ParsePlan['pixelReplacementMaps']
+            #self.zPixelReplacementMapsNonRedundant = filter_z_pixel_replacement_maps(self.zPixelReplacementMaps)
+            #Using list comprehension for simplified logic
+            #self.lineNumSuperPixels = [len(ids) for ids in self.lineSuperPixelIDs]
+            #self.lineFastZIdxs = [idxs[0] + 1 if idxs else 0 for idxs in self.lineSuperPixelZIdxs]
         
+        # Add additional attributes from the MetaData file
+        load_parse_plan(self, self.metaData)
+
         if not os.path.isfile(self.datFileName):
             raise FileNotFoundError('Data file not found.')
         self.rawData = np.memmap(self.filename, dtype='uint32')
@@ -108,6 +129,6 @@ class DataFile():
         #    first_line_header = self.get_line_header(1, 1)
         #    self.header.referenceTimestamp = first_line_header.timestamp
         return header
-            first_line_header = obj.get_line_header(1, 1)
-            obj.header.referenceTimestamp = first_line_header.timestamp
+        first_line_header = obj.get_line_header(1, 1)
+        obj.header.referenceTimestamp = first_line_header.timestamp
         return header

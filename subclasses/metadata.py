@@ -6,7 +6,7 @@ from .acquisitionContainer import AcquisitionContainer
 class MetaData():
     def __init__(self, metadatafile):
         self.metadatafile = metadatafile
-        self.AcquistionContainter = None
+        self.AcquisitionContainer = None
         self.acqDurationCycles = ''
         self.acqDuration_s = ''
         self.acqStartTimeReference= ''
@@ -35,4 +35,4 @@ class MetaData():
                     metaData[_key] = hdf_file[_key]
                     
                 
-                self.AcquistionContainter = AcquisitionContainer(self.metadatafile)
+                self.AcquisitionContainer = AcquisitionContainer(self.metadatafile)

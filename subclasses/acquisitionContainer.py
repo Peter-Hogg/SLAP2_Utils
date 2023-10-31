@@ -37,4 +37,4 @@ class  AcquisitionContainer():
             
             _ref = hdf_file['AcquisitionContainer']['ParsePlan']['pixelReplacementMaps'][:][0][0]
             self.ParsePlan['pixelReplacementMaps'] = hdf_file[_ref][:]
-            self.ParsePlan['acqParsePlan'] = acqParsePlan
+            self.ParsePlan['acqParsePlan'] = acqParsePlan['acqParsePlan']

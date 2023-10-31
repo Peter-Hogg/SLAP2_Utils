@@ -5,8 +5,8 @@ from .trace_pixel import TracePixel
 
 
 class Trace:
-    def __init__(self, hDataFile, zIdx=1, chIdx=1):
-        self.hDataFile = hDataFile
+    def __init__(self, dataFile, zIdx=0, chIdx=0):
+        self.dataFile = dataFile
         self.zIdx = zIdx
         self.chIdx = chIdx
         self.TracePixels = []
@@ -17,34 +17,31 @@ class Trace:
         return [pixel.superPixelId for pixel in self.TracePixels]
 
     def setPixelIdxs(self, rasterPixels=None, integrationPixels=None):
-        def checkMapDims(map):
-            dmdPixelsPerRow = self.hDataFile.header['dmdPixelsPerRow']
-            dmdPixelsPerColumn = self.hDataFile.header['dmdPixelsPerColumn']
+        if isinstance(rasterPixels, np.ndarray) and np.issubdtype(rasterPixels.dtype, np.bool_):
+            rasterPixels = self.checkMapDims(rasterPixels)
+            rasterPixels = np.where(rasterPixels)[0]
 
-            if dmdPixelsPerColumn != dmdPixelsPerRow:
-                if map.shape == (dmdPixelsPerColumn, dmdPixelsPerRow):
-                    map = map.T
+        if isinstance(integrationPixels, np.ndarray) and np.issubdtype(integrationPixels.dtype, np.bool_):
+            integrationPixels = self.checkMapDims(integrationPixels)
+            integrationPixels = np.where(integrationPixels)[0] + len(integrationPixels)
 
-            assert map.shape == (dmdPixelsPerRow, dmdPixelsPerColumn), \
-                f"Incorrect map size. Map needs to be size [{dmdPixelsPerRow},{dmdPixelsPerColumn}]"
-
-            return map
-
-        if rasterPixels is not None and isinstance(rasterPixels, bool):
-            rasterPixels = checkMapDims(rasterPixels)
-            rasterPixels = np.where(rasterPixels)
-
-        if integrationPixels is not None and isinstance(integrationPixels, bool):
-            integrationPixels = checkMapDims(integrationPixels)
-            integrationPixels = np.where(integrationPixels) + np.prod(integrationPixels.shape)
-
-        np.testing.assert_equal(isinstance(rasterPixels, (int, np.integer)), True, err_msg='rasterPixels')
-        np.testing.assert_equal(isinstance(integrationPixels, (int, np.integer)), True, err_msg='integrationPixels')
-
-        pixelIdxs_ = np.concatenate((rasterPixels.flatten(), integrationPixels.flatten()), axis=None).astype(np.uint32)
+        pixelIdxs_ = np.uint32(np.concatenate((rasterPixels, integrationPixels), axis=None))
 
         self.TracePixels = self.getTracePixels(pixelIdxs_)
         self.pixelIdxs = pixelIdxs_
+
+    def checkMapDims(self, map_):
+        dmdPixelsPerRow = self.dataFile.header['dmdPixelsPerRow']
+        dmdPixelsPerColumn = self.dataFile.header['dmdPixelsPerColumn']
+
+        print(map_.shape, (dmdPixelsPerRow, dmdPixelsPerColumn))
+    
+        if dmdPixelsPerColumn != dmdPixelsPerRow and map_.shape == (dmdPixelsPerColumn, dmdPixelsPerRow):
+            map_ = map_.T
+
+        assert map_.shape == (dmdPixelsPerRow, dmdPixelsPerColumn), \
+            f"Incorrect map size. Map needs to be size [{dmdPixelsPerRow},{dmdPixelsPerColumn}]"
+        return map_
 
     def loadData(self):
         # probably unneeded. Trace Pixels load on process.
@@ -65,19 +62,19 @@ class Trace:
 
     def getTracePixels(self, pixelIdxs):
         pixelIDs = np.unique(pixelIdxs) - 1
-        dmdNumPix = self.hDataFile.header['dmdPixelsPerRow'] * self.hDataFile.header['dmdPixelsPerColumn']
+        dmdNumPix = self.dataFile.header['dmdPixelsPerRow'] * self.dataFile.header['dmdPixelsPerColumn']
 
-        pixelReplacementMap = self.hDataFile.zPixelReplacementMaps[self.zIdx]
-        intMask = pixelReplacementMap[:, 1] >= dmdNumPix
-        pixelReplacementMap[intMask, 0] = pixelReplacementMap[intMask, 0] + dmdNumPix
+        pixelReplacementMap = self.dataFile.zPixelReplacementMaps[self.zIdx]
+        intMask = pixelReplacementMap[:] >= dmdNumPix
+        pixelReplacementMap[intMask] = pixelReplacementMap[intMask] + dmdNumPix
 
-        sortIdxs = np.argsort(pixelReplacementMap[:, 0])
-        pixelReplacementMap = pixelReplacementMap[sortIdxs, :]
-        idxs = np.where(np.isin(pixelIDs, pixelReplacementMap[:, 0]))[0]
+        sortIdxs = np.argsort(pixelReplacementMap[:])
+        pixelReplacementMap = pixelReplacementMap[sortIdxs]
+        idxs = np.where(np.isin(pixelIDs, pixelReplacementMap[:]))[0]
         validMask = idxs > 0
 
         idxs = idxs[validMask]
-        validSuperPixelIDs = pixelReplacementMap[idxs, 1]
+        validSuperPixelIDs = pixelReplacementMap[idxs]
         validCounts, validSuperPixelIDs = np.unique(validSuperPixelIDs, return_counts=True)
 
         existingSuperPixelIDs = [pixel.superPixelId for pixel in self.TracePixels]
@@ -89,11 +86,11 @@ class Trace:
         ExistingTracePixels = [self.TracePixels[i] for i in ib]
 
         NewTracePixel = TracePixel()
-        NewTracePixel.fileName = self.hDataFile.filename
-        NewTracePixel.bytesPerCycle = self.hDataFile.header['bytesPerCycle']
-        NewTracePixel.numCycles = self.hDataFile.numCycles
-        NewTracePixel.firstCycleOffsetBytes = self.hDataFile.header['firstCycleOffsetBytes']
-        NewTracePixel.linesPerCycle = self.hDataFile.header['linesPerCycle']
+        NewTracePixel.fileName = self.dataFile.filename
+        NewTracePixel.bytesPerCycle = self.dataFile.header['bytesPerCycle']
+        NewTracePixel.numCycles = self.dataFile.numCycles
+        NewTracePixel.firstCycleOffsetBytes = self.dataFile.header['firstCycleOffsetBytes']
+        NewTracePixel.linesPerCycle = self.dataFile.header['linesPerCycle']
 
         NewTracePixels = [NewTracePixel.copy() for _ in range(len(validSuperPixelIDs))]
 
@@ -106,17 +103,17 @@ class Trace:
             NewTracePixels[idx].superPixelNumPixels = superPixelNumPixels[idx]
             NewTracePixels[idx].superPixelNumPixelsSelected = validCounts[idx]
 
-        for lineIdx, lineZIdx in enumerate(self.hDataFile.lineFastZIdxs):
+        for lineIdx, lineZIdx in enumerate(self.dataFile.lineFastZIdxs):
             if lineZIdx != self.zIdx:
                 continue
 
-            lineSuperPixelIDs = self.hDataFile.lineSuperPixelIDs[lineIdx]
+            lineSuperPixelIDs = self.dataFile.lineSuperPixelIDs[lineIdx]
             mask = np.isin(validSuperPixelIDs, lineSuperPixelIDs)
 
             byteOffsets = (np.where(mask)[0]) * 2
-            byteOffsets += self.hDataFile.lineDataNumElements[lineIdx] * 2 * (self.chIdx - 1)
-            byteOffsets += self.hDataFile.lineDataStartIdxs[lineIdx] * 2
-            byteOffsets -= self.hDataFile.header['firstCycleOffsetBytes']
+            byteOffsets += self.dataFile.lineDataNumElements[lineIdx] * 2 * (self.chIdx - 1)
+            byteOffsets += self.dataFile.lineDataStartIdxs[lineIdx] * 2
+            byteOffsets -= self.dataFile.header['firstCycleOffsetBytes']
 
             pixIdxs = np.where(mask)
 
