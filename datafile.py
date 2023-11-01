@@ -26,12 +26,17 @@ class DataFile():
         self.fastZs =  None
         self.zPixelReplacementMaps = None
         self.lineNumSuperPixels = None
+        self.lineSuperPixelIDs = []
+        self.lineSuperPixelZIdxs = []
+        self.lineDataNumElements = []
+        self.lineDataStartIdxs = []
+        self.num_cycles=0
 
         self._load_file()
-
+        
         
         """#Attributes to fill in
-        numCycles
+        num_cycles
         lineHeaderIdxs;
         lineDataStartIdxs;
         lineDataNumElements;
@@ -67,15 +72,24 @@ class DataFile():
                 # Using list comprehension for simplified logic
                 return [list(filter(lambda x: x[0] != x[1], map_)) for map_ in z_maps]
             
-        
             self.fastZs = metaData.AcquisitionContainer.ParsePlan['zs'][:]
-            #self.lineSuperPixelIDs = [entry for entry in metaData.AcquisitionContainer.ParsePlan['acqParsePlan']]
-            #self.lineSuperPixelZIdxs = [entry['sliceIdx'] for entry in metaData.AcquisitionContainer.ParsePlan['acqParsePlan']]
+            self.lineSuperPixelZIdxs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan'][6:9]
+            self.lineSuperPixelIDs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan'][9:13]
+            #?
             self.zPixelReplacementMaps = metaData.AcquisitionContainer.ParsePlan['pixelReplacementMaps']
             #self.zPixelReplacementMapsNonRedundant = filter_z_pixel_replacement_maps(self.zPixelReplacementMaps)
             #Using list comprehension for simplified logic
-            #self.lineNumSuperPixels = [len(ids) for ids in self.lineSuperPixelIDs]
-            #self.lineFastZIdxs = [idxs[0] + 1 if idxs else 0 for idxs in self.lineSuperPixelZIdxs]
+            self.lineNumSuperPixels = [len(ids) for ids in self.lineSuperPixelIDs]
+            self.lineFastZIdxs = np.zeros(len(self.lineSuperPixelZIdxs))
+            for lineIdx in range(len(self.lineSuperPixelZIdxs)):
+                lineZIdxs_=self.lineSuperPixelZIdxs[lineIdx]
+           
+                if len(lineZIdxs_) != 1:
+                    self.lineFastZIdxs[lineIdx] = 0
+                else:
+                    self.lineFastZIdxs[lineIdx] = lineZIdxs_[0][0] + 1
+            #?
+            print(self.lineFastZIdxs)
         
         # Add additional attributes from the MetaData file
         load_parse_plan(self, self.metaData)
@@ -99,7 +113,7 @@ class DataFile():
         file_format_version = raw_data[1]
         assert file_format_version <= 2, 'Unknown format version'
         if file_format_version == 2:
-            header = load_file_header_v2(self, raw_data)
+            header, self.num_cycles = load_file_header_v2(self, raw_data)
         else:
             raise ValueError(f'Unknown file format version: {file_format_version}')
 
@@ -111,16 +125,19 @@ class DataFile():
         line_idxs = np.zeros(int(header['linesPerCycle']), dtype=int)
         line_size_bytes = np.zeros(int(header['linesPerCycle']), dtype=np.uint32)
         line_idxs[0] = header['firstCycleOffsetBytes'] // 2 + 1
-
-        line_size_bytes[0] = np.frombuffer(rawData[line_idxs[0]:line_idxs[0] + 2], dtype=np.uint32)[0]
-
+        line_size_bytes[0] = raw_data[line_idxs[0]-1]
         for idx in range(1, int(header['linesPerCycle'])):
             line_idxs[idx] = line_idxs[idx - 1] + line_size_bytes[idx - 1] // 2
-            line_size_bytes[idx] = np.frombuffer(rawData[line_idxs[idx]:line_idxs[idx] + 2], dtype=np.uint32)[0]
+            line_size_bytes[idx] = raw_data[line_idxs[idx]-1]
+
 
         line_header_idxs = line_idxs
-        line_data_start_idxs = line_idxs + header['lineHeaderSizeBytes'] // 2
-        line_data_num_elements = (line_size_bytes - header['lineHeaderSizeBytes']) // 2
+        self.lineDataStartIdxs = line_idxs + header['lineHeaderSizeBytes'] // 2
+        self.lineDataNumElements = (line_size_bytes - header['lineHeaderSizeBytes']) // 2
+        self.lineDataNumElements = [int(x) for x in self.lineDataNumElements]
+        self.lineDataStartIdxs = [int(x) for x in self.lineDataStartIdxs] 
+        print(self.lineDataNumElements)
+        print(self.lineDataStartIdxs)
 
 
         # May need to update this conditional in the future
@@ -128,7 +145,7 @@ class DataFile():
         #    header.referenceTimestamp = np.uint64(0)
         #    first_line_header = self.get_line_header(1, 1)
         #    self.header.referenceTimestamp = first_line_header.timestamp
-        return header
-        first_line_header = obj.get_line_header(1, 1)
-        obj.header.referenceTimestamp = first_line_header.timestamp
+        
+        #first_line_header = obj.get_line_header(1, 1)
+        #obj.header.referenceTimestamp = first_line_header.timestamp
         return header

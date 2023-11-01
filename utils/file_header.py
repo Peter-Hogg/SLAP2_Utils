@@ -41,9 +41,10 @@ def load_file_header_v2(obj, rawUint32):
 
     file_size_bytes = len(rawUint32) * 4
     num_cycles = int((file_size_bytes - header_['firstCycleOffsetBytes']) / header_['bytesPerCycle'])
+    print(num_cycles)
     total_num_lines = num_cycles * header['linesPerCycle']
     num_channels = float(header['numChannels'])
-    return header
+    return header, num_cycles
 
 def translate_field_value_pairs(field_value_pairs):
     file_header_fields = [

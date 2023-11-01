@@ -34,12 +34,18 @@ class TracePixel:
         if loadedFilename != fileName_:
             hMemmap = np.memmap(fileName_, dtype='int16', mode='r')
             loadedFilename = fileName_
-
         cycleIdxs = np.arange(0, self.numCycles, dtype=np.uint64)
         cycleByteOffsets = self.firstCycleOffsetBytes + cycleIdxs * self.bytesPerCycle
-        cycleSampleOffsets = cycleByteOffsets // 2
 
-        sampleOffsets = np.array(self.byteOffsets, dtype=np.uint64) // 2
+      # good
+        cycleSampleOffsets = [int (x // 2) for x in cycleByteOffsets] 
+        print(cycleSampleOffsets)
+      
+  
+        sampleOffsets = [int (x // 2) for x in self.byteOffsets] 
+        print(sampleOffsets)
+        sampleOffsets = np.uint64(sampleOffsets.flatten()) + cycleSampleOffsets
+
         sampleOffsets = sampleOffsets[:, np.newaxis] + cycleSampleOffsets
         data_ = hMemmap[sampleOffsets]
         data_[data_ == np.iinfo(np.int16).min] = 0

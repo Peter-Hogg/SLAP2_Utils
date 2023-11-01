@@ -14,7 +14,7 @@ class slapROI():
             self.roiType = 'ArbitraryRoi'
         
         self.shapeData = h5file[roiRef]['shapeData'][:].copy()
-        if h5file[roiRef]['imagingMode']['ClassName'][0][0] ==1:
+        if h5file[roiRef]['imagingMode']['ClassName'][0][0] == 1:
             self.imageMode = "Raster"
         else:
             self.imageMode = 'Integrate'
