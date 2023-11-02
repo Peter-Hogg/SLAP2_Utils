@@ -67,10 +67,10 @@ class Trace:
 
         expectedKernel = np.ones(expectedWindowWidth_lines, dtype='float32')
 
-        if self.dataFile.header['linesPerCycle'] == 0 or self.dataFile.num_cycles == 0:
+        if self.dataFile.header['linesPerCycle'] == 0 or self.dataFile.numCycles == 0:
             numLines = 0
         else:
-            numLines = int(self.dataFile.header['linesPerCycle'] * self.dataFile.num_cycles)
+            numLines = int(self.dataFile.header['linesPerCycle'] * self.dataFile.numCycles)
 
 
 
@@ -79,8 +79,9 @@ class Trace:
         sumExpectedWeighted = np.zeros(numLines, dtype='float32')
 
         for tracePix in self.TracePixels:
-            lineData = np.zeros((int(self.dataFile.header['linesPerCycle']), int(self.dataFile.num_cycles)), dtype='float32')
-            sampled = np.zeros((int(self.dataFile.header['linesPerCycle']), int(self.dataFile.num_cycles)), dtype='float32')
+            lineData = np.zeros((int(self.dataFile.header['linesPerCycle']), int(self.dataFile.numCycles)), dtype='float32')
+            sampled = np.zeros((int(self.dataFile.header['linesPerCycle']), int(self.dataFile.numCycles)), dtype='float32')
+
             lineData[tracePix.lineIdxs,:] = np.array(tracePix.data)
             sampled[tracePix.lineIdxs, :] = 1
             lineData = lineData.flatten('F')
@@ -88,6 +89,9 @@ class Trace:
 
 
             spatialWeight = tracePix.superPixelNumPixelsSelected / tracePix.superPixelNumPixels
+            print(lineData, '\n',
+             tempKernel,'\n',
+              spatialWeight)
             weightedData = np.convolve(lineData, tempKernel * spatialWeight, mode='same')
             tempWeights = np.convolve(sampled, tempKernel, mode='same')
             npad = len(expectedKernel) - 1
@@ -160,8 +164,7 @@ class Trace:
         NewTracePixel.fileName = self.dataFile.filename
         NewTracePixel.bytesPerCycle = self.dataFile.header['bytesPerCycle']
         NewTracePixel.firstCycleOffsetBytes = self.dataFile.header['firstCycleOffsetBytes']
-        NewTracePixel.numCycles = self.dataFile.num_cycles
-
+        NewTracePixel.numCycles = self.dataFile.numCycles
         NewTracePixel.linesPerCycle = self.dataFile.header['linesPerCycle']
   
 

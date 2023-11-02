@@ -30,7 +30,7 @@ class DataFile():
         self.lineSuperPixelZIdxs = []
         self.lineDataNumElements = []
         self.lineDataStartIdxs = []
-        self.num_cycles=0
+        self.numCycles=0
 
         self._load_file()
         
@@ -41,8 +41,8 @@ class DataFile():
         lineDataStartIdxs;
         lineDataNumElements;
         #fastZs
-        lineSuperPixelIDs
-        lineSuperPixelZIdxs
+        #lineSuperPixelIDs
+        #lineSuperPixelZIdxs
         #lineNumSuperPixels
         #zPixelReplacementMaps
         zPixelReplacementMapsNonRedundant
@@ -72,11 +72,13 @@ class DataFile():
                 return [list(filter(lambda x: x[0] != x[1], map_)) for map_ in z_maps]
             
             self.fastZs = metaData.AcquisitionContainer.ParsePlan['zs'][:]
-            self.lineSuperPixelZIdxs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan'][6:9]
-            self.lineSuperPixelIDs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan'][9:13]
+            #Check if it breaks
+            self.lineSuperPixelZIdxs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['sliceIdx']
+            self.lineSuperPixelIDs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['superPixelID']
             #?
             self.zPixelReplacementMaps = metaData.AcquisitionContainer.ParsePlan['pixelReplacementMaps']
             #self.zPixelReplacementMapsNonRedundant = filter_z_pixel_replacement_maps(self.zPixelReplacementMaps)
+            
             #Using list comprehension for simplified logic
             self.lineNumSuperPixels = [len(ids) for ids in self.lineSuperPixelIDs]
             self.lineFastZIdxs = np.zeros(len(self.lineSuperPixelZIdxs))

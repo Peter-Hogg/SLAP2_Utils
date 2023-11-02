@@ -28,10 +28,11 @@ class  AcquisitionContainer():
                     self.ParsePlan[_key] = hdf_file['AcquisitionContainer']['ParsePlan'][_key][:]
                 except:
                     if _key == 'acqParsePlan':
-                        _data = []
+                        _data = {}
                         for _subkey in hdf_file['AcquisitionContainer']['ParsePlan']['acqParsePlan'].keys():
+                            _data[_subkey] = []
                             for _ref in (list(hdf_file['AcquisitionContainer']['ParsePlan']['acqParsePlan'][_subkey][:])):
-                                _data.append(hdf_file[_ref[0]][:])
+                                _data[_subkey].append(hdf_file[_ref[0]][:])
                             acqParsePlan[_key] = _data
 
             

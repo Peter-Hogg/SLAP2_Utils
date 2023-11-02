@@ -39,7 +39,6 @@ class TracePixel:
 
       # good
         cycleSampleOffsets = [int (x // 2) for x in cycleByteOffsets] 
-        
         sampleOffsets = [int (x // 2) for x in self.byteOffsets] 
         
         _sampleOffsets = np.zeros((len(self.byteOffsets), len(cycleSampleOffsets)), dtype='uint64')

@@ -84,13 +84,11 @@ def translate_channel_mask(header):
     assert 'channelMask' in header
     channels = [bit for bit in range(32) if (int(header['channelMask']) & (1 << bit)) != 0]
     header['channels'] = channels
-
     assert 'numChannels' in header
     assert len(channels) == header['numChannels'], 'Data integrity error: header field ''numChannels'' does not agree with header field ''channelMask'''
     return header
 
 def translate_reference_timestamp(header):
-
     if 'referenceTimestamp_lower' in header and 'referenceTimestamp_upper' in header:
         reference_timestamp_lower = header['referenceTimestamp_lower']
         reference_timestamp_upper = int(header['referenceTimestamp_upper']) << 32
