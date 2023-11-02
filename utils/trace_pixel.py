@@ -39,17 +39,25 @@ class TracePixel:
 
       # good
         cycleSampleOffsets = [int (x // 2) for x in cycleByteOffsets] 
-        print(cycleSampleOffsets)
-      
-  
+        
         sampleOffsets = [int (x // 2) for x in self.byteOffsets] 
-        print(sampleOffsets)
-        sampleOffsets = np.uint64(sampleOffsets.flatten()) + cycleSampleOffsets
+        
+        _sampleOffsets = np.zeros((len(self.byteOffsets), len(cycleSampleOffsets)), dtype='uint64')
+        #sampleOffsets = np.uint64(np.array(sampleOffsets).flatten()) + cycleSampleOffsets
+        
+        for i in range(len(self.byteOffsets)):
+            
+            _sampleOffsets[i,:] = sampleOffsets[i] + np.array(cycleSampleOffsets)
+        
+        sampleOffsets = _sampleOffsets
 
-        sampleOffsets = sampleOffsets[:, np.newaxis] + cycleSampleOffsets
-        data_ = hMemmap[sampleOffsets]
-        data_[data_ == np.iinfo(np.int16).min] = 0
+        sampleOffsets = sampleOffsets.astype('int64')
+        #print(hMemmap.dtype)
+        data_ = []
+        for i in range(sampleOffsets.shape[0]):
+            data_.append(np.take(hMemmap,(sampleOffsets[i,:]-1),0))
         self.data = data_
+
         self.isLoaded = True
 
     def process(self, windowWidth_lines, expectedWindowWidth_lines):

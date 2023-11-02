@@ -59,7 +59,6 @@ class DataFile():
         n_base = os.path.splitext(filename)[0].replace('-TRIAL', '', -1).strip()
 
         self.metaDataFileName = os.path.join(base_dir, n_base + '.meta')
-        print(self.metaDataFileName)
         self.datFileName = os.path.join(base_dir, filename)
 
         if not os.path.isfile(self.metaDataFileName):
@@ -89,7 +88,6 @@ class DataFile():
                 else:
                     self.lineFastZIdxs[lineIdx] = lineZIdxs_[0][0] + 1
             #?
-            print(self.lineFastZIdxs)
         
         # Add additional attributes from the MetaData file
         load_parse_plan(self, self.metaData)
@@ -136,8 +134,7 @@ class DataFile():
         self.lineDataNumElements = (line_size_bytes - header['lineHeaderSizeBytes']) // 2
         self.lineDataNumElements = [int(x) for x in self.lineDataNumElements]
         self.lineDataStartIdxs = [int(x) for x in self.lineDataStartIdxs] 
-        print(self.lineDataNumElements)
-        print(self.lineDataStartIdxs)
+
 
 
         # May need to update this conditional in the future

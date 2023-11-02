@@ -41,7 +41,7 @@ def load_file_header_v2(obj, rawUint32):
 
     file_size_bytes = len(rawUint32) * 4
     num_cycles = int((file_size_bytes - header_['firstCycleOffsetBytes']) / header_['bytesPerCycle'])
-    print(num_cycles)
+    
     total_num_lines = num_cycles * header['linesPerCycle']
     num_channels = float(header['numChannels'])
     return header, num_cycles
@@ -90,11 +90,7 @@ def translate_channel_mask(header):
     return header
 
 def translate_reference_timestamp(header):
-    print(header)
 
-
-
-    
     if 'referenceTimestamp_lower' in header and 'referenceTimestamp_upper' in header:
         reference_timestamp_lower = header['referenceTimestamp_lower']
         reference_timestamp_upper = int(header['referenceTimestamp_upper']) << 32

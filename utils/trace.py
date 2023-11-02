@@ -45,7 +45,6 @@ class Trace:
         dmdPixelsPerRow = self.dataFile.header['dmdPixelsPerRow']
         dmdPixelsPerColumn = self.dataFile.header['dmdPixelsPerColumn']
 
-        print(map_.shape, (dmdPixelsPerRow, dmdPixelsPerColumn))
     
         if dmdPixelsPerColumn != dmdPixelsPerRow and map_.shape == (dmdPixelsPerColumn, dmdPixelsPerRow):
             map_ = map_.T
@@ -59,47 +58,56 @@ class Trace:
         self.TracePixels = self.TracePixels.load()
 
     def process(self, windowWidth_lines, expectedWindowWidth_lines):
-        for i in self.TracePixels:
-            i.load()
+        for i,j in enumerate(self.TracePixels):
+            j.load()
 
-        print(self.TracePixels)
 
         tempKernel = np.exp(-np.abs(np.arange(-4*windowWidth_lines, 4*windowWidth_lines+1) / windowWidth_lines))
         tempKernel = tempKernel.astype('float32')
 
         expectedKernel = np.ones(expectedWindowWidth_lines, dtype='float32')
 
-        if self.linesPerCycle == 0 or self.numCycles == 0:
+        if self.dataFile.header['linesPerCycle'] == 0 or self.dataFile.num_cycles == 0:
             numLines = 0
         else:
-            numLines = self.linesPerCycle * self.numCycles
+            numLines = int(self.dataFile.header['linesPerCycle'] * self.dataFile.num_cycles)
+
+
 
         sumDataWeighted = np.zeros(numLines, dtype='float32')
         sumExpected = np.zeros(numLines, dtype='float32')
         sumExpectedWeighted = np.zeros(numLines, dtype='float32')
 
-        lineData = np.zeros((self.linesPerCycle, self.numCycles), dtype='float32')
-        sampled = np.zeros((self.linesPerCycle, self.numCycles), dtype='float32')
+        for tracePix in self.TracePixels:
+            lineData = np.zeros((int(self.dataFile.header['linesPerCycle']), int(self.dataFile.num_cycles)), dtype='float32')
+            sampled = np.zeros((int(self.dataFile.header['linesPerCycle']), int(self.dataFile.num_cycles)), dtype='float32')
+            lineData[tracePix.lineIdxs,:] = np.array(tracePix.data)
+            sampled[tracePix.lineIdxs, :] = 1
+            lineData = lineData.flatten('F')
+            sampled = sampled.flatten('F')
 
-        lineData[self.lineIdxs, :] = self.data
-        sampled[self.lineIdxs, :] = 1
 
-        lineData = lineData.flatten()
-        sampled = sampled.flatten()
+            spatialWeight = tracePix.superPixelNumPixelsSelected / tracePix.superPixelNumPixels
+            weightedData = np.convolve(lineData, tempKernel * spatialWeight, mode='same')
+            tempWeights = np.convolve(sampled, tempKernel, mode='same')
+            npad = len(expectedKernel) - 1
 
-        spatialWeight = self.superPixelNumPixelsSelected / self.superPixelNumPixels
-        weightedData = np.convolve(lineData, tempKernel * spatialWeight, mode='same')
-        tempWeights = np.convolve(sampled, tempKernel, mode='same')
+            
+            expected = np.convolve(lineData, expectedKernel, mode='full')
+            first = npad - npad//2
+            expected=expected[first:first+len(lineData)]
+            #np.set_printoptions(threshold=np.inf)            
 
-        expected = np.convolve(lineData, expectedKernel, mode='same')
-        expectedN = np.convolve(sampled, expectedKernel, mode='same')
-        expected = expected / (expectedN + np.finfo(float).eps)
+            npad1 = len(expectedKernel) - 1
+            expectedN = np.convolve(sampled, expectedKernel, mode='full')
+            first2 = npad1 - npad1//2 
+            expectedN=expectedN[first2:first2+len(sampled)]
 
-        expectedWeighted = expected * tempWeights
-
-        sumDataWeighted += weightedData
-        sumExpected += expected
-        sumExpectedWeighted += expectedWeighted
+            expected = expected / (expectedN + np.finfo(float).eps)
+            expectedWeighted = expected * tempWeights
+            sumDataWeighted += weightedData
+            sumExpected += expected
+            sumExpectedWeighted += expectedWeighted
 
         trace = sumDataWeighted / (sumExpectedWeighted + np.finfo(float).eps) * sumExpected
         return trace, sumDataWeighted, sumExpected, sumExpectedWeighted
@@ -155,6 +163,7 @@ class Trace:
         NewTracePixel.numCycles = self.dataFile.num_cycles
 
         NewTracePixel.linesPerCycle = self.dataFile.header['linesPerCycle']
+  
 
         
         NewTracePixels = [copy.deepcopy(NewTracePixel) for x in range(len(validSuperPixelIDs))]
@@ -176,7 +185,6 @@ class Trace:
             lineZIdx = self.dataFile.lineFastZIdxs[lineIdx]
             if int(lineZIdx) != self.zIdx:
                 continue
-            print("1")
             lineSuperPixelIDs = self.dataFile.lineSuperPixelIDs[lineIdx]
             lineSuperPixelIDs = lineSuperPixelIDs[0]
             # left off, rest is good so far
@@ -198,14 +206,15 @@ class Trace:
             pixIdxs= [int(x) for x in pixIdxs[0]]
 
 
-            for x in pixIdxs:
+            for i, x in enumerate (pixIdxs):
+                
                 NewTracePixels[x].byteOffsets.append(byteOffsets[pixIdxs.index(x)])
-                NewTracePixels[x].lineIdxs=lineIdx
-     
+                NewTracePixels[x].lineIdxs.append(lineIdx)
+                
+                   
             
 
 
-        print(NewTracePixels[0].byteOffsets)
 
  
         for x in ExistingTracePixels:
