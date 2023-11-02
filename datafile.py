@@ -36,7 +36,7 @@ class DataFile():
         
         
         """#Attributes to fill in
-        num_cycles
+        #num_cycles
         lineHeaderIdxs;
         lineDataStartIdxs;
         lineDataNumElements;
@@ -113,7 +113,7 @@ class DataFile():
         file_format_version = raw_data[1]
         assert file_format_version <= 2, 'Unknown format version'
         if file_format_version == 2:
-            header, self.num_cycles = load_file_header_v2(self, raw_data)
+            header, self.numCycles = load_file_header_v2(self, raw_data)
         else:
             raise ValueError(f'Unknown file format version: {file_format_version}')
 

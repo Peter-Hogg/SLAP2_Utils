@@ -89,9 +89,6 @@ class Trace:
 
 
             spatialWeight = tracePix.superPixelNumPixelsSelected / tracePix.superPixelNumPixels
-            print(lineData, '\n',
-             tempKernel,'\n',
-              spatialWeight)
             weightedData = np.convolve(lineData, tempKernel * spatialWeight, mode='same')
             tempWeights = np.convolve(sampled, tempKernel, mode='same')
             npad = len(expectedKernel) - 1
