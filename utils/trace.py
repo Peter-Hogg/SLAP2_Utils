@@ -17,28 +17,23 @@ class Trace:
         return [pixel.superPixelId for pixel in self.TracePixels]
 
     def setPixelIdxs(self, rasterPixels=None, integrationPixels=None):
-        if isinstance(rasterPixels, np.ndarray) and np.issubdtype(rasterPixels.dtype, np.bool_):
+        if ~np.any(rasterPixels):
+            rasterPixels = np.array([])          
+        elif (isinstance(rasterPixels, np.ndarray) and np.issubdtype(rasterPixels.dtype, np.bool_)):
             rasterPixels = self.checkMapDims(rasterPixels)
-            temp_=np.full(int(self.dataFile.header['dmdPixelsPerRow']*self.dataFile.header['dmdPixelsPerColumn']), 1)
-            i=0
-            while i<(self.dataFile.header['dmdPixelsPerRow']*self.dataFile.header['dmdPixelsPerColumn']):
-                temp_[i]=temp_[i]*(i+1)
-                i=i+1
+            rasterPixels = np.where(rasterPixels.ravel('f'))[0]+1
 
-            rasterPixels = temp_
 
-        if isinstance(integrationPixels, np.ndarray) and np.issubdtype(integrationPixels.dtype, np.bool_):
+        if ~np.any(integrationPixels):
+            integrationPixels = np.array([])          
+        elif  (isinstance(integrationPixels, np.ndarray) and np.issubdtype(integrationPixels.dtype, np.bool_)):
             integrationPixels = self.checkMapDims(integrationPixels)
-            temp2=np.full(int(self.dataFile.header['dmdPixelsPerRow']*self.dataFile.header['dmdPixelsPerColumn']), 1)
-            i=0
-            while i<(self.dataFile.header['dmdPixelsPerRow']*self.dataFile.header['dmdPixelsPerColumn']):
-                temp2[i]=temp2[i]*(i+1)+self.dataFile.header['dmdPixelsPerRow']*self.dataFile.header['dmdPixelsPerColumn']
-                i=i+1
-            integrationPixels = temp2
-
-
+            integrationPixels= np.where(integrationPixels.ravel('f'))[0]+int(self.dataFile.header['dmdPixelsPerRow']*self.dataFile.header['dmdPixelsPerColumn'])+1
+        #print(integrationPixels[197, 827])
         pixelIdxs_ = np.uint32(np.concatenate((rasterPixels, integrationPixels), axis=None))
+        print(pixelIdxs_)
         self.TracePixels = self.getTracePixels(pixelIdxs_)
+
         self.pixelIdxs = pixelIdxs_
 
     def checkMapDims(self, map_):
@@ -128,8 +123,10 @@ class Trace:
         for i in range(len(pixelIDs)):
             pixelIDs[i]=pixelIDs[i]-1
         dmdNumPix = self.dataFile.header['dmdPixelsPerRow'] * self.dataFile.header['dmdPixelsPerColumn']
-        
-        pixelReplacementMap = self.dataFile.zPixelReplacementMaps
+
+        pixelReplacementMap = copy.deepcopy(self.dataFile.zPixelReplacementMaps)
+     
+        print(pixelReplacementMap)
         
 
 
@@ -140,20 +137,21 @@ class Trace:
                 pixelReplacementMap[0,j]=pixelReplacementMap[0,j]+dmdNumPix
             j=j+1
         sortIdxs = np.argsort(pixelReplacementMap[0])
-   
        
-        unique, idxs = np.unique(pixelReplacementMap[0], return_counts=True)
-        validSuperPixelIDs = pixelReplacementMap[1]
-        validCounts, validSuperPixelIDs = np.unique(validSuperPixelIDs, return_counts=True)
+        idxs1=ismembc2(pixelIDs,pixelReplacementMap[0])
+        validSuperPixelIDs =pixelReplacementMap[1,idxs1]
+
+        validSuperPixelIDs, validCounts = np.unique(validSuperPixelIDs, return_counts=True)
+
+
+
 
         existingSuperPixelIDs = [pixel.superPixelId for pixel in self.TracePixels]
         C, ia, ib = np.intersect1d(validSuperPixelIDs, existingSuperPixelIDs, return_indices=True)
 
         validSuperPixelIDs = np.delete(validSuperPixelIDs, ia)
         validCounts = np.delete(validCounts, ia)
-        temp3=validSuperPixelIDs
-        validSuperPixelIDs=validCounts
-        validCounts=temp3
+        
   
         ExistingTracePixels = [self.TracePixels[i] for i in ib]
 
@@ -212,9 +210,6 @@ class Trace:
                 NewTracePixels[x].lineIdxs.append(lineIdx)
                 
                    
-            
-
-
 
  
         for x in ExistingTracePixels:
@@ -225,3 +220,28 @@ class Trace:
 
 
 
+def ismembc2(A, B):
+    """
+    Fast membership test for 2D arrays based on sorted order.
+    Returns a boolean array indicating which rows of A are also present in B.
+    Parameters:
+    - A: 2D numpy array to test for membership in B
+    - B: 2D numpy array
+    Returns:
+    - boolean numpy array of shape (A.shape[0],)
+    """
+    # Ensure A and B are numpy arrays
+    A = np.asarray(A)
+    B = np.asarray(B)
+    # Check dimensions
+
+    # Sort rows for both A and B
+    sorted_A = np.sort(A)
+    sorted_B = np.sort(B)
+    # Use numpy's in1d for 1D membership testing
+    # Convert 2D to 1D by viewing in a structured format
+    flag=[]
+    for element in A:
+        flag.append(np.where(B==element)[0][0])
+
+    return flag
