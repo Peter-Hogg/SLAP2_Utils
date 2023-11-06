@@ -37,7 +37,6 @@ class TracePixel:
         cycleIdxs = np.arange(0, self.numCycles, dtype=np.uint64)
         cycleByteOffsets = self.firstCycleOffsetBytes + cycleIdxs * self.bytesPerCycle
 
-      # good
         cycleSampleOffsets = [int (x // 2) for x in cycleByteOffsets] 
         sampleOffsets = [int (x // 2) for x in self.byteOffsets] 
         
@@ -51,7 +50,6 @@ class TracePixel:
         sampleOffsets = _sampleOffsets
 
         sampleOffsets = sampleOffsets.astype('int64')
-        #print(hMemmap.dtype)
         data_ = []
         for i in range(sampleOffsets.shape[0]):
             data_.append(np.take(hMemmap,(sampleOffsets[i,:]-1),0))

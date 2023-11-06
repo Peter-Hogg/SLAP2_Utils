@@ -29,9 +29,7 @@ class Trace:
         elif  (isinstance(integrationPixels, np.ndarray) and np.issubdtype(integrationPixels.dtype, np.bool_)):
             integrationPixels = self.checkMapDims(integrationPixels)
             integrationPixels= np.where(integrationPixels.ravel('f'))[0]+int(self.dataFile.header['dmdPixelsPerRow']*self.dataFile.header['dmdPixelsPerColumn'])+1
-        #print(integrationPixels[197, 827])
         pixelIdxs_ = np.uint32(np.concatenate((rasterPixels, integrationPixels), axis=None))
-        print(pixelIdxs_)
         self.TracePixels = self.getTracePixels(pixelIdxs_)
 
         self.pixelIdxs = pixelIdxs_
@@ -92,7 +90,6 @@ class Trace:
             expected = np.convolve(lineData, expectedKernel, mode='full')
             first = npad - npad//2
             expected=expected[first:first+len(lineData)]
-            #np.set_printoptions(threshold=np.inf)            
 
             npad1 = len(expectedKernel) - 1
             expectedN = np.convolve(sampled, expectedKernel, mode='full')
@@ -125,9 +122,7 @@ class Trace:
         dmdNumPix = self.dataFile.header['dmdPixelsPerRow'] * self.dataFile.header['dmdPixelsPerColumn']
 
         pixelReplacementMap = copy.deepcopy(self.dataFile.zPixelReplacementMaps)
-     
-        print(pixelReplacementMap)
-        
+            
 
 
         intMask = pixelReplacementMap[1,:] >= dmdNumPix
@@ -242,6 +237,7 @@ def ismembc2(A, B):
     # Convert 2D to 1D by viewing in a structured format
     flag=[]
     for element in A:
-        flag.append(np.where(B==element)[0][0])
+        if element in B:
+            flag.append(np.where(B==element)[0][0])
 
     return flag
