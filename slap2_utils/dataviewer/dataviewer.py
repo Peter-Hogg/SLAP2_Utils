@@ -1,9 +1,11 @@
 from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtCore import QCoreApplication
+from skimage.draw import polygon_perimeter
+
 import fastplotlib as fpl
 import numpy as np
 
-from ..file.datafile import DataFile
+from ..datafile import DataFile
 
 def viewROItraces(ch=1, zIdz=1, windowWidth_lines=10, expectedWindowWidth_lines = 100):
     # Values or trace
@@ -14,11 +16,13 @@ def viewROItraces(ch=1, zIdz=1, windowWidth_lines=10, expectedWindowWidth_lines 
     # QT file picker    
     app = QtWidgets.QApplication([])
     fileName = QtWidgets.QFileDialog.getOpenFileName(None,
-    QCoreApplication.translate("MainWindow", "Open Data File"),  QCoreApplication.translate("MainWindow", "Data Files (*.dat)"))
-
+        QCoreApplication.translate("MainWindow", "Open Data File"),
+        QCoreApplication.translate("MainWindow", "Data Files (*.dat)"))[0]
+    
+    
     # Load Data
     experiment = DataFile(fileName)
-    rois2D = returnROIplot(experiment)
+    rois2D = return2Droi(experiment)
 
     plot = fpl.Plot(canvas="qt")
     plot.add_image(rois2D)
@@ -39,15 +43,12 @@ def viewROItraces(ch=1, zIdz=1, windowWidth_lines=10, expectedWindowWidth_lines 
     app.exec()
 
 
-viewROItraces()
-
-
 
 def return2Droi(datafile):
     img = np.zeros((800, 1280), dtype=np.uint8)
 
-    for _roi in len(datafile.metaData.AcquisitionContainer.ROIs[0]):
-        roi_shape = exp1.metaData.AcquisitionContainer.ROIs[_roi].shapeData
+    for _roi in range(len(datafile.metaData.AcquisitionContainer.ROIs)):
+        roi_shape = datafile.metaData.AcquisitionContainer.ROIs[_roi].shapeData
         
         rr, cc = polygon_perimeter(roi_shape[0,:],
                                     roi_shape[1,:],
@@ -56,3 +57,5 @@ def return2Droi(datafile):
         img[rr, cc] = _roi+1
 
     return(img)
+
+viewROItraces()
