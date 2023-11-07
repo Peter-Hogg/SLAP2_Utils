@@ -58,4 +58,42 @@ def return2Droi(datafile):
 
     return(img)
 
+def returnTraces(datafile):
+    zIdx = 1
+    chIdx = 1
+hTrace = Trace(hDataFile,zIdx,chIdx);
+
+
+from skimage.draw import polygon_perimeter
+
+roi_shape = hDataFile.metaData.AcquisitionContainer.ROIs[0].shapeData
+
+img = np.zeros((800, 1280), dtype=np.uint8)
+
+rr, cc = polygon_perimeter(roi_shape[0,:], roi_shape[1,:],
+
+                           shape=img.shape, clip=True)
+
+img[rr, cc] = 1
+
+plt.imshow(img)
+
+#rasterPixels = pixelMask;
+#integrationPixels = pixelMask;
+
+pixelMask=np.full((800, 1280), False)
+pixelMask[img==1] = True
+
+rasterPixels = np.full((800, 1280), False)
+integrationPixels = pixelMask;
+
+hTrace.setPixelIdxs(rasterPixels, integrationPixels);
+#windowWidth_lines = 10;
+#expectedWindowWidth_lines = 100;
+#trace = hTrace.process(windowWidth_lines,expectedWindowWidth_lines);
+_trace, _, _, _ = hTrace.process(10, 100)
+print(_trace)
+plt.plot(_trace)
+
+
 viewROItraces()
