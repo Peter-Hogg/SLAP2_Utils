@@ -132,7 +132,7 @@ class Trace:
                 pixelReplacementMap[0,j]=pixelReplacementMap[0,j]+dmdNumPix
             j=j+1
         sortIdxs = np.argsort(pixelReplacementMap[0])
-       
+        print(pixelReplacementMap)
         idxs1=ismembc2(pixelIDs,pixelReplacementMap[0])
         validSuperPixelIDs =pixelReplacementMap[1,idxs1]
 
