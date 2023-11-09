@@ -50,8 +50,14 @@ class TracePixel:
         sampleOffsets = _sampleOffsets
 
         sampleOffsets = sampleOffsets.astype('int64')
+ 
+
+        if (sampleOffsets[0,:][len(sampleOffsets[0,:])-1])>len(hMemmap):
+            sampleOffsets[0,:][len(sampleOffsets[0,:])-1]=len(hMemmap)
+ 
         data_ = []
         for i in range(sampleOffsets.shape[0]):
+            
             data_.append(np.take(hMemmap,(sampleOffsets[i,:]-1),0))
         self.data = data_
 
