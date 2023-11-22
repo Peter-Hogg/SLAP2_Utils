@@ -1,4 +1,4 @@
-function GenGrating(win, angle, cyclespersecond, freq, gratingsize, internalRotation, daq)
+function [startTime, sType] = GenGrating(win, angle, cyclespersecond, freq, gratingsize, internalRotation, daq)
 % Display an animated grating, using the new Screen('DrawTexture') command.
 % This demo demonstrates fast drawing of such a grating via use of procedural
 % texture mapping. It only works on hardware with support for the GLSL
@@ -79,7 +79,7 @@ phaseincrement = (cyclespersecond * 360) * ifi;
 
 % Build a procedural sine grating texture for a grating with a support of
 % res(1) x res(2) pixels and a RGB color offset of 0.5 -- a 50% gray.
-gratingtex = CreateProceduralSineGrating(win, res(1), res(2), [0.5 0.0 0.0 0.0]);
+gratingtex = CreateProceduralSineGrating(win, res(1), res(2), [0.0 0.0 1 0]);
 
 % Wait for release of all keys on keyboard, then sync us to retrace:
 vbl = Screen('Flip', win);
@@ -116,6 +116,9 @@ write(daq, 0);
 % Leave Stim Screen Blank
 Screen('Fillrect', win, [0, 0, 255]);
 Screen('Flip', win);
+
+sType = 'GenGrating';
+
 
 
 

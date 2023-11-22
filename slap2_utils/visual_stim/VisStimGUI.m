@@ -4,6 +4,12 @@ function StimControl(s2Obj)
 stimlog.time = {};
 stimlog.stim_type = {};
 stimlog.stim_info = {};
+
+%Added
+stimlog.stim_freq = {};
+stimlog.stim_orientation = {};
+
+
 % Create a directory to save the stimLog array as
 if ~exist('stimLogs', 'dir')
 mkdir('stimLogs')
@@ -37,7 +43,6 @@ batteryGratingButton = uicontrol(gcf,'Style', 'push', ...
                            'CallBack', @randoGrating);
 
 
-
 userGratingButton = uicontrol(gcf,'Style', 'push', ...
                            'String', 'User Angle', ...
                            'Position', [20 60 100 30], ...
@@ -47,6 +52,12 @@ psuedoRandSTA = uicontrol(gcf,'Style', 'push', ...
                            'String', 'Pseudo Random STA', ...
                            'Position', [20 230 180 30], ...
                            'CallBack', @randSTAStimuli);
+
+%Added
+allenRandSTA = uicontrol(gcf,'Style', 'push', ...
+                           'String', 'Allen Checker STA', ...
+                           'Position', [20 260 180 30], ...
+                           'CallBack', @allenSTAStimuli);
 
 CloseWinButton = uicontrol(gcf,'Style', 'push', ...
                            'String', 'Close Stim Window', ...
@@ -77,22 +88,38 @@ function toggleOFF(source,event)
 
 end
 function userGrating(source,event)
-    ang = userAngel.getValue
-    GenGrating(myWin, ang, 2, .0034, 1200, 1200, DAQ6001)
+    speed = 2;
+    ang = userAngel.getValue;
+    [t, sType] = GenGrating(myWin, ang, speed, .0034, 1920, 1080, DAQ6001);
+    stimlog.time = [stimlog.time, {t}]
+    stimlog.stim_type = [stimlog.stim_type, {sType}]
+    stimlog.stim_frequency = [stimlog.stim_frequency, {speed}]
+    stimlog.stim_orientation = [stimlog.stim_orientation, {ang}]
+    %ang = userAngel.getValue
+    %GenGrating(myWin, ang, 2, .0034, 1200, 1200, DAQ6001)
 end
 
 function randoGrating(source,event)
-    pseudoRandGrating(myWin, DAQ6001)
+
+    r = readmatrix('Rand_Grating.txt');
+    [t, sType, angle, speed] = pseudoRandGrating(myWin, r, DAQ6001)
+    stimlog.time = [stimlog.time, {t}]
+    stimlog.stim_type = [stimlog.stim_type, {sType}]
+    stimlog.stim_frequency = [stimlog.stim_frequency, {speed}]
+    stimlog.stim_orientation = [stimlog.stim_orientation, {angle}]
+
+
+
 end
 
 function randSTAStimuli(source,event)
-    
+    r = readmatrix('Rand_OriCheck_15.txt')
     for i = [1:1:15]
         fprintf("STA Stim "+ i)
         
         t2 = now();
         datetime(t2,'ConvertFrom','datenum')
-        [t, sType, stimD] = STACheckerStim(myWin, winRect, DAQ6001);
+        [t, sType, stimD] = STACheckerStim(myWin, winRect, r, DAQ6001);
         stimlog.time = [stimlog.time, {t}];
         datetime(t,'ConvertFrom','datenum')
         stimlog.stim_type = [stimlog.stim_type, {sType}];
@@ -107,6 +134,27 @@ function randSTAStimuli(source,event)
 
 end
 
+function allenSTAStimuli(source,event)
+     r = readmatrix('Rand_AllenCheck_15.txt')
+     for i = [1:1:15]
+        fprintf("STA Stim "+ i)
+        
+        t2 = now();
+        datetime(t2,'ConvertFrom','datenum')
+        [t, sType, stimD] = AllenSTAChecker(myWin, winRect, r, DAQ6001);
+        stimlog.time = [stimlog.time, {t}];
+        datetime(t,'ConvertFrom','datenum')
+        stimlog.stim_type = [stimlog.stim_type, {sType}];
+        stimlog.stim_info = [stimlog.stim_info, {stimD}];
+        x = randi([2,6]);
+        pause(x);
+    end
+    
+    t3 = now();
+    datetime(t3,'ConvertFrom','datenum')
+
+
+end
 
 function saveStimLog(source,event)
     saveTime = clock();

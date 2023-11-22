@@ -1,4 +1,4 @@
-function  [time, sType, r] = STACheckerStim(win, winRect, r, daq)
+function  [time, sType, r] = AllenSTAChecker(win, winRect, r, daq)
     % Get the size of the on screen window
     [screenXpixels, screenYpixels] = Screen('WindowSize', win);
     
@@ -11,6 +11,7 @@ function  [time, sType, r] = STACheckerStim(win, winRect, r, daq)
     
     % Make the coordinates for our grid of squares
     [xPos, yPos] = meshgrid(-9:1:9, -6:1:6);
+
     
     
     % Calculate the number of squares and reshape the matrices of coordinates
@@ -24,11 +25,28 @@ function  [time, sType, r] = STACheckerStim(win, winRect, r, daq)
     xPosPlot = xPos .* dim + screenXpixels * 0.50;
     yPosPlot = yPos .* dim + yCenter;
 
-    
-    % Randomly choose which squares are black and white
+    %Adjust Probability Here
+    prob=0.05;
 
-    % Todo
+
+    % Randomly choose which squares are black and white
     r=randi(2,numSquares,1)-1;
+    for i = 1: numSquares
+        if r(i)==1
+            if prob>rand()
+                if 0.5 >=rand()
+                    r(i)=r(i)*1;
+                else
+                    r(i)=0;
+                end
+            else
+                r(i)=0.5;
+            end
+        else 
+            r(i)=0.5;
+        end
+       
+    end
 
     % Make our rectangle coordinates
     randPixel = nan(3, 3);
@@ -55,13 +73,13 @@ function  [time, sType, r] = STACheckerStim(win, winRect, r, daq)
     Screen('Flip', win);
 
 
-    pause(1);
+    pause(5);
 
 
     Screen('Flip', win);
     write(daq, 3);
     pause(.001);
     write(daq, 0);
-    sType = 'psuedRandSTA';
+    sType = 'alllenRandSTA';
 end
 

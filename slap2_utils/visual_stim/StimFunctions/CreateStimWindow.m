@@ -1,6 +1,6 @@
 function [win, winRect] = CreateStimWindow()
 % Make sure this is running on OpenGL Psychtoolbox:
-AssertOpenGL;
+AssertOpenGL();
 % Create the stim window using Psychtoolbox-3
 % Choose screen with maximum id - the secondary display on a dual-display
 % setup for display:
