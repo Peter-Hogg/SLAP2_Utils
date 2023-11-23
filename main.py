@@ -7,7 +7,7 @@ from SLAP2_Utils.utils.trace import Trace
 
 
 
-hDataFile = DataFile('TestData/Tadpole2_20230829_183310_DMD2.dat');
+hDataFile = DataFile('231122_NoiseTestML/acquisition_20231122_162828_DMD1.dat');
 roi_shape = hDataFile.metaData.AcquisitionContainer.ROIs[0].shapeData
 
 #metaData.AcquisitionContainer.ROIs[0].shapeData

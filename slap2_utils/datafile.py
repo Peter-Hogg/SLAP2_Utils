@@ -77,7 +77,6 @@ class DataFile():
             self.lineSuperPixelIDs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['superPixelID']
             #?
             self.zPixelReplacementMaps = metaData.AcquisitionContainer.ParsePlan['pixelReplacementMaps']
-            print(self.zPixelReplacementMaps)
             #self.zPixelReplacementMapsNonRedundant = filter_z_pixel_replacement_maps(self.zPixelReplacementMaps)
             
             #Using list comprehension for simplified logic
