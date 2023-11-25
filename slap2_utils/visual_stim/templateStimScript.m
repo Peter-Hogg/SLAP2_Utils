@@ -52,7 +52,7 @@ function listenForRisingEdge(daqDevice, channel, threshold, callback, window)
         delete(lh)
     
         %[t, sType, angle, speed] = 
-        pseudoRandGrating(window, DAQ6001)
+        gratingProbing(window, DAQ6001)
     end
 end
 
