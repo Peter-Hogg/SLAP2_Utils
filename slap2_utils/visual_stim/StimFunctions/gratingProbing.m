@@ -13,7 +13,7 @@ function [time, sType, stimAngle, speed] = gratingProbing(win, daq)
     for stim = 1:length(angles)
         for size = 1:length(stimSizes) 
             for speed = 1:length(stimSpeed)
-                GenGrating(win, stimAngle(stim), speed, size, 1920, 1280, daq);
+                GenGrating(win, stimAngle(stim), stimSpeed(speed), stimSizes(size), 1920, 1280, daq);
                 pause(1.5)
                 
             end

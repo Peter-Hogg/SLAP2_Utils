@@ -90,7 +90,7 @@ endTime = (datetime - startTime);
 write(daq, 3);
 pause(.001);
 write(daq, 0);
-while endTime < duration([0,0,5]);
+while endTime < duration([0,0,1.5]);
 
     % Update some grating animation parameters:
     
