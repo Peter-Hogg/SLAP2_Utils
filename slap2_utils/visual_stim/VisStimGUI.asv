@@ -59,10 +59,10 @@ allenRandSTA = uicontrol(gcf,'Style', 'push', ...
                            'Position', [20 260 180 30], ...
                            'CallBack', @allenSTAStimuli);
 
-squareGrate = uicontrol(gcf,'Style', 'push', ...
-                           'String', 'Square Grating', ...
-                           'Position', [20 130 180 30], ...
-                           'CallBack', @squareGrat);
+squareGr = uicontrol(gcf,'Style', 'push', ...
+                           'String', 'Allen Checker STA', ...
+                           'Position', [20 260 180 30], ...
+                           'CallBack', @allenSTAStimuli);
 
 primeGratingProbing  = uicontrol(gcf,'Style', 'push', ...
                            'String', 'Prime Grating', ...
@@ -95,10 +95,8 @@ function toggleOFF(source,event)
     % Full Field Off Simulus - 50 ms 
     toggleStimOFF(myWin, DAQ6001);
 
+
 end
-
-
-    
 function userGrating(source,event)
     speed = 2;
     ang = userAngel.getValue;
@@ -166,19 +164,6 @@ function allenSTAStimuli(source,event)
     datetime(t3,'ConvertFrom','datenum')
 
 
-end
-
-
-function squareGrat(source,event)
-    speed = 2;
-    ang = userAngel.getValue;
-    [t, sType] = SquareGrating(myWin, ang, speed, .0034, 1920, 1080, DAQ6001);
-    stimlog.time = [stimlog.time, {t}]
-    stimlog.stim_type = [stimlog.stim_type, {sType}]
-    stimlog.stim_frequency = [stimlog.stim_frequency, {speed}]
-    stimlog.stim_orientation = [stimlog.stim_orientation, {ang}]
-    %ang = userAngel.getValue
-    %GenGrating(myWin, ang, 2, .0034, 1200, 1200, DAQ6001)
 end
 
 function primeGratingStimuli(source,event)
