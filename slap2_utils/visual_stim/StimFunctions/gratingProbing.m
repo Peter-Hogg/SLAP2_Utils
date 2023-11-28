@@ -1,19 +1,19 @@
-function [time, sType, stimAngle, speed] = gratingProbing(win, daq)
-    speed=2;
+function gratingProbing(win, daq)
     % original:
-    sizes = [.0034, .03];
+    sizes = [.0034, .00152, .00034];
     angles = [0,  90,  180,  270];
-    speeds = [0.5 1, 5];
+    speeds = [.5, 2];
 
     % random shuffles
     stimSizes = sizes(randperm(length(sizes)))
     stimAngle = angles(randperm(length(angles)))
     stimSpeed = speeds(randperm(length(speeds)))
-    
+    stimCombos = {'stim', 'angle', 'speed', 'size'};
     for stim = 1:length(angles)
         for size = 1:length(stimSizes) 
             for speed = 1:length(stimSpeed)
-                GenGrating(win, stimAngle(stim), stimSpeed(speed), stimSizes(size), 1920, 1280, daq);
+                %GenGrating(win, angle, cyclespersecond, freq, gratingsize, internalRotation, daq)
+                GenGrating(win, stimAngle(stim), stimSpeed(speed), stimSizes(size),  1920, 1280,  daq);
                 pause(1.5)
                 
             end
@@ -22,5 +22,17 @@ function [time, sType, stimAngle, speed] = gratingProbing(win, daq)
 
     sType = 'grating';
         
+    for stim = 1:length(angles)
+        for size = 1:length(stimSizes) 
+            for speed = 1:length(stimSpeed)
+                newRow = {sType, stimAngle(stim), stimSpeed(speed), stimSizes(size)}
+                stimCombos = [stimCombos; newRow ]
+                              
+            end
+        end
+    end
 
+    currentTime = datetime('now', 'Format', 'yyyyMMdd_HHmmss');
+    stimComboFilename =  sprintf('stimlogs/gratingCombos_%s.csv', currentTime)
+    writecell(stimCombos, stimComboFilename)
 end
