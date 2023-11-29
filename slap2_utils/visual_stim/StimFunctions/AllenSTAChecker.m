@@ -1,4 +1,4 @@
-function  [time, sType, r] = AllenSTAChecker(win, winRect, r, daq)
+function  [time, sType, r] = AllenSTAChecker(win, winRect, prob, size, r, daq)
     % Get the size of the on screen window
     [screenXpixels, screenYpixels] = Screen('WindowSize', win);
     
@@ -6,11 +6,15 @@ function  [time, sType, r] = AllenSTAChecker(win, winRect, r, daq)
     [xCenter, yCenter] = RectCenter(winRect);
     
     % Make a base Rect of 200 by 200 pixels
-    dim = 100;
+
+    % Window is ~1800 x 1200
+    lengthgrid = idivide(900,size);
+    widthgrid = idivide(600,size)
+    dim = size;
     baseRect = [0 0 dim dim];
     
     % Make the coordinates for our grid of squares
-    [xPos, yPos] = meshgrid(-9:1:9, -6:1:6);
+    [xPos, yPos] = meshgrid(-1*lengthgrid:1:lengthgrid, -1*widthgrid:1:widthgrid);
 
     
     
@@ -26,7 +30,6 @@ function  [time, sType, r] = AllenSTAChecker(win, winRect, r, daq)
     yPosPlot = yPos .* dim + yCenter;
 
     %Adjust Probability Here
-    prob=0.05;
 
 
     % Randomly choose which squares are black and white
