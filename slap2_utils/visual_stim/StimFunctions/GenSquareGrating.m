@@ -79,7 +79,7 @@ phaseincrement = (cyclespersecond * 360) * ifi;
 
 % Build a procedural sine grating texture for a grating with a support of
 % res(1) x res(2) pixels and a RGB color offset of 0.5 -- a 50% gray.
-gratingtex = CreateProceduralSquareWaveGrating(win, res(1), res(2), [0 0 1 0])
+gratingtex = CreateProceduralSquareWaveGrating(win, res(1), res(2), [0 0 1 0]);
 
 
 
@@ -92,7 +92,7 @@ endTime = (datetime - startTime);
 write(daq, 3);
 pause(.001);
 write(daq, 0);
-while endTime < duration([0,0,1.5]);
+while endTime < duration([0,0,1.5])
 
     % Update some grating animation parameters:
     
@@ -110,7 +110,7 @@ while endTime < duration([0,0,1.5]);
     % Show it at next retrace:
     vbl = Screen('Flip', win, vbl + 0.5 * ifi);
     endTime = (datetime - startTime);
-    end
+end
 
 write(daq, 3);
 pause(.001);
