@@ -59,6 +59,11 @@ allenRandSTA = uicontrol(gcf,'Style', 'push', ...
                            'Position', [20 260 180 30], ...
                            'CallBack', @allenSTAStimuli);
 
+userSquareGratingn = uicontrol(gcf,'Style', 'push', ...
+                           'String', 'User Angle', ...
+                           'Position', [20 60 130 30], ...
+                           'CallBack', @userSquareGrating);
+
 CloseWinButton = uicontrol(gcf,'Style', 'push', ...
                            'String', 'Close Stim Window', ...
                            'BackgroundColor', 'red', ...
@@ -98,6 +103,19 @@ function userGrating(source,event)
     %ang = userAngel.getValue
     %GenGrating(myWin, ang, 2, .0034, 1200, 1200, DAQ6001)
 end
+
+function SquareGrating(source,event)
+    speed = 2;
+    ang = userAngel.getValue;
+    [t, sType] = GenSquareGrating(myWin, ang, speed, .0034, 1920, 1080, DAQ6001);
+    stimlog.time = [stimlog.time, {t}]
+    stimlog.stim_type = [stimlog.stim_type, {sType}]
+    stimlog.stim_frequency = [stimlog.stim_frequency, {speed}]
+    stimlog.stim_orientation = [stimlog.stim_orientation, {ang}]
+    %ang = userAngel.getValue
+    %GenGrating(myWin, ang, 2, .0034, 1200, 1200, DAQ6001)
+end
+
 
 function randoGrating(source,event)
 
