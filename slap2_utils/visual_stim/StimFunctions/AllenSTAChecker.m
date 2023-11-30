@@ -1,4 +1,4 @@
-function  [time, sType, r] = AllenSTAChecker(win, winRect, prob, size, r, daq)
+function  [time, sType] = AllenSTAChecker(win, winRect, prob, sizes, daq)
     % Get the size of the on screen window
     [screenXpixels, screenYpixels] = Screen('WindowSize', win);
     
@@ -8,13 +8,13 @@ function  [time, sType, r] = AllenSTAChecker(win, winRect, prob, size, r, daq)
     % Make a base Rect of 200 by 200 pixels
 
     % Window is ~1800 x 1200
-    lengthgrid = idivide(900,size);
-    widthgrid = idivide(600,size)
-    dim = size;
+    lengthgrid = floor(900/sizes);
+    widthgrid = floor(600/sizes)
+    dim = sizes;
     baseRect = [0 0 dim dim];
     
     % Make the coordinates for our grid of squares
-    [xPos, yPos] = meshgrid(-1*lengthgrid:1:lengthgrid, -1*widthgrid:1:widthgrid);
+    [xPos, yPos] = meshgrid((-1*lengthgrid):1:(lengthgrid), (-1*widthgrid):1:(widthgrid));
 
     
     
