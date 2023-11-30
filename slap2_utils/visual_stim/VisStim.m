@@ -76,6 +76,11 @@ SingleBarStim = uicontrol(gcf,'Style', 'push', ...
                            'Position', [20 290 180 30], ...
                            'CallBack', @singleBarStim);
 
+SingleSineStim = uicontrol(gcf,'Style', 'push', ...
+                           'String', 'Single Sine Bar', ...
+                           'Position', [20 320 180 30], ...
+                           'CallBack', @singleSineStim);
+
 % Java Slider to pick grating angle 
 userAngel = javaObjectEDT(javax.swing.JSlider(0,360,1))
 userAngel.setBackground(java.awt.Color.white);  % Java setter-method notation
@@ -121,6 +126,19 @@ function singleBarStim(source,event)
     %ang = userAngel.getValue
     %GenGrating(myWin, ang, 2, .0034, 1200, 1200, DAQ6001)
 end
+
+function singleSineStim(source,event)
+    speed = 2;
+    ang = userAngel.getValue;
+    [t, sType] = SingleSine(myWin, 135, speed, 5000, 500, 1080, DAQ6001);
+    stimlog.time = [stimlog.time, {t}]
+    stimlog.stim_type = [stimlog.stim_type, {sType}]
+    stimlog.stim_frequency = [stimlog.stim_frequency, {speed}]
+    stimlog.stim_orientation = [stimlog.stim_orientation, {ang}]
+    %ang = userAngel.getValue
+    %GenGrating(myWin, ang, 2, .0034, 1200, 1200, DAQ6001)
+end
+
 
 function SquareGrating(source,event)
     speed = 2;

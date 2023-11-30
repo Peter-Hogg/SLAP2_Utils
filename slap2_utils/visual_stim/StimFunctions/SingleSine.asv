@@ -93,8 +93,8 @@ deltaX = cos(angleRadians) * barSpeed;
 deltaY = sin(angleRadians) * barSpeed;
 
 
-% Define a sine wave to represent luminosity variation along the bar's length
-luminosityValues = 0.5 * sin(linspace(0, pi, barWidth));
+% Define the luminosity waveform based on a sine wave along the width
+luminosityValues = 0.5 + 0.5 * sin(linspace(0, 2 * pi, barWidth));
 
 
 if deltaX > 0
@@ -137,7 +137,7 @@ while (barPosition(1) >= -barWidth && barPosition(1) <= windowRect(3)) || (barPo
     barPosition(4) = barPosition(4) + deltaY;
 
      % Calculate luminosity values based on the sine wave
-    luminosityBar = repmat(luminosityValues',  1, barHeight);  % Repeat the sine wave values for the bar height
+    luminosityBar = repmat(luminosityValues', 1, barHeight)';  % Repeat the sine wave values for the bar height
 
     % Create the luminance texture
     luminanceTexture = Screen('MakeTexture', win, luminosityBar * white);
