@@ -10,6 +10,6 @@ def returnStimTime(stimFile, distance=250, hz=5000):
     stimLog = h5py.File(stimFile, 'r')
     TTL_Trace = stimLog['TTL'][:]
     peaks, _ = signal.find_peaks(np.diff(TTL_Trace), height=2.5, distance=distance)
-    start = [_peaks[i]*(1/hz) for i in range(0, len(_peaks), 2)]
-    stop = [_peaks[i]*(1/hz) for i in range(1, len(_peaks), 2)]
+    start = [peaks[i]*(1/hz) for i in range(0, len(peaks), 2)]
+    stop = [peaks[i]*(1/hz) for i in range(1, len(peaks), 2)]
     return start, stop
