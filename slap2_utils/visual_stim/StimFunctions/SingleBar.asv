@@ -1,4 +1,4 @@
-function [startTime, sType] = SingleBar(win, angle, cyclespersecond, freq, gratingsize, internalRotation, daq)
+function [startTime, sType] = SingleBar(win, angle, speed, gratingsize, internalRotation, daq)
 % Display an animated grating, using the new Screen('DrawTexture') command.
 % This demo demonstrates fast drawing of such a grating via use of procedural
 % texture mapping. It only works on hardware with support for the GLSL
@@ -21,7 +21,7 @@ white = WhiteIndex(screenid);
 black = BlackIndex(screenid);
 % Initial stimulus parameters for the grating patch:
 
-if nargin < 5 || isempty(internalRotation)
+if nargin < 4 || isempty(internalRotation)
     internalRotation = 0;
 end
 
@@ -31,24 +31,19 @@ else
     rotateMode = [];
 end
 
-if nargin < 4 || isempty(gratingsize)
+if nargin < 3 || isempty(gratingsize)
     gratingsize = 1200;
 end
 
 % res is the total size of the patch in x- and y- direction, i.e., the
 % width and height of the mathematical support:
-res = [gratingsize gratingsize];
 
-if nargin < 3 || isempty(freq)
+if nargin < 2 || isempty(speed)
     % Frequency of the grating in cycles per pixel: Here 0.01 cycles per pixel:
     freq = 1/360;
 end
 
-if nargin < 2 || isempty(cyclespersecond)
-    cyclespersecond = 1;
-end
-
-if nargin < 1 || isempty(angle)
+if nargin < 1  || isempty(angle)
     % Tilt angle of the grating:
     angle = 0;
 end
@@ -68,24 +63,58 @@ amplitude = 0.5;
 % Make sure the GLSL shading language is supported:
 AssertGLSL;
 
-% Retrieve video redraw interval for later control of our animation timing:
-ifi = Screen('GetFlipInterval', win );
 
-% Phase is the phase shift in degrees (0-360 etc.)applied to the sine grating:
-phase = 0;
+windowRect = [0,0,1920,1080];
 
-% Compute increment of phase shift per redraw:
-phaseincrement = (cyclespersecond * 360) * ifi;
 
-% Build a procedural sine grating texture for a grating with a support of
-% res(1) x res(2) pixels and a RGB color offset of 0.5 -- a 50% gray.
-gratingtex = CreateProceduralSquareWaveGrating(win, res(1), res(2), [0 0 1 0]);
 
-rect=SetRect(900-floor(gratingsize/2),0,900+(gratingsize/2),1280);
+[xCenter, yCenter] = RectCenter(windowRect);
 
-finalrect=SetRect(0,0,1800,1280);
-% Wait for release of all keys on keyboard, then sync us to retrace:
-vbl = Screen('Flip', win);
+
+
+
+% Set parameters for the moving bar
+barWidth = gratingsize;
+barHeight = 100;
+barColor = [255 255 255];  % Red color
+barSpeed = speed;  % Speed of the moving bar in pixels per frame
+angleDegrees = angle + 90;  % Angle of movement (in degrees)
+barRotation = angle;  % Angle to rotate the bar
+
+
+% Calculate movement increments (x and y) based on the movement angle
+angleRadians = deg2rad(angleDegrees);
+deltaX = cos(angleRadians) * barSpeed;
+deltaY = sin(angleRadians) * barSpeed;
+
+
+
+
+
+if deltaX > 0
+    initialX = -barWidth;
+else
+    initialX = windowRect(3);
+end
+if deltaY > 0
+    initialY = -barHeight;
+else
+    initialY = windowRect(4);
+end
+
+
+
+% Calculate initial position of the bar
+barStartX = xCenter - barWidth / 2;
+barStartY = yCenter - barHeight / 2;
+barRect = [0 0 barWidth barHeight];
+barPosition = CenterRectOnPointd(barRect, barStartX, barStartY);
+
+% Draw and rotate the bar to the specified angle
+rotatedBarTexture = Screen('MakeTexture', win, barColor);
+Screen('DrawTexture', win, rotatedBarTexture, [], barPosition, barRotation);
+
+
 
 
 startTime = datetime;
@@ -93,34 +122,30 @@ endTime = (datetime - startTime);
 write(daq, 3);
 pause(.001);
 write(daq, 0);
-while endTime < duration([0,0,1.5])
+% Run the animation until the bar goes off the screen
+while barPosition(1) >= -barWidth && barPosition(1) <= windowRect(3) && barPosition(2) >= -barHeight && barPosition(2) <= windowRect(4)
+    % Update the bar's position based on the movement angle
+    barPosition(1) = barPosition(1) + deltaX;
+    barPosition(3) = barPosition(3) + deltaX;
+    barPosition(2) = barPosition(2) + deltaY;
+    barPosition(4) = barPosition(4) + deltaY;
 
-    % Update some grating animation parameters:
-    
-    % Increment phase by 1 degree:
-    phase = phase + phaseincrement;
-    
-    % Draw the grating, centered on the screen, with given rotation 'angle',
-    % sine grating 'phase' shift and amplitude, rotating via set
-    % 'rotateMode'. Note that we pad the last argument with a 4th
-    % component, which is 0. This is required, as this argument must be a
-    % vector with a number of components that is an integral multiple of 4,
-    % i.e. in our case it must have 4 components:
-    Screen('DrawTexture', win, gratingtex, rect, finalrect, angle, [], [], [], [], rotateMode, [phase, freq, amplitude, 0]);
+    % Clear the window
+    Screen('FillRect', win, black);
 
-    % Show it at next retrace:
-    vbl = Screen('Flip', win, vbl + 0.5 * ifi);
-    endTime = (datetime - startTime);
+    % Draw and rotate the bar at its new position
+    Screen('DrawTexture', win, rotatedBarTexture, [], barPosition, barRotation);
+
+    % Flip the screen
+    Screen('Flip', win);
 end
-
 write(daq, 3);
 pause(.001);
-write(daq, 0);       
-% Leave Stim Screen Blank
-Screen('Fillrect', win, [0, 0, 255]);
-Screen('Flip', win);
+write(daq, 0);  
 
-sType = 'GenSquareGrating';
+
+
+sType = 'GenSingleBar';
 
 
 

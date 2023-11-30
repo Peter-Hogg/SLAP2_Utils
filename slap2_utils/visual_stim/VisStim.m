@@ -99,7 +99,7 @@ function toggleOFF(source,event)
 
 end
 function userGrating(source,event)
-    speed = 2;
+    speed = 10;
     ang = userAngel.getValue;
     [t, sType] = GenGrating(myWin, ang, speed, .0034, 1920, 1080, DAQ6001);
     stimlog.time = [stimlog.time, {t}]
@@ -113,7 +113,7 @@ end
 function singleBarStim(source,event)
     speed = 2;
     ang = userAngel.getValue;
-    [t, sType] = SingleBar(myWin, ang, speed, .0034, 1920, 1080, DAQ6001);
+    [t, sType] = SingleBar(myWin, 45, speed, 5000, 500, 1080, DAQ6001);
     stimlog.time = [stimlog.time, {t}]
     stimlog.stim_type = [stimlog.stim_type, {sType}]
     stimlog.stim_frequency = [stimlog.stim_frequency, {speed}]
