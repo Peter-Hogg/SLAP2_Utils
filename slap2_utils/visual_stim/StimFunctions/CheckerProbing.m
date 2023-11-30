@@ -2,15 +2,15 @@ function [time, sType, stimSizes, stimProb] = CheckerProbing(win, winRect, daq)
     % original:
     sizes = [50, 100, 150];
     
-    probability = [0.1 0.2, 0.5];
+    probability = [0.01 0.02, 0.05];
 
     % random shuffles
     stimSizes = sizes(randperm(length(sizes)));
     stimProb = probability(randperm(length(probability)));
-    for size = 1:length(stimSizes) 
+    for s = 1:length(stimSizes) 
        for p = 1:length(stimProb)
 
-           AllenSTAChecker(win, winRect, p, size, daq)
+           AllenSTAChecker(win, winRect, stimProb(p), stimProb(s), daq)
            pause(1.5)
                 
        end
