@@ -10,7 +10,7 @@ function [time, sType, stimSizes, stimProb] = CheckerProbing(win, winRect, daq)
     for s = 1:length(stimSizes) 
        for p = 1:length(stimProb)
 
-           AllenSTAChecker(win, winRect, stimProb(p), stimProb(s), daq)
+           AllenSTAChecker(win, winRect, stimProb(p), stimSizes(s), daq)
            pause(1.5)
                 
        end

@@ -81,7 +81,7 @@ phaseincrement = (cyclespersecond * 360) * ifi;
 % res(1) x res(2) pixels and a RGB color offset of 0.5 -- a 50% gray.
 gratingtex = CreateProceduralSquareWaveGrating(win, res(1), res(2), [0 0 1 0]);
 
-rect=SetRect(900-floor(gratingsize/phaseincrement),0,900+floor(gratingsize/phaseincrement),1280);
+rect=SetRect(900-floor(gratingsize/2),0,900+(gratingsize/2),1280);
 
 finalrect=SetRect(0,0,1800,1280);
 % Wait for release of all keys on keyboard, then sync us to retrace:
