@@ -59,10 +59,15 @@ allenRandSTA = uicontrol(gcf,'Style', 'push', ...
                            'Position', [20 260 180 30], ...
                            'CallBack', @allenSTAStimuli);
 
-userSquareGratingn = uicontrol(gcf,'Style', 'push', ...
-                           'String', 'User Angle', ...
-                           'Position', [20 60 130 30], ...
-                           'CallBack', @userSquareGrating);
+squareGr = uicontrol(gcf,'Style', 'push', ...
+                           'String', 'Allen Checker STA', ...
+                           'Position', [20 260 180 30], ...
+                           'CallBack', @allenSTAStimuli);
+
+primeGratingProbing  = uicontrol(gcf,'Style', 'push', ...
+                           'String', 'Prime Grating', ...
+                           'Position', [20 290 180 30], ...
+                           'CallBack', @primeGratingStimuli);
 
 CloseWinButton = uicontrol(gcf,'Style', 'push', ...
                            'String', 'Close Stim Window', ...
@@ -103,19 +108,6 @@ function userGrating(source,event)
     %ang = userAngel.getValue
     %GenGrating(myWin, ang, 2, .0034, 1200, 1200, DAQ6001)
 end
-
-function SquareGrating(source,event)
-    speed = 2;
-    ang = userAngel.getValue;
-    [t, sType] = GenSquareGrating(myWin, ang, speed, .0034, 1920, 1080, DAQ6001);
-    stimlog.time = [stimlog.time, {t}]
-    stimlog.stim_type = [stimlog.stim_type, {sType}]
-    stimlog.stim_frequency = [stimlog.stim_frequency, {speed}]
-    stimlog.stim_orientation = [stimlog.stim_orientation, {ang}]
-    %ang = userAngel.getValue
-    %GenGrating(myWin, ang, 2, .0034, 1200, 1200, DAQ6001)
-end
-
 
 function randoGrating(source,event)
 
@@ -159,7 +151,7 @@ function allenSTAStimuli(source,event)
         
         t2 = now();
         datetime(t2,'ConvertFrom','datenum')
-        [t, sType, stimD] = AllenSTAChecker(myWin, winRect, r, 0.05, 100,  DAQ6001);
+        [t, sType, stimD] = AllenSTAChecker(myWin, winRect, r, DAQ6001);
         stimlog.time = [stimlog.time, {t}];
         datetime(t,'ConvertFrom','datenum')
         stimlog.stim_type = [stimlog.stim_type, {sType}];
@@ -173,6 +165,11 @@ function allenSTAStimuli(source,event)
 
 
 end
+
+function primeGratingStimuli(source,event)
+    gratingProbing(myWin, DAQ6001)
+end
+
 
 function saveStimLog(source,event)
     saveTime = clock();

@@ -1,4 +1,4 @@
-function [startTime, sType] = SingleSine(win, angle, speed, length, width, internalRotation, daq)
+function [startTime, sType] = SingleBar(win, angle, speed, gratingsize, internalRotation, daq)
 % Display an animated grating, using the new Screen('DrawTexture') command.
 % This demo demonstrates fast drawing of such a grating via use of procedural
 % texture mapping. It only works on hardware with support for the GLSL
@@ -21,7 +21,7 @@ white = WhiteIndex(screenid);
 black = BlackIndex(screenid);
 % Initial stimulus parameters for the grating patch:
 
-if nargin < 5 || isempty(internalRotation)
+if nargin < 4 || isempty(internalRotation)
     internalRotation = 0;
 end
 
@@ -31,14 +31,9 @@ else
     rotateMode = [];
 end
 
-if nargin < 4 || isempty(width)
-    gratingsize = 100;
+if nargin < 3 || isempty(gratingsize)
+    gratingsize = 1200;
 end
-
-if nargin < 3 || isempty(length)
-    gratingsize = 5000;
-end
-
 
 % res is the total size of the patch in x- and y- direction, i.e., the
 % width and height of the mathematical support:
@@ -79,8 +74,8 @@ windowRect = [0,0,1920,1080];
 
 
 % Set parameters for the moving bar
-barWidth = length;
-barHeight = width;
+barWidth = gratingsize;
+barHeight = 100;
 barColor = [255 255 255];  % Red color
 barSpeed = speed;  % Speed of the moving bar in pixels per frame
 angleDegrees = angle + 90;  % Angle of movement (in degrees)
@@ -93,8 +88,7 @@ deltaX = cos(angleRadians) * barSpeed;
 deltaY = sin(angleRadians) * barSpeed;
 
 
-% Define a sine wave to represent luminosity variation along the bar's length
-luminosityValues = 0.5 * sin(linspace(0, pi, barWidth));
+
 
 
 if deltaX > 0
@@ -111,8 +105,8 @@ end
 
 
 % Calculate initial position of the bar
-barStartX = initialX - deltaX;  % Position outside the screen in the opposite direction
-barStartY = initialY - deltaY;
+barStartX = xCenter - barWidth / 2;
+barStartY = yCenter - barHeight / 2;
 barRect = [0 0 barWidth barHeight];
 barPosition = CenterRectOnPointd(barRect, barStartX, barStartY);
 
@@ -129,24 +123,18 @@ write(daq, 3);
 pause(.001);
 write(daq, 0);
 % Run the animation until the bar goes off the screen
-while (barPosition(1) >= -barWidth && barPosition(1) <= windowRect(3)) || (barPosition(1) <= -barWidth && barPosition(2) >= -barHeight && barPosition(2) <= windowRect(4)) || (barPosition(1) >= windowRect(3) && barPosition(2) >= -barHeight && barPosition(2) <= windowRect(4))
+while barPosition(1) >= -barWidth && barPosition(1) <= windowRect(3) && barPosition(2) >= -barHeight && barPosition(2) <= windowRect(4)
     % Update the bar's position based on the movement angle
     barPosition(1) = barPosition(1) + deltaX;
     barPosition(3) = barPosition(3) + deltaX;
     barPosition(2) = barPosition(2) + deltaY;
     barPosition(4) = barPosition(4) + deltaY;
 
-     % Calculate luminosity values based on the sine wave
-    luminosityBar = repmat(luminosityValues',  1, barHeight);  % Repeat the sine wave values for the bar height
-
-    % Create the luminance texture
-    luminanceTexture = Screen('MakeTexture', win, luminosityBar * white);
-
     % Clear the window
     Screen('FillRect', win, black);
 
     % Draw and rotate the bar at its new position
-    Screen('DrawTexture', win, luminanceTexture, [], barPosition, barRotation);
+    Screen('DrawTexture', win, rotatedBarTexture, [], barPosition, barRotation);
 
     % Flip the screen
     Screen('Flip', win);
@@ -164,6 +152,5 @@ sType = 'GenSingleBar';
 
 
 end
-
 
 

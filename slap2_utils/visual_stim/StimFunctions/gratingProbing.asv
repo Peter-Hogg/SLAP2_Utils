@@ -8,7 +8,7 @@ function gratingProbing(win, daq)
     stimSizes = sizes(randperm(length(sizes)))
     stimAngle = angles(randperm(length(angles)))
     stimSpeed = speeds(randperm(length(speeds)))
-    stimCombos = {'stim', 'angle', 'speed', 'size'};
+    stimCombos = []
     for stim = 1:length(angles)
         for size = 1:length(stimSizes) 
             for speed = 1:length(stimSpeed)
@@ -25,14 +25,13 @@ function gratingProbing(win, daq)
     for stim = 1:length(angles)
         for size = 1:length(stimSizes) 
             for speed = 1:length(stimSpeed)
-                newRow = {sType, stimAngle(stim), stimSpeed(speed), stimSizes(size)}
-                stimCombos = [stimCombos; newRow ]
+                stimCombos = [stimCombos; stimAngle(stim), stimSpeed(speed), stimSizes(size)]
                               
             end
         end
     end
 
     currentTime = datetime('now', 'Format', 'yyyyMMdd_HHmmss');
-    stimComboFilename =  sprintf('stimlogs/gratingCombos_%s.csv', currentTime)
-    writecell(stimCombos, stimComboFilename)
+    stimComboFilename =  sprintf('gratingCombos_%s.csv', currentTime)
+    writematrix(stimCombos, stimComboFilename)
 end
