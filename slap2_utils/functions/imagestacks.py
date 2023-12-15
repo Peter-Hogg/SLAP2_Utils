@@ -1,14 +1,15 @@
 import dask
 import os
 import numpy as np 
+import cupy as cu
 import dask.array as da
 import numpy as np
 import matplotlib.pyplot as plt
-import SLAP2_Utils.datafile as slap2
+import slap2_utils.datafile as slap2
 import pyclesperanto_prototype as cle
 import zarr
 import dask_image.imread
-from SLAP2_Utils.subclasses.metadata import MetaData
+from slap2_utils.subclasses.metadata import MetaData
 import tifffile 
 from ScanImageTiffReader import ScanImageTiffReader
 
@@ -16,10 +17,10 @@ from ScanImageTiffReader import ScanImageTiffReader
 def averageStackMemory(path):
     metadata = MetaData(path[:-4]+'.meta')
     duration = metadata.acqDuration_s
-    xdim, ydim = metadata.AcquistionContainter.ParsePlan['rasterSizeXY'][0][0], metadata.AcquistionContainter.ParsePlan['rasterSizeXY'][1][0]
-    linesPerFrame = metadata.AcquistionContainter.ParsePlan['linesPerFrame']
-    lineRate = metadata.AcquistionContainter.ParsePlan['lineRateHz']
-    linesPerCycle = metadata.AcquistionContainter.ParsePlan['linesPerCycle']
+    xdim, ydim = metadata.AcquisitionContainer.ParsePlan['rasterSizeXY'][0][0], metadata.AcquisitionContainer.ParsePlan['rasterSizeXY'][1][0]
+    linesPerFrame = metadata.AcquisitionContainer.ParsePlan['linesPerFrame']
+    lineRate = metadata.AcquisitionContainer.ParsePlan['lineRateHz']
+    linesPerCycle = metadata.AcquisitionContainer.ParsePlan['linesPerCycle']
     frameRate = (lineRate[0]/ydim)[0]
     frameNumber = int(frameRate*duration)
     cyclePeriod_s = linesPerCycle / lineRate
@@ -42,10 +43,10 @@ def averageStackMemory(path):
 def averageStackMemoryGPU(path):
     metadata = MetaData(path[:-4]+'.meta')
     duration = metadata.acqDuration_s
-    xdim, ydim = metadata.AcquistionContainter.ParsePlan['rasterSizeXY'][0][0], metadata.AcquistionContainter.ParsePlan['rasterSizeXY'][1][0]
-    linesPerFrame = metadata.AcquistionContainter.ParsePlan['linesPerFrame']
-    lineRate = metadata.AcquistionContainter.ParsePlan['lineRateHz']
-    linesPerCycle = metadata.AcquistionContainter.ParsePlan['linesPerCycle']
+    xdim, ydim = metadata.AcquisitionContainer.ParsePlan['rasterSizeXY'][0][0], metadata.AcquisitionContainer.ParsePlan['rasterSizeXY'][1][0]
+    linesPerFrame = metadata.AcquisitionContainer.ParsePlan['linesPerFrame']
+    lineRate = metadata.AcquisitionContainer.ParsePlan['lineRateHz']
+    linesPerCycle = metadata.AcquisitionContainer.ParsePlan['linesPerCycle']
     frameRate = (lineRate[0]/ydim)[0]
     frameNumber = int(frameRate*duration)
     cyclePeriod_s = linesPerCycle / lineRate
@@ -60,7 +61,7 @@ def averageStackMemoryGPU(path):
 
     for i in range(int(frames.shape[0]/frameNumber)):
         try:
-            avgStack[i, :,:  ] = cle.mean_z_projection(frames[fStp:fStrt, :,: ])
+            avgStack[i, :,:  ] = cu.mean(frames[fStp:fStrt, :,: ], axis=0)
             fStrt += frameNumber
             fStp += frameNumber
 
@@ -76,10 +77,10 @@ def averageStackMemoryGPU(path):
 def averageStackCPU(path):
     metadata = MetaData(path[:-4]+'.meta')
     duration = metadata.acqDuration_s
-    xdim, ydim = metadata.AcquistionContainter.ParsePlan['rasterSizeXY'][0][0], metadata.AcquistionContainter.ParsePlan['rasterSizeXY'][1][0]
-    linesPerFrame = metadata.AcquistionContainter.ParsePlan['linesPerFrame']
-    lineRate = metadata.AcquistionContainter.ParsePlan['lineRateHz']
-    linesPerCycle = metadata.AcquistionContainter.ParsePlan['linesPerCycle']
+    xdim, ydim = metadata.AcquisitionContainer.ParsePlan['rasterSizeXY'][0][0], metadata.AcquisitionContainer.ParsePlan['rasterSizeXY'][1][0]
+    linesPerFrame = metadata.AcquisitionContainer.ParsePlan['linesPerFrame']
+    lineRate = metadata.AcquisitionContainer.ParsePlan['lineRateHz']
+    linesPerCycle = metadata.AcquisitionContainer.ParsePlan['linesPerCycle']
     frameRate = (lineRate[0]/ydim)[0]
     frameNumber = int(frameRate*duration)
     cyclePeriod_s = linesPerCycle / lineRate
@@ -88,9 +89,7 @@ def averageStackCPU(path):
     # Read image data and rechunk
     with tifffile.imread(path, aszarr=True) as zarr_store:
         imagedata = da.from_zarr(zarr_store)
-        
-
-
+        print(frameNumber, ydim, xdim)
         # Ensure the data is rechunked properly
         imagedata = imagedata.rechunk((frameNumber, ydim, xdim))
         
@@ -122,20 +121,21 @@ def averageStackCPU(path):
 def averageStack(path):
     metadata = MetaData(path[:-4]+'.meta')
     duration = metadata.acqDuration_s
-    xdim, ydim = metadata.AcquistionContainter.ParsePlan['rasterSizeXY'][0][0], metadata.AcquistionContainter.ParsePlan['rasterSizeXY'][1][0]
-    linesPerFrame = metadata.AcquistionContainter.ParsePlan['linesPerFrame']
-    lineRate = metadata.AcquistionContainter.ParsePlan['lineRateHz']
-    linesPerCycle = metadata.AcquistionContainter.ParsePlan['linesPerCycle']
+    xdim, ydim = metadata.AcquisitionContainer.ParsePlan['rasterSizeXY'][0][0], metadata.AcquisitionContainer.ParsePlan['rasterSizeXY'][1][0]
+    linesPerFrame = metadata.AcquisitionContainer.ParsePlan['linesPerFrame']
+    lineRate = metadata.AcquisitionContainer.ParsePlan['lineRateHz']
+    linesPerCycle = metadata.AcquisitionContainer.ParsePlan['linesPerCycle']
     frameRate = (lineRate[0]/ydim)[0]
     frameNumber = int(frameRate*duration)
     cyclePeriod_s = linesPerCycle / lineRate
 
 
-    store = imread(path, aszarr=True)
+    store = tifffile.imread(path, aszarr=True)
     imagedata = da.from_zarr(store)
     imagedata = imagedata.rechunk((frameNumber, ydim, xdim))
-    avgStack = np.zeros((1, int(imagedata.shape[0]/frameNumber), imagedata.shape[1], imagedata.shape[2]))
-
+    avgStack = np.zeros(( int(imagedata.shape[0]/frameNumber), imagedata.shape[1], imagedata.shape[2]))
+    print(imagedata.shape)
+    print(avgStack.shape)
     @dask.delayed
 
 
@@ -152,28 +152,25 @@ def averageStack(path):
     imwrite('average_'+path, avgStack)
 
 def averageStackGPU(path):
-    print(cle.available_device_names())
-    cle.select_device("RTX")
-
     metadata = MetaData(path[:-4]+'.meta')
     duration = metadata.acqDuration_s
-    xdim, ydim = metadata.AcquistionContainter.ParsePlan['rasterSizeXY'][0][0], metadata.AcquistionContainter.ParsePlan['rasterSizeXY'][1][0]
-    linesPerFrame = metadata.AcquistionContainter.ParsePlan['linesPerFrame']
-    lineRate = metadata.AcquistionContainter.ParsePlan['lineRateHz']
-    linesPerCycle = metadata.AcquistionContainter.ParsePlan['linesPerCycle']
+    xdim, ydim = metadata.AcquisitionContainer.ParsePlan['rasterSizeXY'][0][0], metadata.AcquisitionContainer.ParsePlan['rasterSizeXY'][1][0]
+    linesPerFrame = metadata.AcquisitionContainer.ParsePlan['linesPerFrame']
+    lineRate = metadata.AcquisitionContainer.ParsePlan['lineRateHz']
+    linesPerCycle = metadata.AcquisitionContainer.ParsePlan['linesPerCycle']
     frameRate = (lineRate[0]/ydim)[0]
     frameNumber = int(frameRate*duration)
     cyclePeriod_s = linesPerCycle / lineRate
 
 
-    store = imread(path, aszarr=True)
+    store = tifffile.imread(path, aszarr=True)
     imagedata = da.from_zarr(store)
     imagedata = imagedata.rechunk((frameNumber, ydim, xdim))
     avgStack = np.zeros((1, int(imagedata.shape[0]/frameNumber), imagedata.shape[1], imagedata.shape[2]))
 
     @dask.delayed
     def returnSlice(_block):
-        return cle.mean_z_projection(_block)
+        return cu.mean(_block, axis=0)
     results = []
     for _block in imagedata.blocks:
         results.append(returnSlice(_block))
@@ -182,4 +179,4 @@ def averageStackGPU(path):
 
     avgStack = np.array(dask.compute(results))
     
-    imwrite('average_'+path, avgStack)
+    tifffile.imwrite('averageGPU_' + os.path.basename(path), avgStack)

@@ -2,23 +2,29 @@ import dask
 import dask.array as da
 import numpy as np
 import matplotlib.pyplot as plt
-import SLAP2_Utils.datafile as slap2
+import slap2_utils.datafile as slap2
 
-from SLAP2_Utils.subclasses.metadata import MetaData
-from SLAP2_Utils.functions.imagestacks import averageStack
+from slap2_utils.subclasses.metadata import MetaData
+from slap2_utils.functions.imagestacks import averageStack
 from tifffile import imread, imwrite
-from SLAP2_Utils.functions.imagestacks import averageStack2, averageStackGPU
+from slap2_utils.functions.imagestacks import averageStackCPU, averageStackGPU, averageStackMemoryGPU
 import time
 start_time = time.time()
 
-averageStack2('acquisition_20230216_130937_DMD1.tif')
+averageStackCPU('../Driekland_Stacks/Volume_20231215_123601_DMD1.tif')
 
 print("--- %s seconds ---" % (time.time() - start_time))
 
 
 start_time = time.time()
 
-averageStackGPU('acquisition_20230216_130937_DMD1.tif')
+averageStackGPU('../Driekland_Stacks/Volume_20231215_123601_DMD1.tif')
+
+print("--- %s seconds ---" % (time.time() - start_time))
+
+start_time = time.time()
+
+averageStackMemoryGPU('../Driekland_Stacks/Volume_20231215_123601_DMD1.tif')
 
 print("--- %s seconds ---" % (time.time() - start_time))
 """
