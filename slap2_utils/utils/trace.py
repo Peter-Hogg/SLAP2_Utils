@@ -190,7 +190,7 @@ class Trace:
                     continue
 
             byteOffsets = [(x - 1) * 2 for x in positions]
-            byteOffsets = [x+self.dataFile.lineDataNumElements[lineIdx] * 2 * (self.chIdx - 1) for x in byteOffsets]
+            byteOffsets = [x+ len(lineSuperPixelIDs) * 2 * (self.chIdx - 1) for x in byteOffsets]
             byteOffsets = [x+self.dataFile.lineDataStartIdxs[lineIdx] * 2 for x in byteOffsets]
  
             byteOffsets = [int (x-self.dataFile.header['firstCycleOffsetBytes']) for x in byteOffsets]
