@@ -73,16 +73,22 @@ function SLAP2UtilFuncs()
             %pyROI_Ints = pyModule.genSomaROI(filePath);
             % Command to run the Python script
             %commandStr = sprintf('python3 -m somaROIsys.py %s', filePath);
-            commandStr = sprintf('python3 -m slap2_utils.experiments.somaROIsys %s', inputArg);
+            commandStr = sprintf('python3 -m slap2_utils.experiments.somaROIsys %s', filePath);
             % Execute the command and capture the output
-            [status, cmdout] = system(commandStr);
+            [status, pyROI_Ints] = system(commandStr);
             
             if status == 0
                 % Parse the output if the script executed successfully
-                 somaInts = double(pyROI_Ints);
+                pyROI_Ints = pyROI_Ints
+                [folderPath, baseFileName, extension] = fileparts(filePath);
+                newFileName = fullfile(folderPath, ['maskInts_' baseFileName '.mat']);
+                somaInts = load(newFileName)
+                maskData = somaInts.masks;
+                figure;
+                imagesc(maskData);
             else
                 % Handle errors
-                error('Python script failed: %s', cmdout);
+                error('Python script failed: %s', pyROI_Ints);
             end
                 
             % Convert the Python object to a MATLAB array
