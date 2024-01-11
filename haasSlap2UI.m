@@ -64,16 +64,12 @@ function SLAP2UtilFuncs()
         else
             txtDebug.Value = 'Generating Soma ROI...';
 
-            % Import the Python script as a module
-            %pyModule = py.importlib.import_module('somaROI');
-            %pyModule = py.importlib.reload(pyModule);
             filePath = txtFilePath.Value;
-            filePath = strtrim(filePath{1})
-            % Call the function in the Python script
-            %pyROI_Ints = pyModule.genSomaROI(filePath);
+            filePath = strtrim(filePath{1});
+      
             % Command to run the Python script
             %commandStr = sprintf('python3 -m somaROIsys.py %s', filePath);
-            commandStr = sprintf('python3 -m slap2_utils.experiments.somaROIsys %s', filePath);
+            commandStr = sprintf('python -m slap2_utils.experiments.somaROIsys %s', filePath);
             % Execute the command and capture the output
             [status, pyROI_Ints] = system(commandStr);
             
@@ -82,10 +78,18 @@ function SLAP2UtilFuncs()
                 pyROI_Ints = pyROI_Ints
                 [folderPath, baseFileName, extension] = fileparts(filePath);
                 newFileName = fullfile(folderPath, ['maskInts_' baseFileName '.mat']);
-                somaInts = load(newFileName)
+                somaInts = load(newFileName);
                 maskData = somaInts.masks;
                 figure;
                 imagesc(maskData);
+
+                % Get metadata for slize info
+                t = Tiff(filePath,'r');
+                meataData = t.getTag('ImageDescription');
+                hSliceData = jsondecode(meataData);
+                genIntROIPlane(maskData, hSliceData.AcquisitionPathIdx, hSliceData.zsAbsolute);
+                
+
             else
                 % Handle errors
                 error('Python script failed: %s', pyROI_Ints);
@@ -131,4 +135,28 @@ function isTifFile = isTifFilePath(txtFilePath)
     isTifFile = endsWith(lower(value), '.tif');
 end
 
+function genIntROIPlane(labelsArr, pathID, zPos)
+    
+    roiList =  arrayfun(@(hAcqPath)hAcqPath.rois,hS2.hAcquisitionPaths,'UniformOutput',false);
+    
+    slice =  squeeze(labelsArr);
+    labelInts = unique(slice);
+    
+    for j = 1:length(labelInts)
+    
+        label = labelInts(j)
+        if label>0;
+            [row, col] = find(slice ==label);
+            roi_coord = double([row,col+400]);
+            slap2_roi = slap2.roi.ArbitraryRoi(roi_coord, "Integrate", 5000);
+            slap2_roi.z = zPos;
+            roiList{pathID}(end+1) = slap2_roi;
+    
+        end
+    end
+    
+    
+    hS2.hAcquisitionPaths(pathID).rois = roiList{pathID}
 
+
+end

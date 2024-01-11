@@ -53,6 +53,7 @@ function listenForRisingEdge(daqDevice, channel, threshold, callback, window)
     
         %[t, sType, angle, speed] = 
         gratingProbing(window, DAQ6001)
+        pause(4)
     end
 end
 
