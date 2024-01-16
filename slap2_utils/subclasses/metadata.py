@@ -35,4 +35,4 @@ class MetaData():
                     metaData[_key] = hdf_file[_key]
                     
                 
-                self.AcquisitionContainer = AcquisitionContainer(self.metadatafile)
+            self.AcquisitionContainer = AcquisitionContainer(self.metadatafile)
