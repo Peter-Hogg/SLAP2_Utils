@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from SLAP2_Utils.datafile import DataFile
-from SLAP2_Utils.subclasses.metadata import MetaData
-from SLAP2_Utils.utils.trace import Trace
+from slap2_utils.datafile import DataFile
+from slap2_utils.subclasses.metadata import MetaData
+from slap2_utils.utils.trace import Trace
 
 
 
