@@ -121,7 +121,7 @@ class Trace:
             pixelIDs[i]=pixelIDs[i]-1
         dmdNumPix = self.dataFile.header['dmdPixelsPerRow'] * self.dataFile.header['dmdPixelsPerColumn']
 
-        pixelReplacementMap = copy.deepcopy(self.dataFile.zPixelReplacementMaps)
+        pixelReplacementMap = copy.deepcopy(self.dataFile.zPixelReplacementMaps[])
             
 
 

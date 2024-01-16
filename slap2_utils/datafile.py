@@ -72,6 +72,7 @@ class DataFile():
                 return [list(filter(lambda x: x[0] != x[1], map_)) for map_ in z_maps]
             
             self.fastZs = metaData.AcquisitionContainer.ParsePlan['zs'][:]
+            print(self.fastZs)
             #Check if it breaks
             self.lineSuperPixelZIdxs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['sliceIdx']
             self.lineSuperPixelIDs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['superPixelID']
