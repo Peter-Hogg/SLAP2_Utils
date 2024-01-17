@@ -18,18 +18,20 @@ class Trace:
 
     def setPixelIdxs(self, rasterPixels=None, integrationPixels=None):
         if ~np.any(rasterPixels):
-            rasterPixels = np.array([])          
+            rasterPixels = np.array([])
         elif (isinstance(rasterPixels, np.ndarray) and np.issubdtype(rasterPixels.dtype, np.bool_)):
             rasterPixels = self.checkMapDims(rasterPixels)
-            rasterPixels = np.where(rasterPixels.ravel('f'))[0]+1
-
+            #rasterPixels = np.where(rasterPixels.ravel('f'))[0]+1
+            rasterPixels = np.where(rasterPixels.ravel('f'))[0]
 
         if ~np.any(integrationPixels):
-            integrationPixels = np.array([])          
+            integrationPixels = np.array([])
         elif  (isinstance(integrationPixels, np.ndarray) and np.issubdtype(integrationPixels.dtype, np.bool_)):
             integrationPixels = self.checkMapDims(integrationPixels)
             integrationPixels= np.where(integrationPixels.ravel('f'))[0]+int(self.dataFile.header['dmdPixelsPerRow']*self.dataFile.header['dmdPixelsPerColumn'])+1
+
         pixelIdxs_ = np.uint32(np.concatenate((rasterPixels, integrationPixels), axis=None))
+
         self.TracePixels = self.getTracePixels(pixelIdxs_)
 
         self.pixelIdxs = pixelIdxs_
@@ -83,6 +85,9 @@ class Trace:
 
             spatialWeight = tracePix.superPixelNumPixelsSelected / tracePix.superPixelNumPixels
             weightedData = np.convolve(lineData, tempKernel * spatialWeight, mode='same')
+
+
+
             tempWeights = np.convolve(sampled, tempKernel, mode='same')
             npad = len(expectedKernel) - 1
 
@@ -91,14 +96,17 @@ class Trace:
             first = npad - npad//2
             expected=expected[first:first+len(lineData)]
 
+
+
             npad1 = len(expectedKernel) - 1
             expectedN = np.convolve(sampled, expectedKernel, mode='full')
             first2 = npad1 - npad1//2 
             expectedN=expectedN[first2:first2+len(sampled)]
 
             expected = expected / (expectedN + np.finfo(float).eps)
+
             expectedWeighted = expected * tempWeights
-            sumDataWeighted += weightedData
+            sumDataWeighted = sumDataWeighted + weightedData
             sumExpected += expected
             sumExpectedWeighted += expectedWeighted
 
@@ -116,27 +124,31 @@ class Trace:
         return hFuture
 
     def getTracePixels(self, pixelIdxs):
-        pixelIDs = np.unique(pixelIdxs) 
+        pixelIDs = np.unique(pixelIdxs)
+
         for i in range(len(pixelIDs)):
             pixelIDs[i]=pixelIDs[i]-1
+
         dmdNumPix = self.dataFile.header['dmdPixelsPerRow'] * self.dataFile.header['dmdPixelsPerColumn']
 
-        pixelReplacementMap = copy.deepcopy(self.dataFile.zPixelReplacementMaps[])
-            
+
+
+        pixelReplacementMap = copy.deepcopy(self.dataFile.zPixelReplacementMaps[self.zIdx-1])
+        #pixelReplacementMap = copy.deepcopy(self.dataFile.zPixelReplacementMaps)
 
 
         intMask = pixelReplacementMap[1,:] >= dmdNumPix
+
         j=0
         for i in intMask:
             if i:
                 pixelReplacementMap[0,j]=pixelReplacementMap[0,j]+dmdNumPix
             j=j+1
         sortIdxs = np.argsort(pixelReplacementMap[0])
+
         idxs1=ismembc2(pixelIDs,pixelReplacementMap[0])
         validSuperPixelIDs =pixelReplacementMap[1,idxs1]
-
         validSuperPixelIDs, validCounts = np.unique(validSuperPixelIDs, return_counts=True)
-
 
 
 
@@ -169,8 +181,8 @@ class Trace:
         for idx in range(len(NewTracePixels)):
             NewTracePixels[idx].superPixelId = validSuperPixelIDs[idx]
             NewTracePixels[idx].superPixelNumPixels = superPixelNumPixels[idx]
-
             NewTracePixels[idx].superPixelNumPixelsSelected = validCounts[idx]
+
   
         
         for lineIdx in range(len(self.dataFile.lineSuperPixelIDs)):

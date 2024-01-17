@@ -70,8 +70,14 @@ class DataFile():
             def filter_z_pixel_replacement_maps(z_maps):
                 # Using list comprehension for simplified logic
                 return [list(filter(lambda x: x[0] != x[1], map_)) for map_ in z_maps]
-            
-            self.fastZs = metaData.AcquisitionContainer.ParsePlan['zs'][:]
+
+            fastz = metaData.AcquisitionContainer.ParsePlan['zs'][:]
+            final_fastz = [-10203] #initiating with a value thats never found
+            for i in fastz:
+                final_fastz.append(i[0])
+
+            self.fastZs = final_fastz
+
             print(self.fastZs)
             #Check if it breaks
             self.lineSuperPixelZIdxs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['sliceIdx']
