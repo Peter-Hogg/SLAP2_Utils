@@ -111,6 +111,9 @@ class Trace:
             sumExpectedWeighted += expectedWeighted
 
         trace = sumDataWeighted / (sumExpectedWeighted + np.finfo(float).eps) * sumExpected
+
+        #To be added: slap2dataview post-process conditional
+
         return trace, sumDataWeighted, sumExpected, sumExpectedWeighted
 
 
@@ -231,7 +234,7 @@ def ismembc2(A, B):
     Fast membership test for 2D arrays based on sorted order.
     Returns a boolean array indicating which rows of A are also present in B.
     Parameters:
-    - A: 2D numpy array to test for membership in B
+    - A: 2D numpy array  totest for membership in B
     - B: 2D numpy array
     Returns:
     - boolean numpy array of shape (A.shape[0],)
