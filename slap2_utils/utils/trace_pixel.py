@@ -63,6 +63,7 @@ class TracePixel:
 
         self.isLoaded = True
 
+    # Never used, architecture only allows this to be set up in Trace
     def process(self, windowWidth_lines, expectedWindowWidth_lines):
         self.load()
 
