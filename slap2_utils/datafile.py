@@ -5,9 +5,9 @@ import scipy.io
 import h5py
 
 from .subclasses.metadata import MetaData
-from .utils.file_header import load_file_header_v2 
+from .utils.file_header import load_file_header_v2
 
-
+from skimage.draw import polygon_perimeter
 
 
 class DataFile():
@@ -105,7 +105,76 @@ class DataFile():
             raise FileNotFoundError('Data file not found.')
         self.rawData = np.memmap(self.filename, dtype='uint32')
         self.header = self.load_file_header(self.rawData)
-            
+    def unique_xy_roi(self):
+
+        # nested function
+        def overlap(area1, area2):
+            # Check if two areas overlap along the x-axis or y-axis
+            overlap_x = not (area1[1][0] < area2[0][0] or area1[0][0] > area2[1][0])
+            overlap_y = not (area1[1][1] < area2[0][1] or area1[0][1] > area2[1][1])
+
+            # Return True if there is any overlap along both axes
+            return overlap_x and overlap_y
+
+        areas = []
+        for i in range(len(self.metaData.AcquisitionContainer.ROIs)):
+            roi_shape = hDataFile.metaData.AcquisitionContainer.ROIs[i].shapeData
+
+            img = np.zeros((800, 1280), dtype=np.uint8)
+
+            rr, cc = polygon_perimeter(roi_shape[0, :], roi_shape[1, :],
+
+                                   shape=img.shape, clip=True)
+
+            # VERY IMPORTANT
+            for k in range(len(rr)):
+                rr[k] = rr[k] - 1
+
+            for j in range(len(cc)):
+                cc[j] = cc[j] - 1
+
+            img[rr, cc] = 1
+
+            # rasterPixels = pixelMask;
+            # integrationPixels = pixelMask;
+
+            pixelMask = np.full((800, 1280), False)
+            pixelMask[img == 1] = True
+
+
+            coords = np.where(pixelMask==1)
+            min_y = np.min(coords[0])
+            max_y = np.max(coords[0])
+            min_x = np.min(coords[1])
+            max_x = np.max(coords[1])
+
+
+            areas.append([[min_x, max_x],[min_y, max_y]])
+
+        non_overlapping_indices = []
+
+        for i in range(len(areas)):
+            area1 = areas[i]
+
+
+            # Check against all other areas
+            for j in range(len(areas)):
+                if i != j:  # Avoid self-comparison
+                    area2 = areas[j]
+
+                    # Check if the two areas overlap
+                    if overlap(area1, area2):
+                        break
+
+            # If no overlaps were found, add the index to the result
+
+            non_overlapping_indices.append(i)
+
+        return non_overlapping_indices
+
+
+
+
     # Function for loading file header:
     def load_file_header(self, rawData):
         raw_data = np.frombuffer(rawData, dtype=np.uint32)
