@@ -118,35 +118,25 @@ class DataFile():
 
         areas = []
         for i in range(len(self.metaData.AcquisitionContainer.ROIs)):
-            roi_shape = hDataFile.metaData.AcquisitionContainer.ROIs[i].shapeData
+            roi_shape = self.metaData.AcquisitionContainer.ROIs[i].shapeData
 
             img = np.zeros((800, 1280), dtype=np.uint8)
+            print(i)
+            if set(roi_shape[0]) == 1 or set(roi_shape[1]) == 1:
+                rr = roi_shape[0, 0] - 1
+                cc = roi_shape[1, 0] - 1
+                min_y = rr
+                max_y = rr
+                min_x = cc
+                max_x = cc
 
-            rr, cc = polygon_perimeter(roi_shape[0, :], roi_shape[1, :],
+                areas.append([[min_x, max_x], [min_y, max_y]])
+                continue
 
-                                   shape=img.shape, clip=True)
-
-            # VERY IMPORTANT
-            for k in range(len(rr)):
-                rr[k] = rr[k] - 1
-
-            for j in range(len(cc)):
-                cc[j] = cc[j] - 1
-
-            img[rr, cc] = 1
-
-            # rasterPixels = pixelMask;
-            # integrationPixels = pixelMask;
-
-            pixelMask = np.full((800, 1280), False)
-            pixelMask[img == 1] = True
-
-
-            coords = np.where(pixelMask==1)
-            min_y = np.min(coords[0])
-            max_y = np.max(coords[0])
-            min_x = np.min(coords[1])
-            max_x = np.max(coords[1])
+            min_y = np.min(roi_shape[0])
+            max_y = np.max(roi_shape[0])
+            min_x = np.min(roi_shape[1])
+            max_x = np.max(roi_shape[1])
 
 
             areas.append([[min_x, max_x],[min_y, max_y]])
