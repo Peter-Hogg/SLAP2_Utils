@@ -227,6 +227,16 @@ class Trace:
         sorted_trace_pixels = sorted(TracePixels, key=lambda x: x.superPixelId)
         return TracePixels
 
+        def getTracePixels(self, pixelIdxs):
+            pixelIDs = np.unique(pixelIdxs)
+
+            for i in range(len(pixelIDs)):
+                pixelIDs[i] = pixelIDs[i] - 1
+
+            dmdNumPix = self.dataFile.header['dmdPixelsPerRow'] * self.dataFile.header['dmdPixelsPerColumn']
+
+
+
 
 
 def ismembc2(A, B):
