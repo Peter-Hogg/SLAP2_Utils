@@ -36,7 +36,7 @@ class  AcquisitionContainer():
                             acqParsePlan[_key] = _data
 
             
-            _ref = hdf_file['AcquisitionContainer']['ParsePlan']['pixelReplacementMaps'][:][0][0]
+            _refs = []
             for index in range(len(hdf_file['AcquisitionContainer']['ParsePlan']['pixelReplacementMaps'][:])):
                 _refs.append(hdf_file['AcquisitionContainer']['ParsePlan']['pixelReplacementMaps'][:][index][0])
             self.ParsePlan['pixelReplacementMaps'] = [hdf_file[_ref][:] for _ref in _refs]
