@@ -105,65 +105,6 @@ class DataFile():
             raise FileNotFoundError('Data file not found.')
         self.rawData = np.memmap(self.filename, dtype='uint32')
         self.header = self.load_file_header(self.rawData)
-    def unique_xy_roi(self):
-
-        # nested function
-        def overlap(area1, area2):
-            # Check if two areas overlap along the x-axis or y-axis
-            overlap_x = not (area1[1][0] < area2[0][0] or area1[0][0] > area2[1][0])
-            overlap_y = not (area1[1][1] < area2[0][1] or area1[0][1] > area2[1][1])
-
-            # Return True if there is any overlap along both axes
-            return overlap_x and overlap_y
-
-        areas = []
-        for i in range(len(self.metaData.AcquisitionContainer.ROIs)):
-            roi_shape = self.metaData.AcquisitionContainer.ROIs[i].shapeData
-
-            img = np.zeros((800, 1280), dtype=np.uint8)
-            print(i)
-            if set(roi_shape[0]) == 1 or set(roi_shape[1]) == 1:
-                rr = roi_shape[0, 0] - 1
-                cc = roi_shape[1, 0] - 1
-                min_y = rr
-                max_y = rr
-                min_x = cc
-                max_x = cc
-
-                areas.append([[min_x, max_x], [min_y, max_y]])
-                continue
-
-            min_y = np.min(roi_shape[0])
-            max_y = np.max(roi_shape[0])
-            min_x = np.min(roi_shape[1])
-            max_x = np.max(roi_shape[1])
-
-
-            areas.append([[min_x, max_x],[min_y, max_y]])
-
-        non_overlapping_indices = []
-
-        for i in range(len(areas)):
-            area1 = areas[i]
-
-
-            # Check against all other areas
-            for j in range(len(areas)):
-                if i != j:  # Avoid self-comparison
-                    area2 = areas[j]
-
-                    # Check if the two areas overlap
-                    if overlap(area1, area2):
-                        break
-
-            # If no overlaps were found, add the index to the result
-
-            non_overlapping_indices.append(i)
-
-        return non_overlapping_indices
-
-
-
 
     # Function for loading file header:
     def load_file_header(self, rawData):
@@ -214,3 +155,88 @@ class DataFile():
         #first_line_header = obj.get_line_header(1, 1)
         #obj.header.referenceTimestamp = first_line_header.timestamp
         return header
+
+    def get_line_data_idxs(self, lineIdx, cycleIdx=None):
+        # Add logic to get line data indices
+        pass
+
+    def get_line_data(self, line_indices, cycle_indices, i_channel=None, async_options=None):
+        if i_channel is None:
+            i_channel = np.arange(1, self.header['numChannels'] + 1)
+        if async_options is None:
+            async_options = {
+                'AsyncCallback': None,
+                'AsyncLinesPerChunk': 1000
+            }
+
+        cycle_offset = (cycle_indices - 1) * self.header['bytesPerCycle']// 2
+        line_start_indices = self.lineDataStartIdxs[line_indices - 1] + cycle_offset
+        line_num_elements = self.lineDataNumElements[line_indices - 1]
+
+        if self.header['channelsInterleave'] == 1:
+            line_data = self.get_interleaved_data(line_start_indices, line_num_elements, i_channel)
+        else:
+            line_data = self.get_segmented_data(line_start_indices, line_num_elements, i_channel, async_options)
+
+        return line_data
+
+    def get_segmented_data(self, line_start_indices, line_num_elements, i_channel, async_options):
+        channel_line_num_elements = line_num_elements // self.header['numChannels']
+        channel_offsets = i_channel - 1
+        line_offset_indices = min(channel_offsets) * channel_line_num_elements
+
+        channel_range = max(channel_offsets) - min(channel_offsets) + 1
+        total_line_sizes = channel_line_num_elements * channel_range
+        total_line_start_indices = (line_start_indices - 1) + line_offset_indices
+        line_ranges = np.column_stack((total_line_start_indices, total_line_sizes))
+        num_queried_channels = len(i_channel)
+
+        if async_options['AsyncCallback'] is None:
+            # will break here. Need to replace the function of the mex file
+            #line_data = MexFetchImageData('GETDATA', self.StreamId, line_ranges)
+            line_data = self.get_data(self.StreamId, line_ranges)
+            print(line_data)
+            if num_queried_channels > 1:
+                line_data = correct_segmented_channel_line(line_data, num_queried_channels)
+        else:
+            if num_queried_channels > 1:
+                callback = lambda chunk: async_options['AsyncCallback'](correct_segmented_channel_line(chunk, num_queried_channels))
+            else:
+                callback = async_options['AsyncCallback']
+            # will break here. Need to replace the function of the mex file   
+            line_data = MexFetchImageData('GETDATAASYNC', self.StreamId, line_ranges, async_options['AsyncLinesPerChunk'], callback)
+
+        return line_data
+
+
+    def get_data(self, file_id, line_metadata):
+        # Ensure rawData is in the correct dtype ('uint16') before processing
+        if self.rawData.dtype != np.uint16:
+            raw_data = self.rawData.view(np.uint16)
+        else:
+            raw_data = self.rawData
+
+        # Process line range data
+        num_lines = len(line_metadata)
+        line_indices = [{'element_offset': md[0], 'num_elements': md[1]} for md in line_metadata]
+        
+        # Read and process data based on line_indices
+        line_data = [self.read_data(raw_data, li) for li in line_indices]
+        
+        # Convert to desired output format (if necessary)
+        output = [line for line in line_data]
+        
+        return output
+
+    def read_data(self, raw_data, line_index):
+        # Extract specific line data using element_offset and num_elements
+        # Ensure both indices are integers
+        start_index = int(line_index['element_offset'])
+        end_index = int(start_index + line_index['num_elements'])
+        print(start_index, end_index)
+        # Ensure indexing is within bounds and adjust if necessary
+        # Also ensure end_index is an integer
+        end_index = min(end_index, len(raw_data))
+        
+        return raw_data[start_index:end_index]
+
