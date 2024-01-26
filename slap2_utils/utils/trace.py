@@ -228,6 +228,13 @@ class Trace:
         return TracePixels
 
 
+        # To Do
+        def getAverageTrace(self):
+            return None
+
+
+
+
 
 def ismembc2(A, B):
     """
