@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from skimage.draw import polygon_perimeter
  
 from ..utils import trace
@@ -29,22 +30,29 @@ def returnAllTrace(datafile, chIdx=1,  zIdx=1, window=10, expectedWindowWidth=10
 
 def cleanVolumeTrace(datafile, zId, trace):
     sliceIdx = datafile.metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['sliceIdx']
-    zId =0
     dataIndex = []
     for _idx, _sliceIdx in enumerate(sliceIdx):
         if _sliceIdx.shape[0] ==1:
             if zId in _sliceIdx:
                 dataIndex.append(_idx)
+    print(dataIndex)
     cleanTrace = []
+    print(trace[18])
     for x in range(0, trace.shape[0], len(sliceIdx)):
-        cleanTrace.append(np.median(trace[np.array(dataIndex)+x]))
+        print(np.array(dataIndex), np.array(dataIndex)+x)
+        traceIdx = np.array(dataIndex)+x
+        print(trace[traceIdx[0]])
+        print(trace[[np.array(traceIdx)]])
+        cleanTrace.append(np.mean(trace[np.array(dataIndex)+x]))
     return np.array(cleanTrace)
 
 
 def returnVolumeTrace(datafile, roiIndex, chIdx=1):
     ROI = datafile.metaData.AcquisitionContainer.ROIs[roiIndex]
+    print(ROI.z)
     zIdx = datafile.fastZs.index(ROI.z)
-    hTrace = trace.Trace(datafile,zIdx,chIdx)
+    print(zIdx)
+    hTrace = trace.Trace(datafile ,zIdx, chIdx)
     roi_shape = ROI.shapeData
     img = np.zeros((800, 1280), dtype=np.uint8)
     rr, cc = polygon_perimeter(roi_shape[0,:],
@@ -61,6 +69,8 @@ def returnVolumeTrace(datafile, roiIndex, chIdx=1):
 
     hTrace.setPixelIdxs(rasterPixels,integrationPixels)
     _trace, _, _, _ = hTrace.process(1, 1)
+    plt.plot(_trace)
+    plt.show()
     _trace = cleanVolumeTrace(datafile, zIdx, _trace)
     return _trace
    
