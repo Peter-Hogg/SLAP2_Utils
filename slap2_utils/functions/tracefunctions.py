@@ -28,30 +28,28 @@ def returnAllTrace(datafile, chIdx=1,  zIdx=1, window=10, expectedWindowWidth=10
         traces[_roi] = _trace
     return traces
 
-def cleanVolumeTrace(datafile, zId, trace):
+def cleanVolumeTrace(datafile, zId, rawTrace):
     sliceIdx = datafile.metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['sliceIdx']
     dataIndex = []
+    # Need to subtract one for python indexing?
+    zId -= 1
     for _idx, _sliceIdx in enumerate(sliceIdx):
         if _sliceIdx.shape[0] ==1:
             if zId in _sliceIdx:
                 dataIndex.append(_idx)
     print(dataIndex)
+
     cleanTrace = []
-    print(trace[18])
-    for x in range(0, trace.shape[0], len(sliceIdx)):
-        print(np.array(dataIndex), np.array(dataIndex)+x)
+
+    for x in range(0, rawTrace.shape[0], len(sliceIdx)):
         traceIdx = np.array(dataIndex)+x
-        print(trace[traceIdx[0]])
-        print(trace[[np.array(traceIdx)]])
-        cleanTrace.append(np.mean(trace[np.array(dataIndex)+x]))
+        cleanTrace.append(np.mean(rawTrace[np.array(dataIndex)+x]))
     return np.array(cleanTrace)
 
 
 def returnVolumeTrace(datafile, roiIndex, chIdx=1):
-    ROI = datafile.metaData.AcquisitionContainer.ROIs[roiIndex]
-    print(ROI.z)
+    ROI = datafile.metaData.AcquisitionContainer.ROIs[roiIndex]   
     zIdx = datafile.fastZs.index(ROI.z)
-    print(zIdx)
     hTrace = trace.Trace(datafile ,zIdx, chIdx)
     roi_shape = ROI.shapeData
     img = np.zeros((800, 1280), dtype=np.uint8)
@@ -68,9 +66,9 @@ def returnVolumeTrace(datafile, roiIndex, chIdx=1):
     hTrace = trace.Trace(datafile,zIdx,chIdx)
 
     hTrace.setPixelIdxs(rasterPixels,integrationPixels)
-    _trace, _, _, _ = hTrace.process(1, 1)
-    plt.plot(_trace)
+    _trace1, _, _, _ = hTrace.process(1, 1)
+    plt.plot(_trace1)
     plt.show()
-    _trace = cleanVolumeTrace(datafile, zIdx, _trace)
-    return _trace
+    _trace = cleanVolumeTrace(datafile, zIdx, _trace1)
+    return _trace1, _trace
    
