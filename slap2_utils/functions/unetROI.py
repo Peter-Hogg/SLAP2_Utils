@@ -100,12 +100,17 @@ def model_predict(image, mode, spatial_dim):
                     norm = norm_type,
                     dropout = dropout)
 
-        model.load_state_dict(checkpoint['model_state_dict'])
-        try: 
+        try :
+
             print('GPU used')
-            model = model.to("gpu")
+            print(torch.device("cuda"))
+ 
+            device = torch.device("cuda")
+            model.load_state_dict(torch.load(model_path, map_location="cuda:0"))
+            model = model.to(device)
         except:
-            print('GPU used')
+            model.load_state_dict(checkpoint['model_state_dict'])
+            print('CPU used')
             model = model.to('cpu')
         inferer = SliceInferer(roi_size=patch_size, sw_batch_size=batch_size, spatial_dim = 0, progress = True)
 
