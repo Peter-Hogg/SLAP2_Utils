@@ -1,3 +1,4 @@
+import sys
 import dask
 import os
 import numpy as np 
@@ -178,5 +179,16 @@ def averageStackGPU(path):
 
 
     avgStack = np.array(dask.compute(results))
-    
-    tifffile.imwrite('averageGPU_' + os.path.basename(path), avgStack)
+    newFilePath = os.path.join(os.path.split(path)[0], 'averageGPU_'+os.path.basename(path))
+    tifffile.imwrite(newFilePath, avgStack)
+    return newFilePath
+
+def main():
+    if len(sys.argv)<2:
+        print('No path to tif file given')
+        sys.exit(1)
+    tifPath = sys.argv[1]
+    averageStackGPU(tifPath)
+
+if __name__ == "__main__":
+    main()

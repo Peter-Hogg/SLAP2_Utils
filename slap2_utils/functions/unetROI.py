@@ -1,3 +1,4 @@
+import sys
 import math
 import matplotlib.pyplot as plt
 import matplotlib.colors as mplc
@@ -37,9 +38,9 @@ from skimage.measure import label, regionprops
 import skimage.measure as measure
 
 # import processing functions
-from processing.processing_functions import *
+from slap2_utils.functions.processing.processing_functions import *
 
-from DouglasPeucker import DouglasPeucker
+from slap2_utils.functions.DouglasPeucker import DouglasPeucker
 
 # import machine learning modules
 import torch
@@ -51,7 +52,7 @@ from monai.inferers.inferer import SliceInferer
 
 
 def model_predict(image, mode, spatial_dim):
-    path = os.getcwd()
+    path = "C:\\Users\\haasl\\Documents\\SLAP2_Utils\\slap2_utils\\functions\\"
 
     if spatial_dim == 3:
         # use AI assistance
@@ -71,7 +72,7 @@ def model_predict(image, mode, spatial_dim):
         
         # img_dataloader = DataLoader(processed_test_img, batch_size = 1)
 
-        reconstructed_img = inference(processed_test_img,f'{path}/models/{mode}.onnx', batch_size, patch_size, orig_shape)
+        reconstructed_img = inference(processed_test_img,f'{path}\\models\\{mode}.onnx', batch_size, patch_size, orig_shape)
         reconstructed_img = reconstructed_img.astype(int)
 
         # soma category is inferenced for only "Neuron" => change all the soma labels (1) to dendrite labels (2)
@@ -435,12 +436,26 @@ def generateROIs(IMAGE, PIX = 10):
     SLAP_ROI = SLAP_ROI.astype(int)   
     SLAP_Blocks = SLAP_Blocks.astype(int)
 
-    np.save("test.npy", SLAP_ROI)
     end = time.time()
     print('Time Elapsed: ', end - start)
+    
     test = napari.Viewer()
     test.add_image(data1[:, 0, 0, :, :], name='Neuron', scale=(5, 1, 1), colormap='gray', blending='additive')
     #test.add_labels(segsperplane, name='Segments', scale=(5, 1, 1), blending='additive')
+    newFilePath = os.path.join(os.path.split(IMAGE)[0], 'averageGPU_'+os.path.basename(IMAGE))
     test.add_labels(SLAP_ROI, name='ROI', scale=(5, 1, 1), blending='additive')
-    fileName = os.path.basename(IMAGE)[:-4]
-    savemat("%s_unetRoi.mat" %(str(IMAGE[:-4])), {'roi':SLAP_ROI})
+
+    newFilePath = os.path.join(os.path.split(IMAGE)[0], '_unetRoi_'+os.path.basename(IMAGE))
+    np.save(newFilePath[:-4]+'.npy', SLAP_ROI)
+
+    savemat(newFilePath[:-4]+'.mat', {'roi':SLAP_ROI})
+
+def main():
+    if len(sys.argv)<2:
+        print('No path to tif file given')
+        sys.exit(1)
+    tifPath = sys.argv[1]
+    generateROIs(tifPath)
+
+if __name__ == "__main__":
+    main()

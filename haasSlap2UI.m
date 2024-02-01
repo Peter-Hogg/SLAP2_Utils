@@ -1,9 +1,11 @@
 function SLAP2UtilFuncs()
+    slap2PythonPath = 'C:\Users\haasl\Documents\SLAP2_Utils';
+    setenv('PYTHONPATH', slap2PythonPath);
     P = py.sys.path;
-    if count(P, '/mnt/cf28d361-d831-452b-ac27-06bb7bb8fb9e/SSD_Drive/SLAP2_Test_Binaries/SLAP2_Utils') == 0
-        insert(P, int32(0), '/mnt/cf28d361-d831-452b-ac27-06bb7bb8fb9e/SSD_Drive/SLAP2_Test_Binaries/SLAP2_Utils');
+    if count(P, 'C:\Users\haasl\Documents\SLAP2_Utils') == 0;
+        insert(P, int32(0), 'C:\Users\haasl\Documents\SLAP2_Utils');
     end
-
+    mod = py.importlib.import_module('slap2_utils');
 
     % Create the UI figure
     fig = uifigure('Name', 'SLAP2 Util Functions', 'Position', [100 100 600 400]);
@@ -43,12 +45,16 @@ function SLAP2UtilFuncs()
     bntSoma.ButtonPushedFcn = @(btn,event) somaCallback(btn, txtFilePath1);
 
     
+    btnAvgStack = uibutton(gl, 'Text', ['Generate ROIs']);
+    btnAvgStack.Layout.Row = 4;
+    btnAvgStack.Layout.Column = 1;
+    btnAvgStack.ButtonPushedFcn = @(btn,event) avgStackCallback(btn, txtFilePath1);
+
     % Placeholder buttons
-    for i = 4:5
-        btn = uibutton(gl, 'Text', ['Button ' num2str(i)]);
-        btn.Layout.Row = i;
-        btn.Layout.Column = 1;
-    end
+    
+    btn = uibutton(gl, 'Text', ['Button ' num2str(i)]);
+    btn.Layout.Row = 5;
+    btn.Layout.Column = 1;
 
     % Create a text area for debugging in the lower right corner
     txtDebug = uitextarea(gl);
@@ -102,6 +108,58 @@ function SLAP2UtilFuncs()
         end
     end
 end
+
+function avgStackCallback(btn, txtFilePath)
+        if isTifFilePath(txtFilePath) == 0;
+            txtDebug.Value ='No Tiff Selected';
+        else
+            txtDebug.Value = 'Generating Average Stack...';
+
+            filePath = txtFilePath.Value;
+            filePath = strtrim(filePath{1});
+  
+            commandStr = sprintf('python -m slap2_utils.functions.imagestacks %s', filePath);
+            [status, avgStackPath] = system(commandStr);
+            
+            if status == 0
+                txtDebug.Value = 'Average Stack Complete';
+                [folderPath, baseFileName, extension] = fileparts(filePath);
+                newFileName = fullfile(folderPath, ['averageGPU_' baseFileName extension]);
+                commandStr = sprintf('python -m slap2_utils.functions.unetROI %s', newFileName)
+                [status2, avgStackPath] = system(commandStr);
+                if status2 == 0
+                    txtDebug.Value = 'ROI Created';
+                
+                else
+                    error('Python script failed: %s', avgStackPath);
+
+                end
+                %somaInts = load(newFileName);
+                %maskData = somaInts.masks;
+                %figure;
+                %imagesc(maskData);
+
+                % Get metadata for slize info
+                %t = Tiff(filePath,'r');
+                %meataData = t.getTag('ImageDescription');
+                %hSliceData = jsondecode(meataData);
+                %genIntROIPlane(maskData, hSliceData.AcquisitionPathIdx, hSliceData.zsAbsolute);
+                
+            
+                txtDebug.Value = 'ROI Created';
+
+            else
+                % Handle errors
+                error('Python script failed: %s', avgStackPath);
+            end
+                
+            % Convert the Python object to a MATLAB array
+           
+
+
+        end
+end
+
 
 function fileSelectCallback(btn, txtFilePath)
     % File selection callback
@@ -160,3 +218,36 @@ function genIntROIPlane(labelsArr, pathID, zPos)
 
 
 end
+
+
+
+%% Import the array, each interger is an roi
+function loadROI(roiMATfile)
+    labels = load(roiMATfile);
+    stack_size = size(labels);
+    roiList =  arrayfun(@(hAcqPath)hAcqPath.rois,hS2.hAcquisitionPaths,'UniformOutput',false);
+   
+    %% Array of unique 
+    stepSize = 2;
+    for i = 1:stack_size[0]
+        slice =  squeeze(labels(i,:,:));
+        labelInts = unique(slice);
+    
+        for j = 1:length(labelInts)
+    
+            label = labelInts(j)
+            if label>0;
+                z = hS2.hAcquisitionPath1.acquisitionZs(i);
+                [row, col] = find(slice ==label);
+                roi_coord = double([row,col]);
+                slap2_roi = slap2.roi.ArbitraryRoi(roi_coord, "Integrate", 5000);
+                slap2_roi.z = z;
+                roiList{1}(end+1) = slap2_roi;
+        
+            end
+        end
+    end
+    
+    hS2.hAcquisitionPaths(1).rois = roiList{1}
+end
+
