@@ -1,4 +1,4 @@
-function  [time, sType] = AllenSTAChecker(win, winRect, prob, sizes, daq)
+function  [time, sType] = AllenSTAChecker(win, winRect, blackidx, whiteidx, sizes, daq)
     % Get the size of the on screen window
     [screenXpixels, screenYpixels] = Screen('WindowSize', win);
     
@@ -32,24 +32,16 @@ function  [time, sType] = AllenSTAChecker(win, winRect, prob, sizes, daq)
     %Adjust Probability Here
 
 
-    % Randomly choose which squares are black and white
-    r=randi(2,numSquares,1)-1;
+    % Set up background as default
+    
     for i = 1: numSquares
-        if r(i)==1
-            if prob>rand()
-                if 0.5 >=rand()
-                    r(i)=r(i)*1;
-                else
-                    r(i)=0;
-                end
-            else
-                r(i)=0.5;
-            end
-        else 
-            r(i)=0.5;
-        end
-       
+        r(i) = 0.5;  
     end
+
+    % Set up nonrandom
+    r(blackidx) = 1;  
+    r(whiteidx) = 1;
+ 
 
     % Make our rectangle coordinates
     randPixel = nan(3, 3);
