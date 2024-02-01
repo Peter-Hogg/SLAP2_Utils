@@ -11,6 +11,9 @@ import random
 import subprocess
 import time
 
+from scipy.io import savemat
+
+
 from aicsimageio import AICSImage, imread 
 from scipy.ndimage import center_of_mass
 from scipy.ndimage import shift as img_shift
@@ -439,4 +442,5 @@ def generateROIs(IMAGE, PIX = 10):
     test.add_image(data1[:, 0, 0, :, :], name='Neuron', scale=(5, 1, 1), colormap='gray', blending='additive')
     #test.add_labels(segsperplane, name='Segments', scale=(5, 1, 1), blending='additive')
     test.add_labels(SLAP_ROI, name='ROI', scale=(5, 1, 1), blending='additive')
-    #savemat("SatRoiWin%s.mat" %(str(win)), {'roi':roi})
+    fileName = os.path.basename(IMAGE)[:-4]
+    savemat("%s_unetRoi.mat" %(str(IMAGE[:-4])), {'roi':SLAP_ROI})
