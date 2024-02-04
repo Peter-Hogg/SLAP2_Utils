@@ -1,4 +1,3 @@
-import sys
 import math
 import matplotlib.pyplot as plt
 import matplotlib.colors as mplc
@@ -11,9 +10,7 @@ import pandas as pd
 import random
 import subprocess
 import time
-
-from scipy.io import savemat
-
+import copy
 
 from aicsimageio import AICSImage, imread 
 from scipy.ndimage import center_of_mass
@@ -37,10 +34,12 @@ from skimage.segmentation import watershed, random_walker
 from skimage.measure import label, regionprops
 import skimage.measure as measure
 
-# import processing functions
-from slap2_utils.functions.processing.processing_functions import *
+from scipy.io import savemat
 
-from slap2_utils.functions.DouglasPeucker import DouglasPeucker
+# import processing functions
+from processing.processing_functions import *
+
+from DouglasPeucker import DouglasPeucker
 
 # import machine learning modules
 import torch
@@ -52,7 +51,7 @@ from monai.inferers.inferer import SliceInferer
 
 
 def model_predict(image, mode, spatial_dim):
-    path = "C:\\Users\\haasl\\Documents\\SLAP2_Utils\\slap2_utils\\functions\\"
+    path = os.getcwd()
 
     if spatial_dim == 3:
         # use AI assistance
@@ -72,7 +71,7 @@ def model_predict(image, mode, spatial_dim):
         
         # img_dataloader = DataLoader(processed_test_img, batch_size = 1)
 
-        reconstructed_img = inference(processed_test_img,f'{path}\\models\\{mode}.onnx', batch_size, patch_size, orig_shape)
+        reconstructed_img = inference(processed_test_img,f'{path}/models/{mode}.onnx', batch_size, patch_size, orig_shape)
         reconstructed_img = reconstructed_img.astype(int)
 
         # soma category is inferenced for only "Neuron" => change all the soma labels (1) to dendrite labels (2)
@@ -312,18 +311,24 @@ def generateROIs(IMAGE, PIX = 10):
     print(data1.shape)
     img_slice= data1[0,0,:,:,:]
     print(img_slice.shape)
-    labels = sliding_window_inference(img_slice)
-    print(labels.shape)
+    dendrites = img_slice.copy()
+    dendrites = gaussian(dendrites, .75)
+    _otsu = threshold_otsu(dendrites)
+    dendrites[dendrites<4] = 0
+    dendrites[dendrites>0] = 1
+    soma = dendrites
+    #labels = sliding_window_inference(img_slice)
+    #print(labels.shape)
     test = napari.Viewer()
 
     #test.add_labels(segsperplane, name='Segments', scale=(5, 1, 1), blending='additive')
-    test.add_labels(labels.astype(int), name='ROI', scale=(5, 1, 1), blending='additive')
+    test.add_labels(dendrites.astype(int), name='ROI', scale=(5, 1, 1), blending='additive')
     if not os.path.exists('results/'):
         os.makedirs('results')
 
     image = data1[0,0,:,:,:]
-    dendrites = np.zeros_like(labels[0,:,:,:])
-    dendrites[labels[0,:,:,:]==2]=1
+    #dendrites = np.zeros_like(labels[0,:,:,:])
+    #dendrites[labels[0,:,:,:]==2]=1
     dendrites = np.array(dendrites, bool)
     dendrites = remove_small_objects(dendrites, 500, connectivity=10)
 
@@ -413,9 +418,9 @@ def generateROIs(IMAGE, PIX = 10):
                     SLAP_Blocks[z, :, :] = SLAP_Blocks[z, :, :] + flipped
                     SLAP_ROI[z, :, :] = SLAP_ROI[z, :, :] + oneSeg
 
-    soma = labels[0,:,:,:].copy()
-    soma[labels[0,:,:,:]!=1]=0
-    soma = np.array(soma, bool)
+    #soma = labels[0,:,:,:].copy()
+    #soma[labels[0,:,:,:]!=1]=0
+    #soma = np.array(soma, bool)
 
 
     mask_int = soma.astype(int)  
@@ -432,30 +437,17 @@ def generateROIs(IMAGE, PIX = 10):
 
 
 
-    SLAP_ROI[int(SOMA_POINT[0]),:,:]=soma2[int(SOMA_POINT[0]),:,:]                    
+    #SLAP_ROI[int(SOMA_POINT[0]),:,:]=soma2[int(SOMA_POINT[0]),:,:]                    
     SLAP_ROI = SLAP_ROI.astype(int)   
     SLAP_Blocks = SLAP_Blocks.astype(int)
 
+    np.save("test.npy", SLAP_ROI)
     end = time.time()
     print('Time Elapsed: ', end - start)
-    
     test = napari.Viewer()
     test.add_image(data1[:, 0, 0, :, :], name='Neuron', scale=(5, 1, 1), colormap='gray', blending='additive')
     #test.add_labels(segsperplane, name='Segments', scale=(5, 1, 1), blending='additive')
-    newFilePath = os.path.join(os.path.split(IMAGE)[0], 'averageGPU_'+os.path.basename(IMAGE))
     test.add_labels(SLAP_ROI, name='ROI', scale=(5, 1, 1), blending='additive')
-
-    newFilePath = os.path.join(os.path.split(IMAGE)[0], '_unetRoi_'+os.path.basename(IMAGE))
-    np.save(newFilePath[:-4]+'.npy', SLAP_ROI)
-
-    savemat(newFilePath[:-4]+'.mat', {'roi':SLAP_ROI})
-
-def main():
-    if len(sys.argv)<2:
-        print('No path to tif file given')
-        sys.exit(1)
-    tifPath = sys.argv[1]
-    generateROIs(tifPath)
-
-if __name__ == "__main__":
-    main()
+    print(IMAGE)
+    fileName = os.path.basename(IMAGE)[:-4]
+    savemat("%s_threshRoi.mat" %(str(IMAGE[:-4])), {'roi':SLAP_ROI})
