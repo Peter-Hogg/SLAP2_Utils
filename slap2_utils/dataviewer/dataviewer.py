@@ -66,7 +66,7 @@ def return2Droi(datafile):
 def returnTraces(datafile):
     zIdx = 1
     chIdx = 1
-    hTrace = Trace(hDataFile,zIdx,chIdx);
+    hTrace = Trace(hDataFile,zIdx,chIdx)
 
 
     from skimage.draw import polygon_perimeter
@@ -149,14 +149,13 @@ plot.add_image(np.zeros((800, 1280)), name="ROI_1")
 def update_frame(ix):
     
     img = np.zeros((800, 1280), dtype=np.uint8)
-    for _line , col in enumerate(list(np.unique(cc))):
+    for _line , col in enumerate(list(np.unique(cc))[:-1]):
         _superPixVal = hTrace.TracePixels[_line].data[0][int(ix)]
         print(_superPixVal)
         for _row in list(np.where(cc==col)[0]):
             img[rr[_row], col] = _superPixVal
 
     plot["ROI_1"].data = img
-    # you can also do plot.graphics[0].data = video[ix]
 
 
 # create a QMainWindow, set the plot canvas as the main widget
