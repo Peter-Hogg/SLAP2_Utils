@@ -71,12 +71,12 @@ function  [time, sType] = AllenSTAChecker(win, winRect, prob, sizes, daq)
     pause(.001);
     write(daq, 0);
     Screen('FillRect', win, randPixel, Rects);
-     pause(1);
+    pause(1);
     % Flip to the screen
     Screen('Flip', win);
 
 
-    pause(5);
+    pause(1);
 
 
     Screen('Flip', win);

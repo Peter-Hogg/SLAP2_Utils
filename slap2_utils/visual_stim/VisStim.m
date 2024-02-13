@@ -18,7 +18,7 @@ end
 
 StimControlPanel = figure('Color','w');
 [myWin, winRect] = CreateStimWindow();
-
+ToggleScreenOff = 0
 DAQ6001 = daq('ni')
 stimTrig = addoutput(DAQ6001, "Dev1", "ao0", "Voltage");
 
@@ -80,6 +80,18 @@ SingleSineStim = uicontrol(gcf,'Style', 'push', ...
                            'String', 'Single Sine Bar', ...
                            'Position', [20 320 180 30], ...
                            'CallBack', @singleSineStim);
+
+primeExperiment = uicontrol(gcf,'Style', 'push', ...
+                           'String', 'Prime Experiment', ...
+                           'BackgroundColor', 'green', ...
+                           'Position', [20 350 180 30], ...
+                           'CallBack', @primeStim);
+
+
+blankScreen = uicontrol(gcf,'Style', 'push', ...
+                           'String', 'Blank Screen', ...
+                           'Position', [20 380 180 30], ...
+                           'CallBack', @blankScreenCallback);
 
 % Java Slider to pick grating angle 
 userAngel = javaObjectEDT(javax.swing.JSlider(0,360,1))
@@ -190,16 +202,16 @@ end
 
 function allenSTAStimuli(source,event)
      r = readmatrix('Rand_AllenCheck_15.txt')
-     for i = [1:1:15]
+     for i = [1:1:1]
         fprintf("STA Stim "+ i)
         
         t2 = now();
         datetime(t2,'ConvertFrom','datenum')
-        [t, sType, stimD] = AllenSTAChecker(myWin, winRect, r, 0.05, 100,  DAQ6001);
+        [sType] = AllenSTACheckerFast(myWin, winRect, 0.05, 250, DAQ6001);
         stimlog.time = [stimlog.time, {t}];
         datetime(t,'ConvertFrom','datenum')
-        stimlog.stim_type = [stimlog.stim_type, {sType}];
-        stimlog.stim_info = [stimlog.stim_info, {stimD}];
+        %stimlog.stim_type = [stimlog.stim_type, {sType}];
+        %stimlog.stim_info = [stimlog.stim_info, {stimD}];
         x = randi([2,6]);
         pause(x);
     end
@@ -210,6 +222,29 @@ function allenSTAStimuli(source,event)
 
 end
 
+function primeStim(source,event)
+     %AllenSTACheckerFast(myWin, winRect, 0.05, 250,  DAQ6001);
+     gratingRFbattery(myWin, winRect, DAQ6001);
+     %RFTriggerStim(myWin, winRect, DAQ6001);
+
+
+end
+
+    function blankScreenCallback(source,event)
+        
+        if ToggleScreenOff == 0
+                colorFill = [255,0,0];
+                Screen('Fillrect', myWin, colorFill);
+                Screen('Flip', myWin);
+                ToggleScreenOff = 1
+        else ToggleScreenOff == 1
+             ToggleScreenOff = 0
+             colorFill = [0,0,0];
+             Screen('Fillrect', myWin, colorFill);
+             Screen('Flip', myWin);
+        end
+
+end
 function saveStimLog(source,event)
     saveTime = clock();
     fileName = ['stimLog', saveTime(4:6), '.csv']
