@@ -207,7 +207,7 @@ function allenSTAStimuli(source,event)
         
         t2 = now();
         datetime(t2,'ConvertFrom','datenum')
-        [sType] = AllenSTACheckerFast(myWin, winRect, 0.05, 250, DAQ6001);
+        [sType] = AllenSTACheckerFast(myWin, winRect, 3, 200, DAQ6001);
         stimlog.time = [stimlog.time, {t}];
         datetime(t,'ConvertFrom','datenum')
         %stimlog.stim_type = [stimlog.stim_type, {sType}];
