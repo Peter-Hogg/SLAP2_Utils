@@ -126,6 +126,46 @@ class Trace:
         hFuture = hFuture_.afterAll(finalize, 1, PassFuture=True)
         return hFuture
 
+
+    def getRawSuperPixel(self,superpixel=1):
+        for j in self.TracePixels:
+            if not j.loaded:
+                print("You have not loaded the trace properly!")
+                break 
+
+        rawlist=[]
+        if len(self.TracePixels[superpixel].data[0]) == 1:
+            for i in range(len(self.TracePixels[superpixel].data)):
+                rawlist.append(self.TracePixels[superpixel].data[i])
+            return rawlist
+
+        else:
+            for i in range(len(self.TracePixels[superpixel].data)):
+                for j in range(len(self.TracePixels[superpixel].data[i])):
+                    rawlist.append(self.TracePixels[superpixel].data[i][j])
+            return rawlist
+
+    def getRawAverageSuperPixel(self,superpixel=1):
+        for j in self.TracePixels:
+            if not j.loaded:
+                print("You have not loaded the trace properly!")
+                break 
+
+        if len(self.TracePixels[superpixel].data[0]) == 1:
+            print("this is not a volumetric trace!")
+            break
+        else:
+            for i in range(len(self.TracePixels[superpixel].data)):
+                average=0
+                for j in range(len(self.TracePixels[superpixel].data[i])):
+                    average+=self.TracePixels[superpixel].data[i][j]
+                average=round(average/3)
+                rawlist.append(average)
+            return rawlist
+                
+
+
+
     def getTracePixels(self, pixelIdxs):
         pixelIDs = np.unique(pixelIdxs)
 
