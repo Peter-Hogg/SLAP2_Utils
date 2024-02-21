@@ -65,5 +65,4 @@ def genSomaROI(path):
 path = sys.argv[1] 
 genSomaROI(path)
 if __name__ == "__main__":
-    # This block is not necessary for calling from MATLAB
     pass

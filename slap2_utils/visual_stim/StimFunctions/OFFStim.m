@@ -4,7 +4,7 @@ screenid = max(Screen('Screens'));
 
 white = WhiteIndex(screenid);
 black = BlackIndex(screenid);
-colorFill = [0,0,255];
+colorFill = [255,0,0];
 Screen('Fillrect', win, black);
 time = clock;
 write(daq, 3);
