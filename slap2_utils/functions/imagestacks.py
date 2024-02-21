@@ -27,8 +27,10 @@ def averageStack(path):
 
     store = tifffile.imread(path, aszarr=True)
     imagedata = da.from_zarr(store)
-    imagedata = imagedata.rechunk((frameNumber, imagedata.shape[1], imagedata.shape[2]))
-    avgStack = np.zeros(( int(imagedata.shape[0]/frameNumber), imagedata.shape[1], imagedata.shape[2]))
+    framePerSlice = int(imagedata.shape[0]/frameNumber)
+
+    imagedata = imagedata.rechunk((framePerSlice, imagedata.shape[1], imagedata.shape[2]))
+    avgStack = np.zeros((1, frameNumber, imagedata.shape[1], imagedata.shape[2]))
 
     @dask.delayed
     def returnSlice(_block):
@@ -48,8 +50,10 @@ def averageStackGPU(path):
     frameNumber = _stackInfo['numZs']
     
     imagedata = da.from_zarr(store)
-    imagedata = imagedata.rechunk((frameNumber, imagedata.shape[1], imagedata.shape[2]))
-    avgStack = np.zeros((1, int(imagedata.shape[0]/frameNumber), imagedata.shape[1], imagedata.shape[2]))
+    framePerSlice = int(imagedata.shape[0]/frameNumber)
+
+    imagedata = imagedata.rechunk((framePerSlice, imagedata.shape[1], imagedata.shape[2]))
+    avgStack = np.zeros((1, frameNumber, imagedata.shape[1], imagedata.shape[2]))
 
 
     @dask.delayed
