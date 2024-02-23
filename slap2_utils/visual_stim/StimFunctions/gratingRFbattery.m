@@ -1,5 +1,5 @@
 function gratingRFbattery(win, winRect, daq)
-    pause(4)
+    pause(10)
 
     angles = [0, 45, 90, 135,  180, 225,  270, 360];
     
@@ -20,5 +20,5 @@ function gratingRFbattery(win, winRect, daq)
 
     writecell(randomSquare, allenSTAName)
     writematrix(stimAngle, gratingName)
-
+    sca;
 end

@@ -100,15 +100,24 @@ function  [randSquare] = AllenSTACheckerFast(win, winRect, totalsquare, sizes, d
         pause(.5);
         % Flip to the screen
         Screen('Flip', win);
+        write(daq, 3);
+        pause(.001);
+        write(daq, 0);
+
+        Screen('Fillrect', win, [127, 127, 127]);
+        Screen('Flip', win);
+        pause(.5);
+
+
     end
 
-    pause(1);
+    pause(4);
 
 
     Screen('Flip', win);
-    write(daq, 3);
-    pause(.001);
-    write(daq, 0);
+    %write(daq, 3);
+    %pause(.001);
+    %write(daq, 0);
     
 end
 
