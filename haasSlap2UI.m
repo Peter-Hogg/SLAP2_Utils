@@ -152,10 +152,10 @@ function ShiftAdjustment(btn,txtFilePath1,txtFilePath2)
     
     % Loop through local field to change it
     for i = 1:length(roichange.hAcquisitionPath1.rois)
-        roichange.hAcquisitionPath1.rois(1,i).z = roichange.hAcquisitionPath1.rois(1,i).z+shift_list(1);
+        roichange.hAcquisitionPath1.rois(1,i).z = roichange.hAcquisitionPath1.rois(1,i).z - shift_list(1);
         for j = 1:length(roichange.hAcquisitionPath1.rois(1, i).shapeData)
-            roichange.hAcquisitionPath1.rois(1,i).shapeData(j,1) = roichange.hAcquisitionPath1.rois(1,i).shapeData(j,1) + shift_list(2);
-            roichange.hAcquisitionPath1.rois(1,i).shapeData(j,2) = roichange.hAcquisitionPath1.rois(1,i).shapeData(j,2) + shift_list(3);
+            roichange.hAcquisitionPath1.rois(1,i).shapeData(j,1) = roichange.hAcquisitionPath1.rois(1,i).shapeData(j,1) - shift_list(2);
+            roichange.hAcquisitionPath1.rois(1,i).shapeData(j,2) = roichange.hAcquisitionPath1.rois(1,i).shapeData(j,2) - shift_list(3);
 
 
         end
@@ -166,8 +166,8 @@ function ShiftAdjustment(btn,txtFilePath1,txtFilePath2)
         roichange.hAcquisitionPath2.rois(1,i).z = roichange.hAcquisitionPath2.rois(1,i).z+shift_list(1);
         for j = 1:length(roichange.hAcquisitionPath2.rois(1, i).shapeData)
 
-            roichange.hAcquisitionPath2.rois(1,i).shapeData(j,1) = roichange.hAcquisitionPath2.rois(1,i).shapeData(j,1) + shift_list(2);
-            roichange.hAcquisitionPath2.rois(1,i).shapeData(j,2) = roichange.hAcquisitionPath2.rois(1,i).shapeData(j,2) + shift_list(3);
+            roichange.hAcquisitionPath2.rois(1,i).shapeData(j,1) = roichange.hAcquisitionPath2.rois(1,i).shapeData(j,1) - shift_list(2);
+            roichange.hAcquisitionPath2.rois(1,i).shapeData(j,2) = roichange.hAcquisitionPath2.rois(1,i).shapeData(j,2) - shift_list(3);
 
         end 
      end

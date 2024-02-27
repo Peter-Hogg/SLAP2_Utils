@@ -9,7 +9,7 @@ def xyzshift(path1,path2):
 
     x = ski.registration.phase_cross_correlation(imstack1[0], imstack2[0], upsample_factor=1, space='real', disambiguate=False,
                                                  reference_mask=None, moving_mask=None,
-                                                 overlap_ratio=0.3, normalization='phase')
+                                                 overlap_ratio=0.3, normalization=None)
 
     print(x[0][0], x[0][1], x[0][2])
     return x[0]
