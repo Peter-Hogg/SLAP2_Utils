@@ -1,4 +1,6 @@
 function SLAP2UtilFuncs()
+
+% temp edit, original: 'C:\Users\haasl\Documents\SLAP2_Utils'
     slap2PythonPath = 'C:\Users\haasl\Documents\SLAP2_Utils';
     setenv('PYTHONPATH', slap2PythonPath);
     P = py.sys.path;
@@ -50,10 +52,18 @@ function SLAP2UtilFuncs()
     btnAvgStack.Layout.Column = 1;
     btnAvgStack.ButtonPushedFcn = @(btn,event) avgStackCallback(btn, txtFilePath1);
 
+
+    % Jerry - Button for ROI shift, under dev
+    btnShift = uibutton(gl, 'Text', 'Shift Adjustment');
+    btnShift.Layout.Row = 5;
+    btnShift.Layout.Column = 1;
+    btnShift.ButtonPushedFcn = @(btn,event) ShiftAdjustment(btn,txtFilePath1,txtFilePath2);
+
+
     % Placeholder buttons
     
     btn = uibutton(gl, 'Text', ['Button ' num2str(i)]);
-    btn.Layout.Row = 5;
+    btn.Layout.Row = 6;
     btn.Layout.Column = 1;
 
     % Create a text area for debugging in the lower right corner
@@ -107,6 +117,69 @@ function SLAP2UtilFuncs()
 
         end
     end
+end
+
+% Jerry - Shift Adjustment
+function ShiftAdjustment(btn,txtFilePath1,txtFilePath2)
+    if isTifFilePath(txtFilePath1) == 0
+        txtDebug.Value ='No Tiff Selected';
+    end
+    if isTifFilePath(txtFilePath2) == 0
+        txtDebug.Value ='No Tiff Selected';
+    end
+
+    % Select the two path
+    filePath1 = txtFilePath1.Value;
+    filePath1 = strtrim(filePath1{1});
+  
+
+    filePath2 = txtFilePath2.Value;
+    filePath2 = strtrim(filePath2{1});
+    
+    disp(filePath1)
+    disp(filePath2);
+
+  % in linux this will be python 
+    commandStr = sprintf('python -m slap2_utils.functions.xyzshift %s', filePath1, filePath2);
+    
+    [status, result] = system(commandStr);
+
+    % Using str as output, and result is converted, order is z, y, x
+    shift_list = str2num (result);
+
+    % Change local variable
+    roichange = evalin('base','hS2');
+    
+    % Loop through local field to change it
+    for i = 1:length(roichange.hAcquisitionPath1.rois)
+        roichange.hAcquisitionPath1.rois(1,i).z = roichange.hAcquisitionPath1.rois(1,i).z+shift_list(1);
+        for j = 1:length(roichange.hAcquisitionPath1.rois(1, i).shapeData)
+            roichange.hAcquisitionPath1.rois(1,i).shapeData(j,1) = roichange.hAcquisitionPath1.rois(1,i).shapeData(j,1) + shift_list(2);
+            roichange.hAcquisitionPath1.rois(1,i).shapeData(j,2) = roichange.hAcquisitionPath1.rois(1,i).shapeData(j,2) + shift_list(3);
+
+
+        end
+
+    end
+
+     for i = 1:length(roichange.hAcquisitionPath2.rois)
+        roichange.hAcquisitionPath2.rois(1,i).z = roichange.hAcquisitionPath2.rois(1,i).z+shift_list(1);
+        for j = 1:length(roichange.hAcquisitionPath2.rois(1, i).shapeData)
+
+            roichange.hAcquisitionPath2.rois(1,i).shapeData(j,1) = roichange.hAcquisitionPath2.rois(1,i).shapeData(j,1) + shift_list(2);
+            roichange.hAcquisitionPath2.rois(1,i).shapeData(j,2) = roichange.hAcquisitionPath2.rois(1,i).shapeData(j,2) + shift_list(3);
+
+        end 
+     end
+
+     assignin('base','hS2',roichange);
+
+
+
+    if status == 0
+        txtDebug.Value = 'worked';
+    end
+
 end
 
 function avgStackCallback(btn, txtFilePath)
