@@ -148,16 +148,13 @@ function ShiftAdjustment(btn,txtFilePath1,txtFilePath2)
     disp(filePath2);
 
   % in linux this will be python 
-    commandStr = sprintf('python -m slap2_utils.functions.xyzshift %s %s', filePath1, filePath2);
+    commandStr = sprintf('python -m slap2_utils.functions.xyzshift %s', filePath1, filePath2);
     
     [status, result] = system(commandStr);
 
     % Using str as output, and result is converted, order is z, y, x
     shift_list = str2num (result);
-    
-    for i = 1:length(shift_list)
-        shift_list(i)=round(shift_list(i));
-    end
+
     % Change local variable
     roichange = evalin('base','hS2');
     
@@ -205,8 +202,6 @@ function ShiftAdjustmentUI(btn,txtFilePath1)
     answer = inputdlg(prompt,dlgtitle,fieldsize,definput);
     slice = str2num(answer{1});
 
-
-
     if isTifFilePath(txtFilePath1) == 0
         txtDebug.Value ='No Tiff Selected';
     end
@@ -216,31 +211,14 @@ function ShiftAdjustmentUI(btn,txtFilePath1)
     filePath1 = txtFilePath1.Value;
     filePath1 = strtrim(filePath1{1});
 
-    BothImage = evalin('base','hS2Gui');
-
-    imagecell =  BothImage.hViewports(1).hImView.hFrameDisplayBuffer.data(1,1);
-    image = imagecell{1,1}{1,1};
-
-    % We rotate it because its been rotated when compared with the image
-    image = rot90(image,3);
-    imagepath = 'C:\Users\Jerry\Desktop\Tmpimage.csv';
-    writematrix(image,imagepath) 
-
-
 
   % in linux this will be python 
-    commandStr = sprintf('python -m slap2_utils.functions.xyzshift_ui %s %d %s', filePath1, slice, imagepath);
-    
+    commandStr = sprintf('python -m slap2_utils.functions.xyzshift_ui %s', filePath1, sliceb);
     
     [status, result] = system(commandStr);
 
-    
     % Using str as output, and result is converted, order is z, y, x
-    disp(result);
     shift_list = str2num (result);
-    for i = 1:length(shift_list)
-        shift_list(i)=round(shift_list(i));
-    end
 
     % Change local variable
     roichange = evalin('base','hS2');
