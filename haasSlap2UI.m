@@ -1,11 +1,11 @@
-function SLAP2UtilFuncs()
-
-% temp edit, original: 'C:\Users\haasl\Documents\SLAP2_Utils'
-    slap2PythonPath = 'C:\Users\Jerry\Desktop\SLAP2_Utils';
-    setenv('PYTHONPATH', slap2PythonPath);
+function SLAP2UtilFuncs(localSlap, localGUI)
+    
+    % temp edit, original: 'C:\Users\haasl\Documents\SLAP2_Utils'
+    slap2PythonPath = 'C:\Users\haasl\Documents\SLAP2_Utils';
+    setenv('PYTHONPATH', slap2PythonPath);    setenv('PYTHONPATH', slap2PythonPath);
     P = py.sys.path;
-    if count(P, 'C:\Users\Jerry\Desktop\SLAP2_Utils') == 0;
-        insert(P, int32(0), 'C:\Users\Jerry\Desktop\SLAP2_Utils');
+    if count(P, 'C:\Users\haasl\Documents\SLAP2_Utils') == 0;
+        insert(P, int32(0), 'C:\Users\haasl\Documents\SLAP2_Utils');
     end
     mod = py.importlib.import_module('slap2_utils');
 
@@ -13,7 +13,7 @@ function SLAP2UtilFuncs()
     fig = uifigure('Name', 'SLAP2 Util Functions', 'Position', [100 100 600 400]);
 
     % Create a grid layout
-    gl = uigridlayout(fig, [6, 2]);
+    gl = uigridlayout(fig, [6, 6]);
     gl.RowHeight = {30, 30, 30, 30, 30};
     gl.ColumnWidth = {'1x', '3x'};
 
@@ -26,6 +26,21 @@ function SLAP2UtilFuncs()
     txtFilePath1.Layout.Column = 2;
     txtFilePath1.Editable = 'off';
 
+
+    % DMD Radio button for latest file
+    tiffDMDgroup = uibuttongroup(gl); 
+    tiffDMDgroup.Layout.Row = 1;
+    tiffDMDgroup.Layout.Column = [4:5];
+    rb1 = uiradiobutton(tiffDMDgroup, 'Text', 'DMD1', 'Position',[0 0 0 0]);
+    rb2 = uiradiobutton(tiffDMDgroup, 'Text', 'DMD2','Position',[0 0 0 0]);
+
+
+    % Button to average last tiff
+    lastAcquTif = uibutton(gl, 'Text', 'Last TIF');
+    lastAcquTif.Layout.Row = 1;
+    lastAcquTif.Layout.Column = 6;
+
+    
     % Assign the callback function with additional parameters
     btnFileSelect1.ButtonPushedFcn = @(btn,event) fileSelectCallback(btn, txtFilePath1);
 
@@ -44,7 +59,7 @@ function SLAP2UtilFuncs()
     bntSoma = uibutton(gl, 'Text', 'Generate Soma ROI');
     bntSoma.Layout.Row = 3;
     bntSoma.Layout.Column = 1;
-    bntSoma.ButtonPushedFcn = @(btn,event) somaCallback(btn, txtFilePath1);
+    bntSoma.ButtonPushedFcn = @(btn,event) somaCallback(btn, txtFilePath1, slap2Obj);
 
     
     btnAvgStack = uibutton(gl, 'Text', ['Generate ROIs']);
@@ -57,7 +72,7 @@ function SLAP2UtilFuncs()
     btnShift = uibutton(gl, 'Text', 'Shift Adjustment');
     btnShift.Layout.Row = 5;
     btnShift.Layout.Column = 1;
-    btnShift.ButtonPushedFcn = @(btn,event) ShiftAdjustment(btn,txtFilePath1,txtFilePath2);
+    btnShift.ButtonPushedFcn = @(btn,event) ShiftAdjustment(btn,txtFilePath1,txtFilePath2,local);
 
 
     btnShiftPlane = uibutton(gl, 'Text', 'Shift Adjustment UI');
@@ -82,7 +97,8 @@ function SLAP2UtilFuncs()
 
 
 
-    function somaCallback(btn, txtFilePath)
+    function somaCallback(btn, txtFilePath, localSlap)
+        localSlap.disarm
         if isTifFilePath(txtFilePath) == 0;
             txtDebug.Value ='No Tiff Selected';
         else
@@ -128,7 +144,11 @@ function SLAP2UtilFuncs()
 end
 
 % Jerry - Shift Adjustment
-function ShiftAdjustment(btn,txtFilePath1,txtFilePath2)
+function ShiftAdjustment(btn,txtFilePath1,txtFilePath2,localSlap)
+    if localSlap.arm == 0
+       localSlap.disarm
+    end 
+
     if isTifFilePath(txtFilePath1) == 0
         txtDebug.Value ='No Tiff Selected';
     end
@@ -159,38 +179,36 @@ function ShiftAdjustment(btn,txtFilePath1,txtFilePath2)
         shift_list(i)=round(shift_list(i));
     end
     % Change local variable
-    roichange = evalin('base','hS2');
     
     % Loop through local field to change it
-    for i = 1:length(roichange.hAcquisitionPath1.rois)
-        roichange.hAcquisitionPath1.rois(1,i).z = roichange.hAcquisitionPath1.rois(1,i).z - shift_list(1);
-        for j = 1:length(roichange.hAcquisitionPath1.rois(1, i).shapeData)
-            roichange.hAcquisitionPath1.rois(1,i).shapeData(j,1) = roichange.hAcquisitionPath1.rois(1,i).shapeData(j,1) - shift_list(2);
-            roichange.hAcquisitionPath1.rois(1,i).shapeData(j,2) = roichange.hAcquisitionPath1.rois(1,i).shapeData(j,2) - shift_list(3);
+    for i = 1:length(localSlap.hAcquisitionPath1.rois)
+        localSlap.hAcquisitionPath1.rois(1,i).z = localSlap.hAcquisitionPath1.rois(1,i).z - shift_list(1);
+        for j = 1:length(localSlap.hAcquisitionPath1.rois(1, i).shapeData)
+            localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,1) = localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,1) - shift_list(2);
+            localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,2) = localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,2) - shift_list(3);
 
 
         end
 
     end
 
-     for i = 1:length(roichange.hAcquisitionPath2.rois)
-        roichange.hAcquisitionPath2.rois(1,i).z = roichange.hAcquisitionPath2.rois(1,i).z+shift_list(1);
-        for j = 1:length(roichange.hAcquisitionPath2.rois(1, i).shapeData)
+     for i = 1:length(localSlap.hAcquisitionPath2.rois)
+        localSlap.hAcquisitionPath2.rois(1,i).z = localSlap.hAcquisitionPath2.rois(1,i).z+shift_list(1);
+        for j = 1:length(localSlap.hAcquisitionPath2.rois(1, i).shapeData)
 
-            roichange.hAcquisitionPath2.rois(1,i).shapeData(j,1) = roichange.hAcquisitionPath2.rois(1,i).shapeData(j,1) - shift_list(2);
-            roichange.hAcquisitionPath2.rois(1,i).shapeData(j,2) = roichange.hAcquisitionPath2.rois(1,i).shapeData(j,2) - shift_list(3);
+            localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,1) = localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,1) - shift_list(2);
+            localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,2) = localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,2) - shift_list(3);
 
         end 
      end
 
-     assignin('base','hS2',roichange);
 
 
-
+    
     if status == 0
         txtDebug.Value = 'worked';
     end
-
+    localSlap.arm
 end
 
 
