@@ -1,11 +1,11 @@
-function SLAP2UtilFuncs(localSlap, localGUI)
+function haasSlap2UI(localSlap, localGUI)
     
     % temp edit, original: 'C:\Users\haasl\Documents\SLAP2_Utils'
-    slap2PythonPath = 'C:\Users\haasl\Documents\SLAP2_Utils';
+    slap2PythonPath = 'C:\Users\Jerry\Desktop\SLAP2_Utils';
     setenv('PYTHONPATH', slap2PythonPath);    setenv('PYTHONPATH', slap2PythonPath);
     P = py.sys.path;
-    if count(P, 'C:\Users\haasl\Documents\SLAP2_Utils') == 0;
-        insert(P, int32(0), 'C:\Users\haasl\Documents\SLAP2_Utils');
+    if count(P, 'C:\Users\Jerry\Desktop\SLAP2_Utils') == 0;
+        insert(P, int32(0), 'C:\Users\Jerry\Desktop\SLAP2_Utils');
     end
     mod = py.importlib.import_module('slap2_utils');
 
@@ -59,7 +59,7 @@ function SLAP2UtilFuncs(localSlap, localGUI)
     bntSoma = uibutton(gl, 'Text', 'Generate Soma ROI');
     bntSoma.Layout.Row = 3;
     bntSoma.Layout.Column = 1;
-    bntSoma.ButtonPushedFcn = @(btn,event) somaCallback(btn, txtFilePath1, slap2Obj);
+    bntSoma.ButtonPushedFcn = @(btn,event) somaCallback(btn, txtFilePath1);
 
     
     btnAvgStack = uibutton(gl, 'Text', ['Generate ROIs']);
@@ -72,14 +72,20 @@ function SLAP2UtilFuncs(localSlap, localGUI)
     btnShift = uibutton(gl, 'Text', 'Shift Adjustment');
     btnShift.Layout.Row = 5;
     btnShift.Layout.Column = 1;
-    btnShift.ButtonPushedFcn = @(btn,event) ShiftAdjustment(btn,txtFilePath1,txtFilePath2,local);
+    btnShift.ButtonPushedFcn = @(btn,event) ShiftAdjustment(btn,txtFilePath1,txtFilePath2,localSlap);
 
 
     btnShiftPlane = uibutton(gl, 'Text', 'Shift Adjustment UI');
     btnShiftPlane.Layout.Row = 6;
     btnShiftPlane.Layout.Column = 1;
-    btnShiftPlane.ButtonPushedFcn = @(btn,event) ShiftAdjustmentUI(btn,txtFilePath1);
     
+   
+    
+    % Saved image path for 
+
+    btnShiftPlane.ButtonPushedFcn = @(btn,event) ShiftAdjustmentUI(btn,txtFilePath1,localSlap,localGUI);
+    
+
 
 
 
@@ -97,8 +103,7 @@ function SLAP2UtilFuncs(localSlap, localGUI)
 
 
 
-    function somaCallback(btn, txtFilePath, localSlap)
-        localSlap.disarm
+    function somaCallback(btn, txtFilePath)
         if isTifFilePath(txtFilePath) == 0;
             txtDebug.Value ='No Tiff Selected';
         else
@@ -146,7 +151,7 @@ end
 % Jerry - Shift Adjustment
 function ShiftAdjustment(btn,txtFilePath1,txtFilePath2,localSlap)
     if localSlap.arm == 0
-       localSlap.disarm
+       localSlap.disarm;
     end 
 
     if isTifFilePath(txtFilePath1) == 0
@@ -175,9 +180,9 @@ function ShiftAdjustment(btn,txtFilePath1,txtFilePath2,localSlap)
     % Using str as output, and result is converted, order is z, y, x
     shift_list = str2num (result);
     
-    for i = 1:length(shift_list)
-        shift_list(i)=round(shift_list(i));
-    end
+    shift_list(2)=round(shift_list(2));
+    shift_list(3)=round(shift_list(3));
+
     % Change local variable
     
     % Loop through local field to change it
@@ -193,7 +198,7 @@ function ShiftAdjustment(btn,txtFilePath1,txtFilePath2,localSlap)
     end
 
      for i = 1:length(localSlap.hAcquisitionPath2.rois)
-        localSlap.hAcquisitionPath2.rois(1,i).z = localSlap.hAcquisitionPath2.rois(1,i).z+shift_list(1);
+        localSlap.hAcquisitionPath2.rois(1,i).z = localSlap.hAcquisitionPath2.rois(1,i).z - shift_list(1);
         for j = 1:length(localSlap.hAcquisitionPath2.rois(1, i).shapeData)
 
             localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,1) = localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,1) - shift_list(2);
@@ -208,20 +213,18 @@ function ShiftAdjustment(btn,txtFilePath1,txtFilePath2,localSlap)
     if status == 0
         txtDebug.Value = 'worked';
     end
-    localSlap.arm
+    localSlap.arm;
 end
 
 
 % Jerry - Shift Adjustment UI
-function ShiftAdjustmentUI(btn,txtFilePath1)
+function ShiftAdjustmentUI(btn,txtFilePath1,localSlap,localGUI)
     
+    if localSlap.armed == 0
+       localSlap.disarm;
+    end 
 
-    prompt = {'Enter the slice it is currently at. Make sure it is correct before clicking Ok.'};
-    dlgtitle = 'Input';
-    fieldsize = [1 45];
-    definput = {'1','hsv'};
-    answer = inputdlg(prompt,dlgtitle,fieldsize,definput);
-    slice = str2num(answer{1});
+
 
 
 
@@ -233,59 +236,58 @@ function ShiftAdjustmentUI(btn,txtFilePath1)
     % Select the two path
     filePath1 = txtFilePath1.Value;
     filePath1 = strtrim(filePath1{1});
+    [path,name,~] = fileparts(filePath1);
+  
 
-    BothImage = evalin('base','hS2Gui');
-
-    imagecell =  BothImage.hViewports(1).hImView.hFrameDisplayBuffer.data(1,1);
+    imagecell =  localGUI.hViewports(1).hImView.hFrameDisplayBuffer.data(1,1);
     image = imagecell{1,1}{1,1};
 
     % We rotate it because its been rotated when compared with the image
     image = rot90(image,3);
-    imagepath = 'C:\Users\Jerry\Desktop\Tmpimage.csv';
+    imagepath = strcat(path,'\',name,'.csv');
     writematrix(image,imagepath) 
 
+    slice = localGUI.hViewports(1).currentZ;
 
 
   % in linux this will be python 
-    commandStr = sprintf('python -m slap2_utils.functions.xyzshift_ui %s %d %s', filePath1, slice, imagepath);
+    commandStr = sprintf('py -m slap2_utils.functions.xyzshift_ui %s %d %s', filePath1, slice, imagepath);
     
     
     [status, result] = system(commandStr);
 
     
     % Using str as output, and result is converted, order is z, y, x
-    disp(result);
     shift_list = str2num (result);
     for i = 1:length(shift_list)
         shift_list(i)=round(shift_list(i));
     end
 
     % Change local variable
-    roichange = evalin('base','hS2');
+ 
     
     % Loop through local field to change it
-    for i = 1:length(roichange.hAcquisitionPath1.rois)
-        roichange.hAcquisitionPath1.rois(1,i).z = roichange.hAcquisitionPath1.rois(1,i).z - shift_list(1);
-        for j = 1:length(roichange.hAcquisitionPath1.rois(1, i).shapeData)
-            roichange.hAcquisitionPath1.rois(1,i).shapeData(j,1) = roichange.hAcquisitionPath1.rois(1,i).shapeData(j,1) - shift_list(2);
-            roichange.hAcquisitionPath1.rois(1,i).shapeData(j,2) = roichange.hAcquisitionPath1.rois(1,i).shapeData(j,2) - shift_list(3);
+    for i = 1:length(localSlap.hAcquisitionPath1.rois)
+        localSlap.hAcquisitionPath1.rois(1,i).z = localSlap.hAcquisitionPath1.rois(1,i).z - shift_list(1);
+        for j = 1:length(localSlap.hAcquisitionPath1.rois(1, i).shapeData)
+            localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,1) = localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,1) - shift_list(2);
+            localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,2) = localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,2) - shift_list(3);
 
 
         end
 
     end
 
-     for i = 1:length(roichange.hAcquisitionPath2.rois)
-        roichange.hAcquisitionPath2.rois(1,i).z = roichange.hAcquisitionPath2.rois(1,i).z+shift_list(1);
-        for j = 1:length(roichange.hAcquisitionPath2.rois(1, i).shapeData)
+     for i = 1:length(localSlap.hAcquisitionPath2.rois)
+        localSlap.hAcquisitionPath2.rois(1,i).z = localSlap.hAcquisitionPath2.rois(1,i).z - shift_list(1);
+        for j = 1:length(localSlap.hAcquisitionPath2.rois(1, i).shapeData)
 
-            roichange.hAcquisitionPath2.rois(1,i).shapeData(j,1) = roichange.hAcquisitionPath2.rois(1,i).shapeData(j,1) - shift_list(2);
-            roichange.hAcquisitionPath2.rois(1,i).shapeData(j,2) = roichange.hAcquisitionPath2.rois(1,i).shapeData(j,2) - shift_list(3);
+            localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,1) = localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,1) - shift_list(2);
+            localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,2) = localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,2) - shift_list(3);
 
         end 
      end
 
-     assignin('base','hS2',roichange);
 
 
 

@@ -1,11 +1,17 @@
 import skimage as ski
 import sys
-
+import tifffile
+import json
 import pandas as pd
 
 def xyzshift_UI(path1,slice,image):
-
+    slice = float(slice[0])
     imstack1 = ski.io.imread(path1,plugin="tifffile")
+    _data = tifffile.tiffcomment(path1)
+    _stackInfo = json.loads(_data)
+    store = tifffile.imread(path1, aszarr=True)
+
+    zindexlist = _stackInfo['zsAbsolute']
 
     # See which one has the least error and shift from there
     besterror = 1000000000000000000000000000000
@@ -21,8 +27,8 @@ def xyzshift_UI(path1,slice,image):
             besterror = result[1]
             bestindex = i
             shift = result[0]
-    z_change = (i+1) - int(slice[0])
-    print(z_change, shift[0], shift[1])
+    z_change = zindexlist[bestindex] - slice
+    print(zindexlist[bestindex], z_change, shift[0], shift[1])
 
 def main():
     # Loading bunch of stuff
