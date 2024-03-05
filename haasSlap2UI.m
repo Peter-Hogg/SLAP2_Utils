@@ -31,9 +31,9 @@ function haasSlap2UI(localSlap, localGUI)
     tiffDMDgroup = uibuttongroup(gl); 
     tiffDMDgroup.Layout.Row = 1;
     tiffDMDgroup.Layout.Column = [4:5];
-    rb1 = uiradiobutton(tiffDMDgroup, 'Text', 'DMD1', 'Position',[0 0 0 0]);
-    rb2 = uiradiobutton(tiffDMDgroup, 'Text', 'DMD2','Position',[0 0 0 0]);
-
+    rb1 = uiradiobutton(tiffDMDgroup, 'Text', 'DMD1', 'Position', [20, 10, 80, 20]);
+    rb2 = uiradiobutton(tiffDMDgroup, 'Text', 'DMD2', 'Position', [95, 10, 100, 20]);
+    %fullFileName
 
     % Button to average last tiff
     lastAcquTif = uibutton(gl, 'Text', 'Last TIF');
