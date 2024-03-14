@@ -11,7 +11,7 @@ import cupyx
 from cupyx.scipy.fft import fftn, ifftn, fftfreq
 from cupyx.scipy import ndimage as ndi
 
-from _masked_phase_cross_correlation import _masked_phase_cross_correlation
+from ._masked_phase_cross_correlation import _masked_phase_cross_correlation
 
 
 def _upsampled_dft(data, upsampled_region_size, upsample_factor=1, axis_offsets=None):

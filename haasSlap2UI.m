@@ -1,11 +1,11 @@
 function haasSlap2UI(localSlap, localGUI)
     
     % temp edit, original: 'C:\Users\haasl\Documents\SLAP2_Utils'
-    slap2PythonPath = 'C:\Users\Jerry\Desktop\SLAP2_Utils';
+    slap2PythonPath = 'C:\Users\haasl\Documents\SLAP2_Utils';
     setenv('PYTHONPATH', slap2PythonPath);    setenv('PYTHONPATH', slap2PythonPath);
     P = py.sys.path;
-    if count(P, 'C:\Users\Jerry\Desktop\SLAP2_Utils') == 0;
-        insert(P, int32(0), 'C:\Users\Jerry\Desktop\SLAP2_Utils');
+    if count(P, 'C:\Users\haasl\Documents\SLAP2_Utils') == 0;
+        insert(P, int32(0), 'C:\Users\haasl\Documents\SLAP2_Utils');
     end
     mod = py.importlib.import_module('slap2_utils');
 
@@ -39,6 +39,7 @@ function haasSlap2UI(localSlap, localGUI)
     lastAcquTif = uibutton(gl, 'Text', 'Last TIF');
     lastAcquTif.Layout.Row = 1;
     lastAcquTif.Layout.Column = 6;
+    lastAcquTif.ButtonPushedFcn = @(btn,event) lastTifCallBack(btn, localSlap, rb1, rb2, txtFilePath1);
 
     
     % Assign the callback function with additional parameters
@@ -59,10 +60,10 @@ function haasSlap2UI(localSlap, localGUI)
     bntSoma = uibutton(gl, 'Text', 'Generate Soma ROI');
     bntSoma.Layout.Row = 3;
     bntSoma.Layout.Column = 1;
-    bntSoma.ButtonPushedFcn = @(btn,event) somaCallback(btn, txtFilePath1);
+    bntSoma.ButtonPushedFcn = @(btn,event) somaCallback(btn, txtFilePath1, localSlap);
 
     
-    btnAvgStack = uibutton(gl, 'Text', ['Generate ROIs']);
+    btnAvgStack = uibutton(gl, 'Text', ['Avg Stack']);
     btnAvgStack.Layout.Row = 4;
     btnAvgStack.Layout.Column = 1;
     btnAvgStack.ButtonPushedFcn = @(btn,event) avgStackCallback(btn, txtFilePath1);
@@ -103,7 +104,7 @@ function haasSlap2UI(localSlap, localGUI)
 
 
 
-    function somaCallback(btn, txtFilePath)
+    function somaCallback(btn, txtFilePath, localSlap)
         if isTifFilePath(txtFilePath) == 0;
             txtDebug.Value ='No Tiff Selected';
         else
@@ -130,9 +131,9 @@ function haasSlap2UI(localSlap, localGUI)
 
                 % Get metadata for slize info
                 t = Tiff(filePath,'r');
-                meataData = t.getTag('ImageDescription');
-                hSliceData = jsondecode(meataData);
-                genIntROIPlane(maskData, hSliceData.AcquisitionPathIdx, hSliceData.zsAbsolute);
+                metaData = t.getTag('ImageDescription');
+                hSliceData = jsondecode(metaData);
+                genIntROIPlane(localSlap, maskData, hSliceData.AcquisitionPathIdx, hSliceData.zsAbsolute);
                 
 
             else
@@ -237,6 +238,7 @@ function ShiftAdjustmentUI(btn,txtFilePath1,localSlap,localGUI)
     filePath1 = txtFilePath1.Value;
     filePath1 = strtrim(filePath1{1});
     [path,name,~] = fileparts(filePath1);
+    filePath1 = strcat(path,'\averageGPU_',name,'.tif');
   
 
     imagecell =  localGUI.hViewports(1).hImView.hFrameDisplayBuffer.data(1,1);
@@ -244,14 +246,34 @@ function ShiftAdjustmentUI(btn,txtFilePath1,localSlap,localGUI)
 
     % We rotate it because its been rotated when compared with the image
     image = rot90(image,3);
-    imagepath = strcat(path,'\',name,'.csv');
-    writematrix(image,imagepath) 
+    image = fliplr(image);
+    imagepath = strcat(path,'\',name,'UIimg.tif');
+    
+    
+    t = Tiff(imagepath,'w');
+    image = uint32(image);
+    % Setup tags
+    % Lots of info here:
+    % http://www.mathworks.com/help/matlab/ref/tiffclass.html
+    tagstruct.ImageLength     = size(image,1);
+    tagstruct.ImageWidth      = size(image,2);
+    tagstruct.Photometric     = Tiff.Photometric.MinIsBlack;
+    tagstruct.BitsPerSample   = 32;
+    tagstruct.SamplesPerPixel = 1;
+    tagstruct.RowsPerStrip    = 16;
+    %tagstruct.PlanarConfiguration = Tiff.PlanarConfiguration.Chunky;
+    tagstruct.Software        = 'MATLAB';
+    t.setTag(tagstruct)
+    
+    t.write(image);
+    t.close();
 
     slice = localGUI.hViewports(1).currentZ;
 
+    
 
   % in linux this will be python 
-    commandStr = sprintf('py -m slap2_utils.functions.xyzshift_ui %s %d %s', filePath1, slice, imagepath);
+    commandStr = sprintf('python -m slap2_utils.functions.xyzshift_ui %s %d %s', filePath1, slice, imagepath);
     
     
     [status, result] = system(commandStr);
@@ -289,7 +311,7 @@ function ShiftAdjustmentUI(btn,txtFilePath1,localSlap,localGUI)
      end
 
 
-
+    localSlap.arm;
 
     if status == 0
         txtDebug.Value = 'worked';
@@ -298,6 +320,31 @@ function ShiftAdjustmentUI(btn,txtFilePath1,localSlap,localGUI)
 end
 
 function avgStackCallback(btn, txtFilePath)
+        if isTifFilePath(txtFilePath) == 0;
+            txtDebug.Value ='No Tiff Selected';
+        else
+            txtDebug.Value = 'Generating Average Stack...';
+
+            filePath = txtFilePath.Value;
+            filePath = strtrim(filePath{1});
+  
+            commandStr = sprintf('python -m slap2_utils.functions.imagestacks %s', filePath)
+            [status, avgStackPath] = system(commandStr);
+            
+            if status == 0
+                txtDebug.Value = 'Average Stack Complete';
+            else
+                % Handle errors
+                error('Python script failed: %s', avgStackPath);
+            end
+                
+          
+
+
+        end
+end
+
+function autoROICallback(btn, txtFilePath)
         if isTifFilePath(txtFilePath) == 0;
             txtDebug.Value ='No Tiff Selected';
         else
@@ -348,12 +395,25 @@ function avgStackCallback(btn, txtFilePath)
         end
 end
 
-
 function fileSelectCallback(btn, txtFilePath)
     % File selection callback
     [file, path] = uigetfile('*.*');
     if file ~= 0
         txtFilePath.Value = fullfile(path, file);
+    end
+end
+
+
+function lastTifCallBack(btn, localSlap,  dmd1, dmd2, txtFilePath)
+    basePath = localSlap.fullFileName;
+    if dmd1.Value
+        pathEnd =   '_DMD1.tif';
+    end
+    if dmd2.Value
+        pathEnd =   '_DMD1.tif';
+    end
+    if basePath ~= 0
+        txtFilePath.Value = strcat(basePath, pathEnd);
     end
 end
 
@@ -381,9 +441,9 @@ function isTifFile = isTifFilePath(txtFilePath)
     isTifFile = endsWith(lower(value), '.tif');
 end
 
-function genIntROIPlane(labelsArr, pathID, zPos)
+function genIntROIPlane(hS2Local, labelsArr, pathID, zPos)
     
-    roiList =  arrayfun(@(hAcqPath)hAcqPath.rois,hS2.hAcquisitionPaths,'UniformOutput',false);
+    roiList =  arrayfun(@(hAcqPath)hAcqPath.rois,hS2Local.hAcquisitionPaths,'UniformOutput',false);
     
     slice =  squeeze(labelsArr);
     labelInts = unique(slice);
@@ -402,7 +462,7 @@ function genIntROIPlane(labelsArr, pathID, zPos)
     end
     
     
-    hS2.hAcquisitionPaths(pathID).rois = roiList{pathID}
+    hS2Local.hAcquisitionPaths(pathID).rois = roiList{pathID}
 
 
 end
