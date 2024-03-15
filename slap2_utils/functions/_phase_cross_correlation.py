@@ -5,13 +5,12 @@ http://www.mathworks.com/matlabcentral/fileexchange/18401-efficient-subpixel-ima
 
 import itertools
 import warnings
-
 import cupy as cp
 import cupyx
 from cupyx.scipy.fft import fftn, ifftn, fftfreq
 from cupyx.scipy import ndimage as ndi
 
-from ._masked_phase_cross_correlation import _masked_phase_cross_correlation
+from _masked_phase_cross_correlation import _masked_phase_cross_correlation
 
 
 def _upsampled_dft(data, upsampled_region_size, upsample_factor=1, axis_offsets=None):
@@ -51,12 +50,13 @@ def _upsampled_dft(data, upsampled_region_size, upsample_factor=1, axis_offsets=
             The upsampled DFT of the specified region.
     """
     # if people pass in an integer, expand it to a list of equal-sized sections
-    if not hasattr(upsampled_region_size, "__iter__"):
+    #upsampled_region_size = upsampled_region_size.get()
+    if upsampled_region_size.size ==1 :
         upsampled_region_size = [
             upsampled_region_size,
         ] * data.ndim
     else:
-        if len(upsampled_region_size) != data.ndim:
+        if upsampled_region_size.size != data.ndim:
             raise ValueError(
                 "shape of upsampled region sizes must be equal "
                 "to icput data's number of dimensions."
@@ -375,6 +375,7 @@ def phase_cross_correlation(
         upsample_factor = cp.array(upsample_factor, dtype=float_dtype)
         shift = cp.round(shift * upsample_factor) / upsample_factor
         upsampled_region_size = cp.ceil(upsample_factor * 1.5)
+        
         # Center of output array at dftshift + 1
         dftshift = cp.fix(upsampled_region_size / 2.0)
         # Matrix multiply DFT around the current shift estimate
@@ -422,4 +423,4 @@ def phase_cross_correlation(
             "moving_mask=~cp.isnan(moving_image))"
         )
 
-    return shift.get(), _compute_error(CCmax, src_amp, target_amp).get(), _compute_phasediff(CCmax).get()
+    return shift.get(), _compute_error(CCmax, src_amp, target_amp).get(), float(_compute_phasediff(CCmax).get())
