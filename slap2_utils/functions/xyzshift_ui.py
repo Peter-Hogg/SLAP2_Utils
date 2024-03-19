@@ -20,11 +20,13 @@ def xyzshift_UI(path1,slice,image):
     shift = []
 
     for i in range(len(imstack1[0])):
-        result = ski.registration.phase_cross_correlation(imstack1[0][i], image, upsample_factor=100, space='real', disambiguate=False,
+        #result = ski.registration.phase_cross_correlation(imstack1[0][i], image, upsample_factor=100, space='real', disambiguate=False,
+             #                                        reference_mask=None, moving_mask=None,
+              #                                       normalization=None)
+        
+        result = phase_cross_correlation(imstack1[0][i], image, upsample_factor=100, space='real', disambiguate=False,
                                                      reference_mask=None, moving_mask=None,
                                                      normalization=None)
-        
-        #result = phase_cross_correlation(imstack1[0][i], image)
 
         if result[1] < besterror:
             besterror = result[1]
