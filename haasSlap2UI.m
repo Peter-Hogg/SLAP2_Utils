@@ -70,13 +70,13 @@ function haasSlap2UI(localSlap, localGUI)
 
 
     % Jerry - Button for ROI shift, under dev
-    btnShift = uibutton(gl, 'Text', 'Shift Adjustment');
+    btnShift = uibutton(gl, 'Text', 'Shift 2stacks');
     btnShift.Layout.Row = 5;
     btnShift.Layout.Column = 1;
     btnShift.ButtonPushedFcn = @(btn,event) ShiftAdjustment(btn,txtFilePath1,txtFilePath2,localSlap);
 
 
-    btnShiftPlane = uibutton(gl, 'Text', 'Shift Adjustment UI');
+    btnShiftPlane = uibutton(gl, 'Text', 'Shift UI');
     btnShiftPlane.Layout.Row = 6;
     btnShiftPlane.Layout.Column = 1;
     
@@ -224,10 +224,21 @@ function ShiftAdjustmentUI(btn,txtFilePath1,localSlap,localGUI)
     if localSlap.armed == 0
        localSlap.disarm;
     end 
+    basePath = localSlap.fileDir;
 
+    Folderinfo = dir(basePath);
+    
+    newestdate=-100;
+    newestname='100';
+    for i = 1:length(Folderinfo)
+        if contains(Folderinfo(i).name, 'UIimg')
+            if newestdate == -100 | newestdate > Folderinfo(i).datenum
+                newestdate = Folderinfo(i).datenum
+                newestname = Folderinfo(i).name
+            end
 
-
-
+        end
+    end
 
     if isTifFilePath(txtFilePath1) == 0
         txtDebug.Value ='No Tiff Selected';
@@ -248,6 +259,8 @@ function ShiftAdjustmentUI(btn,txtFilePath1,localSlap,localGUI)
     image = rot90(image,3);
     image = fliplr(image);
     imagepath = strcat(path,'\',name,'UIimg.tif');
+    
+
     
     
     t = Tiff(imagepath,'w');
@@ -284,38 +297,83 @@ function ShiftAdjustmentUI(btn,txtFilePath1,localSlap,localGUI)
     for i = 1:length(shift_list)
         shift_list(i)=round(shift_list(i));
     end
-
-    % Change local variable
- 
+    if newestdate == -100
+        % Change local variable
+     
+        
+        % Loop through local field to change it
+        for i = 1:length(localSlap.hAcquisitionPath1.rois)
+            localSlap.hAcquisitionPath1.rois(1,i).z = localSlap.hAcquisitionPath1.rois(1,i).z - shift_list(1);
+            for j = 1:length(localSlap.hAcquisitionPath1.rois(1, i).shapeData)
+                localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,1) = localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,1) - shift_list(2);
+                localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,2) = localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,2) - shift_list(3);
     
-    % Loop through local field to change it
-    for i = 1:length(localSlap.hAcquisitionPath1.rois)
-        localSlap.hAcquisitionPath1.rois(1,i).z = localSlap.hAcquisitionPath1.rois(1,i).z - shift_list(1);
-        for j = 1:length(localSlap.hAcquisitionPath1.rois(1, i).shapeData)
-            localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,1) = localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,1) - shift_list(2);
-            localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,2) = localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,2) - shift_list(3);
+    
+            end
+    
+        end
+    
+         for i = 1:length(localSlap.hAcquisitionPath2.rois)
+            localSlap.hAcquisitionPath2.rois(1,i).z = localSlap.hAcquisitionPath2.rois(1,i).z - shift_list(1);
+            for j = 1:length(localSlap.hAcquisitionPath2.rois(1, i).shapeData)
+    
+                localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,1) = localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,1) - shift_list(2);
+                localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,2) = localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,2) - shift_list(3);
+    
+            end 
+         end
+    
+    
+        localSlap.arm;
+    
+        if status == 0
+            txtDebug.Value = 'worked';
+        end
 
+    else 
+        
+        commandStr2 = sprintf('python -m slap2_utils.functions.xyzshift_ui %s %d %s', filePath1, slice, imagepath);
 
+        [~, result2] = system(commandStr2);
+
+    
+        % Using str as output, and result is converted, order is z, y, x
+        shift_list2 = str2num (result2);
+        for i = 1:length(shift_list2)
+            shift_list2(i)=round(shift_list2(i));
+        end
+
+        for i = 1:length(localSlap.hAcquisitionPath1.rois)
+            localSlap.hAcquisitionPath1.rois(1,i).z = localSlap.hAcquisitionPath1.rois(1,i).z - shift_list(1) + shift_list2(1);
+            for j = 1:length(localSlap.hAcquisitionPath1.rois(1, i).shapeData)
+                localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,1) = localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,1) - shift_list(2) + shift_list2(2);
+                localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,2) = localSlap.hAcquisitionPath1.rois(1,i).shapeData(j,2) - shift_list(3) + shift_list2(3);
+    
+    
+            end
+    
+        end
+    
+         for i = 1:length(localSlap.hAcquisitionPath2.rois)
+            localSlap.hAcquisitionPath2.rois(1,i).z = localSlap.hAcquisitionPath2.rois(1,i).z - shift_list(1) + shift_list2(1);
+            for j = 1:length(localSlap.hAcquisitionPath2.rois(1, i).shapeData)
+    
+                localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,1) = localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,1) - shift_list(2) + shift_list2(2);
+                localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,2) = localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,2) - shift_list(3) + shift_list2(3);
+    
+            end 
+         end
+    
+    
+        localSlap.arm;
+    
+        if status == 0
+            txtDebug.Value = 'worked';
         end
 
     end
+    
 
-     for i = 1:length(localSlap.hAcquisitionPath2.rois)
-        localSlap.hAcquisitionPath2.rois(1,i).z = localSlap.hAcquisitionPath2.rois(1,i).z - shift_list(1);
-        for j = 1:length(localSlap.hAcquisitionPath2.rois(1, i).shapeData)
-
-            localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,1) = localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,1) - shift_list(2);
-            localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,2) = localSlap.hAcquisitionPath2.rois(1,i).shapeData(j,2) - shift_list(3);
-
-        end 
-     end
-
-
-    localSlap.arm;
-
-    if status == 0
-        txtDebug.Value = 'worked';
-    end
 
 end
 

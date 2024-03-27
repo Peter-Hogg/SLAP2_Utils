@@ -146,14 +146,15 @@ class Trace:
             return rawlist
 
     def getRawAverageSuperPixel(self,superpixel=1):
+        rawlist = []
         for j in self.TracePixels:
             if not j.loaded:
                 print("You have not loaded the trace properly!")
                 break 
 
-        if len(self.TracePixels[superpixel].data[0]) == 1:
-            print("this is not a volumetric trace!")
-            break
+            if len(self.TracePixels[superpixel].data[0]) == 1:
+                print("this is not a volumetric trace!")
+                break
         else:
             for i in range(len(self.TracePixels[superpixel].data)):
                 average=0
