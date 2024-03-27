@@ -6,6 +6,7 @@ import time
 import numpy as np
 import pyclesperanto_prototype as cle
 import napari
+import random
 
 from skimage.io import imread
 from skimage.morphology import skeletonize,binary_closing, skeletonize_3d,dilation, erosion, remove_small_objects, disk, square
@@ -14,6 +15,7 @@ from skimage import filters
 from scipy.io import savemat
 from skimage.measure import label, regionprops
 from scipy import ndimage
+from scipy.ndimage import center_of_mass
 
 from segment_anything import sam_model_registry, SamPredictor
 
@@ -54,6 +56,56 @@ def find_skeleton_3Dpoints(skelly_image):
             y_points.append((z,x,y))
     return end_points, y_points
 
+
+def find_bounding_box(data, label):
+
+    rows, cols = np.where(data == label)
+
+    if rows.size == 0 or cols.size == 0:
+        return None, None, None, None
+    
+    min_y, max_y = np.min(rows), np.max(rows)
+    min_x, max_x = np.min(cols), np.max(cols)
+
+    return min_y, min_x, max_y, max_x
+
+def cutlabel(array, label):
+    labelMod = random.randint(3, 10)
+    
+    min_y, min_x, max_y, max_x = find_bounding_box(array, label)
+    if min_y == None:
+        return 
+    elif ((max_y-min_y) <= 30) or ((max_x - min_x) >= 2*(max_y-min_y)):
+        return 
+    elif (max_x - min_x) < 2*(max_y-min_y):
+        halfway = int((max_y - min_y)/2 + min_y)
+        mask = (array == label)
+        array[:halfway, :][mask[:halfway, :]] = label + labelMod
+    else:
+        return
+
+    array1 = cutlabel(array, label+labelMod)
+    array2 = cutlabel(array, label)
+
+    if array1 is not None:
+        array[:halfway, :][mask[:halfway, :]] = array1[:halfway, :][mask[:halfway, :]]
+    
+    if array2 is not None:
+        array[halfway:, :][mask[halfway:, :]]= array2[halfway:, :][mask[halfway:, :]]
+    
+    return array
+
+def returnSomaRoi(maskSAM, RFPix):
+    RFPix = RFPix.copy()
+    RFPix[RFPix > 0] = 1
+    maskSAM[maskSAM > 0] = 1
+    for z in range(RFPix.shape[0]):
+        RFPix[z,:,:] = RFPix[z,:,:] * maskSAM
+    _com = center_of_mass(RFPix)
+    somaLabel = np.zeros_like(RFPix)
+    somaLabel[int(_com[0]), :, : ] = RFPix[int(_com[0]), :, : ]
+    return somaLabel.astype(int)
+
 def genDendriticRoi(imagepath):
     cl_filename = "test_object_segmenter_from_folders.cl"
 
@@ -86,22 +138,42 @@ def genDendriticRoi(imagepath):
         boxSelector.add_image(projection, gamma=.35)
         boxSelector.add_shapes()
 
-    while len(boxSelector.layers[1].data) < 1:
-        time.sleep(1)
-    input_box = boxSelector.layers[1].data[0].astype(int)
-    input_box = [np.min(input_box[:, 1]),np.min(input_box[:, 0]),  np.max(input_box[:, 1]), np.max(input_box[:, 0])] #np.concatenate([input_box[0, :], input_box[2, :]])
-    input_box = np.array(input_box)
+
+    neuron_box = boxSelector.layers[1].data[0].astype(int)
+    neuron_box = [np.min(neuron_box[:, 1]),np.min(neuron_box[:, 0]),  np.max(neuron_box[:, 1]), np.max(neuron_box[:, 0])] #np.concatenate([input_box[0, :], input_box[2, :]])
+    neuron_box = np.array(neuron_box)
+
+
+    soma_box = boxSelector.layers[1].data[1].astype(int)
+    soma_box = [np.min(soma_box[:, 1]),np.min(soma_box[:, 0]),  np.max(soma_box[:, 1]), np.max(soma_box[:, 0])] #np.concatenate([input_box[0, :], input_box[2, :]])
+    soma_box = np.array(soma_box)
+
 
     # Generate neuron mask with SAM
     masks, _, _ = predictor.predict(
                                     point_coords=None,
                                     point_labels=None,
-                                    box=input_box,
+                                    box=neuron_box,
                                     multimask_output=False)
     
+
+
+ 
+
     # Use the Random Forest
     labels = masked_sliding_window_inference(img_slice, masks[0], segmenter)
     labels[:, masks[0]==False] = 0
+
+    soma_masks, _, _ = predictor.predict(
+            point_coords=None,
+            point_labels=None,
+            box=soma_box,
+            multimask_output=False,
+        )
+    
+
+
+    soma = returnSomaRoi(soma_masks[0], labels)
 
     # Prepare the neuron labels for ROI creation
     neuron = labels.copy()
@@ -131,6 +203,8 @@ def genDendriticRoi(imagepath):
     lineInts = list(np.unique(line_fragments))
     lineInts.pop(0)
     SLAP2ROIs = np.zeros_like(neuron)
+    SLAP2ROIs2 = np.zeros_like(neuron)
+
     roi=1
     footprint = square(15)
 
@@ -139,20 +213,25 @@ def genDendriticRoi(imagepath):
         roiData = dilation(line_fragments, footprint)
         roiData = roiData * neuron[z, :, : ]
         SLAP2ROIs[z, :, :], _ = ndimage.label(roiData)
+        
+        for _label in list(np.unique(SLAP2ROIs[z, :, : ]))[1:]:
+            modified_slice = cutlabel(SLAP2ROIs[z, :, :].astype(int), _label)
+            if modified_slice is not None:
+                SLAP2ROIs2[z, :, : ] += modified_slice.astype(int)
 
-    labeled_array, num_features = ndimage.label(SLAP2ROIs)
+    SLAP2ROIs2[soma==1]=1
+
+    #abeled_array, num_features = ndimage.label(SLAP2ROIs)
     # Specify full connectivity for 3D (26-connectivity)
-    structure = np.zeros((3, 3, 3), dtype=int)
-    structure[1, :, :] = 1
+    #structure = np.zeros((3, 3, 3), dtype=int)
+    #structure[1, :, :] = 1
 
     # Apply connected component labeling with the specified structure
-    labeled_array, num_features = ndimage.label(SLAP2ROIs, structure=structure)
-    newFilePath = os.path.join(os.path.split(imagepath)[0], 'averageGPU_'+os.path.basename(imagepath))
+    #labeled_array, num_features = ndimage.label(SLAP2ROIs, structure=structure)
 
     newFilePath = os.path.join(os.path.split(imagepath)[0], '_autoROI_'+os.path.basename(imagepath))
-    np.save(newFilePath[:-4]+'.npy', labeled_array)
-
-    savemat(newFilePath[:-4]+'.mat', {'roi':labeled_array})
+    np.save(newFilePath[:-4]+'.npy', SLAP2ROIs2)
+    savemat(newFilePath[:-4]+'.mat', {'roi':SLAP2ROIs2})
 
 
 
