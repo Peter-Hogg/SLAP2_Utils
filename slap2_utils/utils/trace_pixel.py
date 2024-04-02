@@ -16,6 +16,7 @@ class TracePixel:
         self.numCycles = 0
         self.bytesPerCycle = 0
         self.linesPerCycle = 0
+        self.y = -1
 
     def load(self, hMemmap=None):
         allLoaded = self.isLoaded

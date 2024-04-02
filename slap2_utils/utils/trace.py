@@ -166,17 +166,17 @@ class Trace:
 
     def orderadjust(self):
 
-        ordered_trace = []
-        test = []
+
         for pixels in self.TracePixels:
-            ordered_trace.append((pixels.superPixelId - 1280*800) // 800)
-            test.append(pixels.superPixelId)
+            pixels.y =(pixels.superPixelId - 1024000) % 1280
 
-        print(ordered_trace)
-        print(test)
+        ordered_trace = sorted(self.TracePixels, key=lambda trace_pixel:trace_pixel.y)
 
-
-
+        self.TracePixels = ordered_trace
+        check = []
+        for pixels in self.TracePixels:
+            check.append((pixels.superPixelId - 1024000) % 1280)
+        print(check)
 
 
 
