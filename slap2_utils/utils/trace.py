@@ -163,7 +163,20 @@ class Trace:
                 average=round(average/3)
                 rawlist.append(average)
             return rawlist
-                
+
+    def orderadjust(self):
+
+        ordered_trace = []
+        test = []
+        for pixels in self.TracePixels:
+            ordered_trace.append((pixels.superPixelId - 1280*800) // 800)
+            test.append(pixels.superPixelId)
+
+        print(ordered_trace)
+        print(test)
+
+
+
 
 
 

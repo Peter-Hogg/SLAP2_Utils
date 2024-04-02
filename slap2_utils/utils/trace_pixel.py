@@ -107,3 +107,4 @@ class TracePixel:
         trace = sumDataWeighted / (sumExpectedWeighted + np.finfo(float).eps) * sumExpected
 
         return trace, sumDataWeighted, sumExpected, sumExpectedWeighted
+
