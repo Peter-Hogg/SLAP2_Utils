@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SLAP2_Utils
 
 ## Overview
@@ -32,3 +33,7 @@ This project is licensed under the Mozilla Public License Version 2.0 - see the 
 
 ## Credits and Acknowledgements
 This library was developed by Peter Hogg and Jerry Tong. It's a rework of several Matlab tools from MBF. Thanks to all contributors who have helped in refining this tool and helped with the project
+=======
+# SLAP2 Utils
+SLAP2 Helper Functions
+>>>>>>> 2d61c77f0eb629e86fad171c5715a645a196f37e
