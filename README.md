@@ -1,2 +1,2 @@
-# SLAP2_Utils
+# SLAP2 Utils
 SLAP2 Helper Functions
