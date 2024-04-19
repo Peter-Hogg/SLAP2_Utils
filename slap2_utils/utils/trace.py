@@ -1,3 +1,4 @@
+#Imports necessary libraries and initializes some variables.
 import numpy as np
 from .trace_pixel import TracePixel
 import copy
@@ -6,6 +7,8 @@ import copy
 
 class Trace:
     def __init__(self, dataFile, zIdx=0, chIdx=0):
+        #Initializes the Trace object with provided parameters.
+        #Sets default values for TracePixels and pixelIdxs.
         self.dataFile = dataFile
         self.zIdx = zIdx
         self.chIdx = chIdx
@@ -13,9 +16,12 @@ class Trace:
         self.pixelIdxs = []
 
     @property
+    #Defines a property superPixelIds that returns a list of superpixel IDs.
     def superPixelIds(self):
         return [pixel.superPixelId for pixel in self.TracePixels]
 
+    #Sets pixel indexes based on provided raster and integration pixel maps from the input.
+    #TracePixels are called after pixelIdxs are provided.
     def setPixelIdxs(self, rasterPixels=None, integrationPixels=None):
         if ~np.any(rasterPixels):
             rasterPixels = np.array([])
@@ -35,7 +41,8 @@ class Trace:
         self.TracePixels = self.getTracePixels(pixelIdxs_)
 
         self.pixelIdxs = pixelIdxs_
-
+    
+    #Checks and adjusts the dimensions of a map based on DMD (Digital Micromirror Device) pixel parameters.
     def checkMapDims(self, map_):
         dmdPixelsPerRow = self.dataFile.header['dmdPixelsPerRow']
         dmdPixelsPerColumn = self.dataFile.header['dmdPixelsPerColumn']
@@ -48,15 +55,16 @@ class Trace:
             f"Incorrect map size. Map needs to be size [{dmdPixelsPerRow},{dmdPixelsPerColumn}]"
         return map_
 
-    def loadData(self):
-        # probably unneeded. Trace Pixels load on process.
-        self.TracePixels = self.TracePixels.load()
 
+        
+    #TracePixels are loaded by calling its sub-functions.
+    #This is a bit different from MatLab version due to the inherent object-oriented programming difference.
     def process(self, windowWidth_lines, expectedWindowWidth_lines):
         for i,j in enumerate(self.TracePixels):
             j.load()
 
 
+        #Different convolution algorithms are applied to compensate for the inconsistent interval in data
         tempKernel = np.exp(-np.abs(np.arange(-4*windowWidth_lines, 4*windowWidth_lines+1) / windowWidth_lines))
         tempKernel = tempKernel.astype('float32')
 
@@ -117,16 +125,7 @@ class Trace:
         return trace, sumDataWeighted, sumExpected, sumExpectedWeighted
 
 
-    def processAsync(self, windowWidth_lines, expectedWindowWidth_lines):
-        hFuture_ = self.TracePixels.processAsync(windowWidth_lines, expectedWindowWidth_lines)
-
-        def finalize(hFuture):
-            self.TracePixels, trace = hFuture.fetchOutputs()
-
-        hFuture = hFuture_.afterAll(finalize, 1, PassFuture=True)
-        return hFuture
-
-
+    # Quick function to get raw pixel instead of the decolvolved data.
     def getRawSuperPixel(self,superpixel=1):
         for j in self.TracePixels:
             if not j.loaded:
@@ -145,6 +144,7 @@ class Trace:
                     rawlist.append(self.TracePixels[superpixel].data[i][j])
             return rawlist
 
+    # Averaging SuperPixels together if it is from the same iteration.
     def getRawAverageSuperPixel(self,superpixel=1):
         rawlist = []
         for j in self.TracePixels:
@@ -164,9 +164,8 @@ class Trace:
                 rawlist.append(average)
             return rawlist
 
+    # A function that stores the order of the superpixel in an roi. How it is stored and retrieved from the memory is unordered
     def orderadjust(self):
-
-
         for pixels in self.TracePixels:
             pixels.y =(pixels.superPixelId - 1024000) % 1280
 
@@ -179,7 +178,7 @@ class Trace:
         print(check)
 
 
-
+    # Initiation and loading of tracepixels.
     def getTracePixels(self, pixelIdxs):
         pixelIDs = np.unique(pixelIdxs)
 
