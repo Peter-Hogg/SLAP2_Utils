@@ -7,9 +7,11 @@ The `SLAP2_Utils` library is designed to facilitate the reading of SLAP2 (Scanne
 ## Features
 - **Reading SLAP2 Binary Files**: Convert SLAP2 proprietary binary data into accessible formats for Python.
 - **Metadata Parsing**: Extract and utilize metadata associated with SLAP2 data files.
-- **Data Manipulation**: Tools to manipulate and process data points read from the binary file
-- **Trace Extraction**: Tools to extract and generate traces from ROIs imaged in integrated scan mode
-
+- **Data Manipulation**: Tools to manipulate and process data points read from the binary file.
+- **Trace Extraction**: Tools to extract and generate traces from ROIs imaged in integrated scan mode.
+- **MatLab-based Visual Stimulus**: Different kinds of visual stimulus, from checkers, moving bars, to visual stimulus utilized by the Allen Institute, ready to be imported for a SLAP2-related experiment.
+- **Motion Corrections**: GPU-based tools that allows calculation of motion drifts, with x, y, z changes applied directly on the ROI inside the SLAP2 software (work in progress).
+  
 ## Technologies Used
 - Python 3.x
 - NumPy
@@ -32,5 +34,5 @@ Contributions are welcome! If you'd like to contribute, please fork the reposito
 This project is licensed under the Mozilla Public License Version 2.0 - see the LICENSE.md file for details.
 
 ## Credits and Acknowledgements
-This library was developed by Peter Hogg and Jerry Tong. It's a rework of several Matlab tools from MBF. Thanks to all contributors who have helped in refining this tool and helped with the project
+This library was developed by Peter Hogg and Jerry Tong. It's a rework of several Matlab tools from MBF with added utility functions. Thanks to all contributors who have helped in refining this tool and helped with the project.
 
