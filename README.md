@@ -18,6 +18,7 @@ The `SLAP2_Utils` library is designed to facilitate the reading of SLAP2 (Scanne
 - SciPy
 - h5py
 - scikit-image
+- cupy
 
 ## Installation
 Clone this repository
