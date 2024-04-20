@@ -8,17 +8,19 @@ tags:
     - voltage imaging
 authors:
     - name: Peter Hogg
-        orid: 0000-0003-2176-4977
-        equal-contrib: true 
-        affiliation: 1
+    orid: 0000-0003-2176-4977
+    equal-contrib: true 
+    affiliation: 1
+
     - name: Jerry Tong
-        orcid: 0000-0000-0000-0000
-        equal-contrib: true
-        affiliation: 1 
+    orcid: Author Without ORCID
+    equal-contrib: true
+    affiliation: 1 
+
     - name: Kurt Haas
-        orid: 0000-0003-4754-1560
-        equal-contrib: false
-        affiliation: 1
+    orid: 0000-0003-4754-1560
+    equal-contrib: false
+    affiliation: 1
 affiliations:
  - name: Department of Cellular and Physiological Sciences, Centre for Brain Health, School of Biomedical Engineering, University of British Columbia, Vancouver, Canada
    index: 1
