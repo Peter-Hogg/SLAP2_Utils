@@ -7,17 +7,17 @@ tags:
     - calcium imaging
     - voltage imaging
 authors:
-    - name: Peter Hogg
+  - name: Peter Hogg
     orid: 0000-0003-2176-4977
     equal-contrib: true 
     affiliation: 1
 
-    - name: Jerry Tong
+  - name: Jerry Tong
     orcid: Author Without ORCID
     equal-contrib: true
     affiliation: 1 
 
-    - name: Kurt Haas
+  - name: Kurt Haas
     orid: 0000-0003-4754-1560
     equal-contrib: false
     affiliation: 1
