@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # SLAP2_Utils
 
 ## Overview
