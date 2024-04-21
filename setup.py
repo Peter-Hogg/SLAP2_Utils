@@ -12,7 +12,7 @@ with open('requirements.txt', 'r') as f:
 
 setup(
 
-    name='SLAP2_Utils', 
+    name='slap2utils', 
     version='0.0.3',  
 
     
