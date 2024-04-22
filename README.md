@@ -20,6 +20,12 @@ The `SLAP2_Utils` library is designed to facilitate the reading of SLAP2 (Scanne
 - cupy
 
 ## Installation
+Install with pip
+```bash
+pip install SLAP2-UTILS
+```
+
+
 Clone this repository
 
 ```bash
