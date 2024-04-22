@@ -1,4 +1,4 @@
-import numpy as numpy
+import numpy as np
 
 def roiImg(datafile, idx):
     """ Returns ROI coords as a 2D array
