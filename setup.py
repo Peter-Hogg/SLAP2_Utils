@@ -5,15 +5,15 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 
-with open('requirements.txt', 'r') as f:
+with open(path.join(here, 'requirements.txt'), 'r') as f:
     required = f.read().splitlines()
 
 
 
 setup(
 
-    name='slap2utils', 
-    version='0.0.3',  
+    name='slap2_utils', 
+    version='0.0.4',  
 
     
     description='Code to support using a SLAP2 Microscope',  
@@ -27,7 +27,7 @@ setup(
     author_email='peter.hogg@ubc.ca',  
     
     classifiers=[ 
-        
+        'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
         'Development Status :: 4 - Beta',
 
 
