@@ -50,7 +50,7 @@ Before further processing, the user also needs to extract the desired ROI inform
 
 # SLAP2 Uility UI that Accompanies SLAP2 Software
 
-
+Besides the library of python scripts that processes SLAP2 datafile, a MATLAB UI scripts are developed that accompanies the SLAP2 software. The script is written in MATLAB because some functionality of the script requires the script to directly interact the SLAP2 software, which is also written and ran in MATLAB. Although the script is written in MATLAB, the UI frequently calls on python scripts such that some functionality can be ran much faster than if it was written in MATLAB.
 
 # Visualization
 
