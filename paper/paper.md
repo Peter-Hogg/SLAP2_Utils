@@ -41,7 +41,8 @@ To overcome the inherent speed limitations of two-photon imaging, the Scanned Li
 
 # SLAP2 Datafile Pipeline
 
-This paper first provide a python version of the code provided in MBF, with added function to organize the eventual parsed data ( When a recording session is finished in the SLAP2 software, at least two files are usually produced: .dat file and .meta file. Both file contains many subfields of information. The .dat file containing mainly general information, from lines per cycle to number of channels, and .meta file contains more detailed information, including the parse plan of the recording and unparsed raw data (inside the memmap subfield) from the recording. This means that a simple reading of the code is not suffice to extract the recording properly, and additional codes are needed to correctly extract the data inside the memmap field. .  
+This paper first provide a python version of the code provided in MBF, with added function to organize the eventual parsed data ( When a recording session is finished in the SLAP2 software, at least two files are usually produced: .dat file and .meta file. Both file contains many subfields of information. The .dat file containing mainly general information, from lines per cycle to number of channels, and .meta file contains more detailed information, including the parse plan of the recording and unparsed raw data (inside the memmap subfield) from the recording. This means that a simple reading of the code is not suffice to extract the recording properly, and additional codes are needed to correctly extract the data inside the memmap field. 
+
 ![Figure 1{fig:example}](SLAP2_Pipeline.svg)
 
 
