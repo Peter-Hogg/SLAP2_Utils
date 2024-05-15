@@ -48,7 +48,7 @@ This paper first provide a python version of the code provided in MBF, with adde
 
 # Visualization
 Figures can be included like this:
-![imageinf](SLAP2_Pipeline.svg)
+![.\label{imageinf}](SLAP2_Pipeline.svg)
 
 
 Figures can be included like this:
