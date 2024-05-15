@@ -50,7 +50,19 @@ Before further processing, the user also needs to extract the desired ROI inform
 
 # SLAP2 Uility UI that Accompanies SLAP2 Software
 
-Besides the library of python scripts that processes SLAP2 datafile, a MATLAB UI script called haasSlapUI.m are developed that accompanies the SLAP2 software. The script is written in MATLAB because some functionality of the script requires the script to directly interact the SLAP2 software, which is also written and ran in MATLAB. Although the script is written in MATLAB, the UI frequently calls on python scripts such that some functionality can be ran much faster than if it was written in MATLAB. When the script is downloaded, the path must be edited to be the local directory of the repository
+Besides the Python script library that processes SLAP2 data, a MATLAB UI script called haasSlapUI.m has been developed to accompany the SLAP2 software. The script is written in MATLAB because some of its functionality requires the script to interact directly with the SLAP2 software, which is also written and run in MATLAB. Although the script is custom-written in MATLAB, the UI frequently calls on other Python scripts, such that some functionality can run much faster than if written in MATLAB. When the script is downloaded, the path must be edited to be the repository's local directory. The UI includes useful functions such as importing ROI from external sources, generating the average stack of the record (imagestacks.py python script), automatic selection of the tif file from the previous recording, and adjustment of physical shifts. The calculation of the shift adjustment is based on a comparison between the screen's point of view versus a reference stack, which is accomplished by running the xyshift_ui.py. The shift calculation is also sped up by making the calculation GPU-based, which allows the real-time shift adjustment to be conducted quickly. 
+
+# Availability
+
+Figures can be included like this:
+
+![Caption for example figure.\label{fig:example}](SLAP2_Pipeline.svg)
+
+and referenced from text using \autoref{fig:example}.
+
+# Acknowledgements
+
+The development of this Python library was supported by funds from the Canadian Institutes of Health Research (CIHR) Foundation Award (FDN-148468).
 
 # Visualization
 
