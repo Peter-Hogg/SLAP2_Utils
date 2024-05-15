@@ -37,14 +37,17 @@ Two-photon microscopy is an important technique for deep, *in vivo*, recordings 
 
 # Statement of need
 
-To overcome the inherent speed limitations of two-photon imaging, the Scanned Line Angular Projection (SLAP) microscope was developed to make use of elements of random-access and projection microscopy to increase the acquisition rate of two-photon imaging for the recording of neuronal activity [@Kazemipour2019]. The second generation of this technology builds upon these concepts in the designs of SLAP2, a commercially available microscope kit [@mbfSLAP2]. However, the custom tools needed to read data from the binary files generated during high-speed acquisitions of neural activity are written outside the Python programming language, making designing workflows that leverage Python ecosystem packages cumbersome. To overcome this limitation, we developed the Python library, SLAP2 Utils. Our package provides pure Python implementation of functions needed to read the raw microscope data, such that SLAP2 data can be processed in the Python environment. This enables ranges of Python libraries from copy that speeds up the running of Python programs by running scripts on GPU using CUDA libraries to Keras of Tensorflow (for machine learning) to copy that speeds up the running of Python programs by using CUDA and running scripts on a GPU.
+To overcome the inherent speed limitations of two-photon imaging, the Scanned Line Angular Projection (SLAP) microscope was developed to make use of elements of random-access and projection microscopy to increase the acquisition rate of two-photon imaging for the recording of neuronal activity [@Kazemipour2019]. The second generation of this technology builds upon these concepts in the designs of SLAP2, a commercially available microscope kit [@mbfSLAP2]. However, the custom tools needed to read data from the binary files generated during high-speed acquisitions of neural activity in specific region of interest and are written outside the Python programming language, making designing workflows that leverage Python ecosystem packages cumbersome. To overcome this limitation, we developed the Python library, SLAP2 Utils. Our package provides pure Python implementation of functions needed to read the raw microscope data, such that SLAP2 data can be processed in the Python environment. This enables ranges of Python libraries from copy that speeds up the running of Python programs by running scripts on GPU using CUDA libraries to Keras of Tensorflow (for machine learning) to copy that speeds up the running of Python programs by using CUDA and running scripts on a GPU.
 
-# SLAP2 Datafile Overview
+# SLAP2 Datafile Pipeline
+
+This paper first provide a python version of the code provided in MBF, with added function to organize the eventual parsed data ( When a recording session is finished in the SLAP2 software, at least two files are usually produced: .dat file and .meta file. Both file contains many subfields of information. The .dat file containing mainly general information, from lines per cycle to number of channels, and .meta file contains more detailed information, including the parse plan of the recording and unparsed raw data (inside the memmap subfield) from the recording. This means that a simple reading of the code is not suffice to extract the recording properly, and additional codes are needed to correctly extract the data inside the memmap field. .  
+![Figure 1{fig:example}](SLAP2_Pipeline.svg)
 
 
 # Visualization
 Figures can be included like this:
-![Caption for example figure.\label{fig:example}](SLAP2_Pipeline.svg)
+
 
 
 Figures can be included like this:
