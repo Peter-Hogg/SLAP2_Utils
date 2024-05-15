@@ -48,10 +48,10 @@ This paper first provide a python version of the code provided in MBF, with adde
 
 # Visualization
 Figures can be included like this:
-![.\label{imageinf}](SLAP2_Pipeline.svg)
 
 
 Figures can be included like this:
+
 ![Caption for example figure.\label{fig:example}](SLAP2_Pipeline.svg)
 
 
