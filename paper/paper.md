@@ -44,7 +44,7 @@ To overcome the inherent speed limitations of two-photon imaging, the Scanned Li
 
 # Visualization
 Figures can be included like this:
-![Caption for example figure.\label{fig:example}](SLAP2_Utils/edit/main/paper/SLAP2_Pipeline.svg)
+![Caption for example figure.\label{fig:example}](SLAP2_Utils/paper/SLAP2_Pipeline.svg)
 
 
 Figures can be included like this:
