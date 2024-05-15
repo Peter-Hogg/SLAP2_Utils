@@ -52,7 +52,7 @@ Figures can be included like this:
 
 
 Figures can be included like this:
-![Caption for example figure.\label{fig:example}](docs/img/pyntLines.png)
+![Caption for example figure.\label{fig:example}](SLAP2_Pipeline.svg)
 
 ![imageinf](docs/img/pyntLines.png)
 
