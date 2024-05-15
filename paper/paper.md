@@ -47,13 +47,10 @@ This paper first provide a python version of the code provided in MBF, with adde
 
 
 # Visualization
-Figures can be included like this:
-
 
 Figures can be included like this:
 
 ![Caption for example figure.\label{fig:example}](SLAP2_Pipeline.svg)
-
 
 and referenced from text using \autoref{fig:example}.
 
