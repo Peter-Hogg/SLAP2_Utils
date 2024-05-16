@@ -26,14 +26,11 @@ affiliations:
    index: 1
 date: 15 April 2024
 bibliography: paper.bib
-
-
 ---
 
 # Summary
 
 Two-photon microscopy is an important technique for deep, *in vivo*, recordings of neuronal activity from fluorescent biosensors. However, the neural activity frequently occurs at orders of magnitude faster than what a typical laser-scanning two-photon microscope can record. To overcome this limitation, several novel scanning techniques have been developed, resulting in neural data being stored in complicated file structures rather than typical image formats. We present our Python toolbox with customized codes that interact with such a data structure generated from a novelly designed two-photon microscope, SLAP2, capable of recording neural activity at kilohertz. The ability to import the data structure in Python also enables the implementation of other python scripts and libraries. This Python package includes many different features that accompany the SLAP2 microscope in a separate MATLAB UI, from motion correction on ROI to  importing Python scripts and allows quick visualization of imaged results. 
-
 
 # Statement of need
 
@@ -47,38 +44,19 @@ Before further processing, the user also needs to extract the desired ROI inform
 
 ![Figure 1: SLAP2 Pipeline. The .dat file and .meta file are inputted into datafile.py under the _load_file function, which returns a datafile object, The ROI information need to be extracted and such information are together inputted with the output of _load_file function into the trace.py, function with the order of setPixelIdxs, process, and orderadjust.\label{fig:fig1}](SLAP2_Pipeline.svg)
 
-
 # SLAP2 Uility UI that Accompanies SLAP2 Software
 
-Besides the Python script library that processes SLAP2 data, a MATLAB UI script called haasSlapUI.m has been developed to accompany the SLAP2 software. The script is written in MATLAB because some of its functionality requires the script to interact directly with the SLAP2 software, which is also written and run in MATLAB. Although the script is custom-written in MATLAB, the UI frequently calls on other Python scripts, such that some functionality can run much faster than if written in MATLAB. When the script is downloaded, the path must be edited to be the repository's local directory. The UI includes useful functions such as importing ROI from external sources, generating the average stack of the record (imagestacks.py python script), automatic selection of the tif file from the previous recording, and adjustment of physical shifts [@pytorch, @scikit]. The calculation of the shift adjustment is based on the phase cross correlation between the screen's point of view versus a reference stack, which is accomplished by running the xyshift_ui.py [@phasecross, @scikit] The shift calculation is also sped up by making the calculation GPU-based, which allows the real-time shift adjustment to be conducted quickly [@cupy]. 
+Besides the Python script library that processes SLAP2 data, a MATLAB UI script called haasSlapUI.m has been developed to accompany the SLAP2 software. The script is written in MATLAB because some of its functionality requires the script to interact directly with the SLAP2 software, which is also written and run in MATLAB. Although the script is custom-written in MATLAB, the UI frequently calls on other Python scripts, such that some functionality can run much faster than if written in MATLAB. When the script is downloaded, the path must be edited to be the repository's local directory. The UI includes useful functions such as importing ROI from external sources, generating the average stack of the record (imagestacks.py python script), automatic selection of the tif file from the previous recording, and adjustment of physical shifts [@pytorch, @scikit]. The calculation of the shift adjustment is based on the phase cross correlation between the screen's point of view versus a reference stack, which is accomplished by running the xyshift_ui.py [@phasecross, @scikit]. The shift calculation is also sped up by making the calculation GPU-based, which allows the real-time shift adjustment to be conducted quickly [@cupy]. 
 
 # Availability
 
-Figures can be included like this:
-
-![Caption for example figure.\label{fig:example}](SLAP2_Pipeline.svg)
-
-and referenced from text using \autoref{fig:example}.
+All the code and scripts mentioned above are publicly available on the GitHub repository ([https://github.com/Peter-Hogg/SLAP2_Utils/tree/main]). The repository is feature-complete, and additional features are being added over time according to needs. 
 
 # Acknowledgements
 
-The development of this Python library was supported by funds from the Canadian Institutes of Health Research (CIHR) Foundation Award (FDN-148468).
-
-# Visualization
-
-Figures can be included like this:
-
-![Caption for example figure.\label{fig:example}](SLAP2_Pipeline.svg)
-
-and referenced from text using \autoref{fig:example}.
-
-
+The development of this Python library was supported by funds from the Canadian Institutes of Health Research (CIHR) Foundation Award (FDN-148468). The authors also thank John Price for his valuable suggestions on the manuscript.
 
 # Citations
 
-
-# Acknowledgements
-
-The development of this Python library was supported by funds from the Canadian Institutes of Health Research (CIHR) Foundation Award (FDN-148468).
 
 # References
