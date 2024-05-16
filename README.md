@@ -18,6 +18,7 @@ The `SLAP2_Utils` library is designed to facilitate the reading of SLAP2 (Scanne
 - h5py
 - scikit-image
 - cupy
+- PyTorch
 
 ## Installation
 Install with pip
