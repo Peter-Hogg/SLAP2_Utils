@@ -55,6 +55,7 @@ class DataFile():
         
         
     def _load_file(self):
+        # Loading file names and check whether file is found
         base_dir, filename = os.path.split(self.filename)
         n_base = os.path.splitext(filename)[0].replace('-TRIAL', '', -1).strip()
 
@@ -66,6 +67,7 @@ class DataFile():
         self.metaData = MetaData(self.metaDataFileName)
         print('MetaData Loaded')
 
+        # Subfunction of loading parse plan
         def load_parse_plan(self, metaData):   
             def filter_z_pixel_replacement_maps(z_maps):
                 # Using list comprehension for simplified logic
@@ -78,13 +80,11 @@ class DataFile():
 
             self.fastZs = final_fastz
 
-            print(self.fastZs)
             #Check if it breaks
             self.lineSuperPixelZIdxs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['sliceIdx']
             self.lineSuperPixelIDs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['superPixelID']
-            #?
+            
             self.zPixelReplacementMaps = metaData.AcquisitionContainer.ParsePlan['pixelReplacementMaps']
-            #self.zPixelReplacementMapsNonRedundant = filter_z_pixel_replacement_maps(self.zPixelReplacementMaps)
             
             #Using list comprehension for simplified logic
             self.lineNumSuperPixels = [len(ids) for ids in self.lineSuperPixelIDs]
@@ -96,7 +96,7 @@ class DataFile():
                     self.lineFastZIdxs[lineIdx] = 0
                 else:
                     self.lineFastZIdxs[lineIdx] = lineZIdxs_[0][0] + 1
-            #?
+            
         
         # Add additional attributes from the MetaData file
         load_parse_plan(self, self.metaData)
@@ -112,11 +112,12 @@ class DataFile():
         if raw_data.dtype != 'uint32':
             raw_data.dtype('uint32')
 
+        # See if magic number matches, returns an error if that is not the case
         file_magic_number = raw_data[0]
         assert file_magic_number == self.MAGIC_NUMBER, 'Data format error. This is not a SLAP2 data file.'
         
         
-        # Currently have only implemented file version 2
+        # Currently, we have only implemented file version 2
         file_format_version = raw_data[1]
         assert file_format_version <= 2, 'Unknown format version'
         if file_format_version == 2:
@@ -128,6 +129,8 @@ class DataFile():
         raw_data  =  np.frombuffer(raw_data, dtype=np.uint16)
         if raw_data.dtype != 'uint16':
             raw_data.astype('uint16')
+
+        # Load different fields in the object accordingly
 
         line_idxs = np.zeros(int(header['linesPerCycle']), dtype=int)
         line_size_bytes = np.zeros(int(header['linesPerCycle']), dtype=np.uint32)
