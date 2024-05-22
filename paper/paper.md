@@ -57,7 +57,4 @@ All the code and scripts mentioned above are publicly available on the GitHub re
 
 The development of this Python library was supported by funds from the Canadian Institutes of Health Research (CIHR) Foundation Award (FDN-148468). 
 
-# Citations
-
-
 # References
