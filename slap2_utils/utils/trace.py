@@ -175,7 +175,6 @@ class Trace:
         check = []
         for pixels in self.TracePixels:
             check.append((pixels.superPixelId - 1024000) % 1280)
-        print(check)
 
 
     # Initiation and loading of tracepixels.
