@@ -229,118 +229,118 @@ class Trace:
 
 
     def getTracePixels(self, pixelIdxs):
-    """
-    getTracePixels sets up the initial TracePixel fields, such as how many there should be, its initial 
-    fields (like dmdNumPix), loading superpixelIDs in tracepixel, and adds new tracepixels on top of existing
-    superpixels.
-    Returns:
-    - TracePixels with old TracePixels and new TracePixels
-    """
-    
-    # Get unique pixel indices and adjust for 0-based indexing
-    pixelIDs = np.unique(pixelIdxs)
-    for i in range(len(pixelIDs)):
-        pixelIDs[i] = pixelIDs[i] - 1
+        """
+        getTracePixels sets up the initial TracePixel fields, such as how many there should be, its initial
+        fields (like dmdNumPix), loading superpixelIDs in tracepixel, and adds new tracepixels on top of existing
+        superpixels.
+        Returns:
+        - TracePixels with old TracePixels and new TracePixels
+        """
 
-    # Load DMD (Digital Micro-mirror Device) pixel data
-    dmdNumPix = self.dataFile.header['dmdPixelsPerRow'] * self.dataFile.header['dmdPixelsPerColumn']
-    pixelReplacementMap = copy.deepcopy(self.dataFile.zPixelReplacementMaps[self.zIdx - 1])
+        # Get unique pixel indices and adjust for 0-based indexing
+        pixelIDs = np.unique(pixelIdxs)
+        for i in range(len(pixelIDs)):
+            pixelIDs[i] = pixelIDs[i] - 1
 
-    # Identify pixels that exceed the number of DMD pixels
-    intMask = pixelReplacementMap[1, :] >= dmdNumPix
+        # Load DMD (Digital Micro-mirror Device) pixel data
+        dmdNumPix = self.dataFile.header['dmdPixelsPerRow'] * self.dataFile.header['dmdPixelsPerColumn']
+        pixelReplacementMap = copy.deepcopy(self.dataFile.zPixelReplacementMaps[self.zIdx - 1])
 
-    # Adjust pixelReplacementMap for these identified pixels
-    j = 0
-    for i in intMask:
-        if i:
-            pixelReplacementMap[0, j] = pixelReplacementMap[0, j] + dmdNumPix
-        j = j + 1
-    
-    # Sort pixelReplacementMap by the first column
-    sortIdxs = np.argsort(pixelReplacementMap[0])
+        # Identify pixels that exceed the number of DMD pixels
+        intMask = pixelReplacementMap[1, :] >= dmdNumPix
 
-    # Find superpixel IDs corresponding to the given pixel indices
-    idxs1 = ismembc2(pixelIDs, pixelReplacementMap[0])
-    validSuperPixelIDs = pixelReplacementMap[1, idxs1]
-    validSuperPixelIDs, validCounts = np.unique(validSuperPixelIDs, return_counts=True)
+        # Adjust pixelReplacementMap for these identified pixels
+        j = 0
+        for i in intMask:
+            if i:
+                pixelReplacementMap[0, j] = pixelReplacementMap[0, j] + dmdNumPix
+            j = j + 1
 
-    # Extract existing superpixel IDs from TracePixels
-    existingSuperPixelIDs = [pixel.superPixelId for pixel in self.TracePixels]
-    
-    # Find intersection of valid and existing superpixel IDs
-    C, ia, ib = np.intersect1d(validSuperPixelIDs, existingSuperPixelIDs, return_indices=True)
+        # Sort pixelReplacementMap by the first column
+        sortIdxs = np.argsort(pixelReplacementMap[0])
 
-    # Remove intersecting IDs from validSuperPixelIDs and validCounts
-    validSuperPixelIDs = np.delete(validSuperPixelIDs, ia)
-    validCounts = np.delete(validCounts, ia)
+        # Find superpixel IDs corresponding to the given pixel indices
+        idxs1 = ismembc2(pixelIDs, pixelReplacementMap[0])
+        validSuperPixelIDs = pixelReplacementMap[1, idxs1]
+        validSuperPixelIDs, validCounts = np.unique(validSuperPixelIDs, return_counts=True)
 
-    # Retrieve the corresponding existing TracePixels
-    ExistingTracePixels = [self.TracePixels[i] for i in ib]
+        # Extract existing superpixel IDs from TracePixels
+        existingSuperPixelIDs = [pixel.superPixelId for pixel in self.TracePixels]
 
-    # Initialize new TracePixel
-    NewTracePixel = TracePixel()
-    NewTracePixel.fileName = self.dataFile.filename
-    NewTracePixel.bytesPerCycle = self.dataFile.header['bytesPerCycle']
-    NewTracePixel.firstCycleOffsetBytes = self.dataFile.header['firstCycleOffsetBytes']
-    NewTracePixel.numCycles = self.dataFile.numCycles
-    NewTracePixel.linesPerCycle = self.dataFile.header['linesPerCycle']
+        # Find intersection of valid and existing superpixel IDs
+        C, ia, ib = np.intersect1d(validSuperPixelIDs, existingSuperPixelIDs, return_indices=True)
 
-    # Create a list of new TracePixels based on the valid superpixel IDs
-    NewTracePixels = [copy.deepcopy(NewTracePixel) for x in range(len(validSuperPixelIDs))]
+        # Remove intersecting IDs from validSuperPixelIDs and validCounts
+        validSuperPixelIDs = np.delete(validSuperPixelIDs, ia)
+        validCounts = np.delete(validCounts, ia)
 
-    # Get the number of pixels per superpixel ID
-    superPixelNumPixelsIDs, superPixelNumPixels = np.unique(pixelReplacementMap[1], return_counts=True)
+        # Retrieve the corresponding existing TracePixels
+        ExistingTracePixels = [self.TracePixels[i] for i in ib]
 
-    # Filter to include only valid superpixel IDs
-    ia = np.where(np.isin(superPixelNumPixelsIDs, validSuperPixelIDs))[0]
-    superPixelNumPixels = superPixelNumPixels[ia]
+        # Initialize new TracePixel
+        NewTracePixel = TracePixel()
+        NewTracePixel.fileName = self.dataFile.filename
+        NewTracePixel.bytesPerCycle = self.dataFile.header['bytesPerCycle']
+        NewTracePixel.firstCycleOffsetBytes = self.dataFile.header['firstCycleOffsetBytes']
+        NewTracePixel.numCycles = self.dataFile.numCycles
+        NewTracePixel.linesPerCycle = self.dataFile.header['linesPerCycle']
 
-    # Assign superpixel data to new TracePixels
-    for idx in range(len(NewTracePixels)):
-        NewTracePixels[idx].superPixelId = validSuperPixelIDs[idx]
-        NewTracePixels[idx].superPixelNumPixels = superPixelNumPixels[idx]
-        NewTracePixels[idx].superPixelNumPixelsSelected = validCounts[idx]
+        # Create a list of new TracePixels based on the valid superpixel IDs
+        NewTracePixels = [copy.deepcopy(NewTracePixel) for x in range(len(validSuperPixelIDs))]
 
-    # Iterate over line superpixel IDs and process them
-    for lineIdx in range(len(self.dataFile.lineSuperPixelIDs)):
-        lineZIdx = self.dataFile.lineFastZIdxs[lineIdx]
-        
-        # Skip lines that do not match the current z-index
-        if int(lineZIdx) != self.zIdx:
-            continue
-        
-        lineSuperPixelIDs = self.dataFile.lineSuperPixelIDs[lineIdx][0]
-        mask = np.isin(validSuperPixelIDs, lineSuperPixelIDs)
-        
-        positions = []
-        for i in range(len(mask)):
-            if mask[i]:
-                firstocc = np.where(lineSuperPixelIDs == validSuperPixelIDs[i])
-                positions.append(firstocc[0][0] + 1)
-        
-        # Calculate byte offsets for the valid positions
-        byteOffsets = [(x - 1) * 2 for x in positions]
-        byteOffsets = [x + len(lineSuperPixelIDs) * 2 * (self.chIdx - 1) for x in byteOffsets]
-        byteOffsets = [x + self.dataFile.lineDataStartIdxs[lineIdx] * 2 for x in byteOffsets]
-        byteOffsets = [int(x - self.dataFile.header['firstCycleOffsetBytes']) for x in byteOffsets]
-        
-        pixIdxs = np.where(mask)
-        pixIdxs = [int(x) for x in pixIdxs[0]]
+        # Get the number of pixels per superpixel ID
+        superPixelNumPixelsIDs, superPixelNumPixels = np.unique(pixelReplacementMap[1], return_counts=True)
 
-        # Assign byte offsets and line indices to the new TracePixels
-        for i, x in enumerate(pixIdxs):
-            NewTracePixels[x].byteOffsets.append(byteOffsets[pixIdxs.index(x)])
-            NewTracePixels[x].lineIdxs.append(lineIdx)
+        # Filter to include only valid superpixel IDs
+        ia = np.where(np.isin(superPixelNumPixelsIDs, validSuperPixelIDs))[0]
+        superPixelNumPixels = superPixelNumPixels[ia]
 
-    # Append existing TracePixels to the list of new TracePixels
-    for x in ExistingTracePixels:
-        NewTracePixels.append(x)
+        # Assign superpixel data to new TracePixels
+        for idx in range(len(NewTracePixels)):
+            NewTracePixels[idx].superPixelId = validSuperPixelIDs[idx]
+            NewTracePixels[idx].superPixelNumPixels = superPixelNumPixels[idx]
+            NewTracePixels[idx].superPixelNumPixelsSelected = validCounts[idx]
 
-    # Sort the TracePixels by superPixelId
-    TracePixels = NewTracePixels
-    sorted_trace_pixels = sorted(TracePixels, key=lambda x: x.superPixelId)
-    
-    return TracePixels
+        # Iterate over line superpixel IDs and process them
+        for lineIdx in range(len(self.dataFile.lineSuperPixelIDs)):
+            lineZIdx = self.dataFile.lineFastZIdxs[lineIdx]
+
+            # Skip lines that do not match the current z-index
+            if int(lineZIdx) != self.zIdx:
+                continue
+
+            lineSuperPixelIDs = self.dataFile.lineSuperPixelIDs[lineIdx][0]
+            mask = np.isin(validSuperPixelIDs, lineSuperPixelIDs)
+
+            positions = []
+            for i in range(len(mask)):
+                if mask[i]:
+                    firstocc = np.where(lineSuperPixelIDs == validSuperPixelIDs[i])
+                    positions.append(firstocc[0][0] + 1)
+
+            # Calculate byte offsets for the valid positions
+            byteOffsets = [(x - 1) * 2 for x in positions]
+            byteOffsets = [x + len(lineSuperPixelIDs) * 2 * (self.chIdx - 1) for x in byteOffsets]
+            byteOffsets = [x + self.dataFile.lineDataStartIdxs[lineIdx] * 2 for x in byteOffsets]
+            byteOffsets = [int(x - self.dataFile.header['firstCycleOffsetBytes']) for x in byteOffsets]
+
+            pixIdxs = np.where(mask)
+            pixIdxs = [int(x) for x in pixIdxs[0]]
+
+            # Assign byte offsets and line indices to the new TracePixels
+            for i, x in enumerate(pixIdxs):
+                NewTracePixels[x].byteOffsets.append(byteOffsets[pixIdxs.index(x)])
+                NewTracePixels[x].lineIdxs.append(lineIdx)
+
+        # Append existing TracePixels to the list of new TracePixels
+        for x in ExistingTracePixels:
+            NewTracePixels.append(x)
+
+        # Sort the TracePixels by superPixelId
+        TracePixels = NewTracePixels
+        sorted_trace_pixels = sorted(TracePixels, key=lambda x: x.superPixelId)
+
+        return TracePixels
 
 
 def ismembc2(A, B):
