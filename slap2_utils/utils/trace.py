@@ -228,8 +228,7 @@ class Trace:
         self.TracePixels = ordered_trace
 
 
-    # Initiation and loading of tracepixels.
-   def getTracePixels(self, pixelIdxs):
+    def getTracePixels(self, pixelIdxs):
     """
     getTracePixels sets up the initial TracePixel fields, such as how many there should be, its initial 
     fields (like dmdNumPix), loading superpixelIDs in tracepixel, and adds new tracepixels on top of existing
