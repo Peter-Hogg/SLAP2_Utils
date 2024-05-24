@@ -19,7 +19,7 @@ def roiImg(datafile, idx):
     roi_shape = datafile.metaData.AcquisitionContainer.ROIs[idx].shapeData
     img = np.zeros((int(datafile.header['dmdPixelsPerColumn']),
                      int(datafile.header['dmdPixelsPerRow'])), dtype=np.uint32)
-    img[roi_shape[0].astype('int'),roi_shape[1].astype('int')] = 1
+    img[roi_shape[0].astype('int')-1,roi_shape[1].astype('int')-1] = 1
     return img
 
 
@@ -42,7 +42,7 @@ def roiBoolean(datafile, idx):
     booleanPixels=np.full((int(datafile.header['dmdPixelsPerColumn']),
                                 int(datafile.header['dmdPixelsPerRow'])),
                                 False)
-    booleanPixels[roi_shape[0].astype('int'),roi_shape[1].astype('int')] = True   
+    booleanPixels[roi_shape[0].astype('int')-1,roi_shape[1].astype('int')-1] = True   
     
     return booleanPixels
 
