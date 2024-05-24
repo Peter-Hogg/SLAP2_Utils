@@ -56,7 +56,7 @@ def roiLabels(datafile, refstack=None):
         for lbl, roi in enumerate(datafile.metaData.AcquisitionContainer.ROIs):
             z = roi.shapeData
             plane = datafile.fastZs.index(roi.z)
-            roiLabels[plane, :, :][roi.shapeData[0].astype('int'),roi.shapeData[1].astype('int')]= lbl+1
+            roiLabels[plane, :, :][roi_shape[0].astype('int')-1,roi_shape[1].astype('int')-1]= lbl+1
         return  roiLabels
     else:
         return
