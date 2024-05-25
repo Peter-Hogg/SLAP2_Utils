@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from skimage.draw import polygon_perimeter
  
 from ..utils import trace
-
+from ..utils import roi_utils
 def returnAllTrace(datafile, chIdx=1,  zIdx=1, window=10, expectedWindowWidth=100):
     # Returns dictionary of traces. Key is ROI index.
     traces  = {}
@@ -11,18 +11,11 @@ def returnAllTrace(datafile, chIdx=1,  zIdx=1, window=10, expectedWindowWidth=10
 
     # Iterate through all ROIs in the datafile metadata
     for _roi in range(len(datafile.metaData.AcquisitionContainer.ROIs)):
-        roi_shape = datafile.metaData.AcquisitionContainer.ROIs[_roi].shapeData
-        
-        # Create a blank image and draw the perimeter of the ROI shape
-        img = np.zeros((800, 1280), dtype=np.uint8)
-        rr, cc = polygon_perimeter(roi_shape[0, :], roi_shape[1, :], shape=img.shape, clip=True)
-        img[rr, cc] = 1
-        
-        # Create masks for the ROI
-        mask = np.full((800, 1280), False, dtype=bool)
-        mask[img == 1] = True
-        rasterPixels = np.full((800, 1280), False, dtype=bool)
-        integrationPixels = mask
+ 
+        rasterPixels = np.full((int(datafile.header['dmdPixelsPerColumn']),
+                                int(datafile.header['dmdPixelsPerRow'])),
+                                False)
+        integrationPixels = roi_utils.roiBoolean(datafile, _roi)
 
         # Set the pixels for the trace object
         hTrace.setPixelIdxs(rasterPixels, integrationPixels)
@@ -70,17 +63,11 @@ def returnVolumeTrace(datafile, roiIndex, chIdx=1):
     # Initialize the trace object
     hTrace = trace.Trace(datafile, zIdx, chIdx)
     
-    # Create a blank image and draw the perimeter of the ROI shape
-    roi_shape = ROI.shapeData
-    img = np.zeros((800, 1280), dtype=np.uint8)
-    rr, cc = polygon_perimeter(roi_shape[0, :], roi_shape[1, :], shape=img.shape, clip=True)
-    img[rr, cc] = 1
-    
-    # Create masks for the ROI
-    mask = np.full((800, 1280), False, dtype=bool)
-    mask[img == 1] = True
-    rasterPixels = np.full((800, 1280), False, dtype=bool)
-    integrationPixels = mask
+    # Create boolean arrays of raster and  integration pixels
+    rasterPixels = np.full((int(datafile.header['dmdPixelsPerColumn']),
+                            int(datafile.header['dmdPixelsPerRow'])),
+                            False)
+    integrationPixels = roi_utils.roiBoolean(datafile, roiIndex)
     
     # Initialize the trace object again (redundant initialization)
     hTrace = trace.Trace(datafile, zIdx, chIdx)
@@ -94,11 +81,45 @@ def returnVolumeTrace(datafile, roiIndex, chIdx=1):
     # Adjust the order of the trace
     hTrace = hTrace.orderadjust()
     
-    # Plot the raw trace
-    plt.plot(_trace1)
-    plt.show()
-    
     # Clean the volume trace
     _trace = cleanVolumeTrace(datafile, zIdx, _trace1)
     
     return _trace1, _trace
+
+
+
+def superPixelTraces(datafile, roiIdx, zIdx=1, chIdx=1):
+    """
+
+    Args:
+        datafile: SLAP2_Utils Datafile Object
+
+        roiIdx: int 
+            index value of roi in the roi list
+
+        zIdx: Z-Plane Index
+
+        chIdx: int
+            Index of the channel being recorded
+
+    Returns:
+        _pixSignal: array
+            An array of floats of a raw signal for each super pixel
+    """
+
+    traceObject = Trace(datafile,zIdx,chIdx)
+ 
+    integrationPixels = roi_utils.roiBoolean(datafile, roiIdx)
+    rasterPixels      = np.full(integrationPixels.shape, False)
+
+    traceObject.setPixelIdxs(rasterPixels, integrationPixels)
+    for pix in traceObject.TracePixels:
+        pix.load()
+
+    traceObject.orderadjust()
+
+    _pixSignal = np.zeros((traceObject.TracePixels[0].data[0].shape[0]*len(traceObject.TracePixels[0].data), len(traceObject.TracePixels)))
+    for colIdx, pix in enumerate(traceObject.TracePixels):
+        _pixSignal[:, colIdx] = np.array(pix.data).flatten('F')
+    
+    return _pixSignal
