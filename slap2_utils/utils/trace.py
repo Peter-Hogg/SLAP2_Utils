@@ -6,10 +6,40 @@ import copy
 class Trace:
     def __init__(self, dataFile, zIdx=0, chIdx=0):
         """
-        Trace class contains the datafile and tracepixels of the provided ROI
-        Returns:
-        - Trace object with the following fields
-        """
+        A class used to read raw data and generate traces from a SLAP2 data file.
+
+        Attributes
+        ----------
+        dataFile : DataFile
+            The data file containing raw data to generate the trace from
+        zIdx : int
+            The Z index of the trace.
+        chIdx : int
+            The channel index of the trace.
+        TracePixels : list
+            A list of TracePixel objects associated with the trace.
+        pixelIdxs : list
+            A list of pixel indices for the trace.
+
+        Methods
+        -------
+        superPixelIds
+            Returns a list of superpixel IDs for the trace.
+        setPixelIdxs(rasterPixels=None, integrationPixels=None)
+            Sets the pixel indices based on the provided raster and integration pixel maps.
+        checkMapDims(map_)
+            Checks and adjusts the dimensions of a map based on DMD (Digital Micromirror Device) pixel parameters.
+        process(windowWidth_lines, expectedWindowWidth_lines)
+            Processes the trace by loading the TracePixels and deconvolving the data.
+        getRawSuperPixel(superpixel=1)
+            Obtains the raw data for a specific superpixel.
+        getRawAverageSuperPixel(superpixel=1)
+            Obtains the averaged raw data for a specific superpixel (volumetric trace only).
+        orderadjust()
+            Adjusts the order of the TracePixels based on their y-index.
+        getTracePixels(pixelIdxs)
+            Sets up the initial TracePixel fields and returns the TracePixels with new and existing TracePixels.
+    """
         # Initializes the Trace object with provided parameters.
         # Sets default values for TracePixels and pixelIdxs.
         self.dataFile = dataFile
@@ -21,6 +51,14 @@ class Trace:
     @property
     # Defines a property superPixelIds that returns a list of superpixel IDs.
     def superPixelIds(self):
+        """
+        Gets a list of superpixel IDs for the trace.
+
+        Returns
+        -------
+        list
+            A list of superpixel IDs.
+        """
         return [pixel.superPixelId for pixel in self.TracePixels]
 
     
@@ -28,12 +66,18 @@ class Trace:
     # TracePixels are called after pixelIdxs are provided.
     def setPixelIdxs(self, rasterPixels=None, integrationPixels=None):
         """
-        setPixelIdxs sets up the masks for the provided ROI if it is not provided 
-        (default is all true) and check whether the provided masks are correct in 
-        its dimensions. It then calls getTracePixelsto set up initial fields and 
-        properties of individual superpixels in a ROI.
-        Returns:
-        - Trace object with loaded TracePixels and pixelIdxs
+        Sets the pixel indices based on the provided raster and integration pixel maps.
+
+        Parameters
+        ----------
+        rasterPixels : np.ndarray, optional
+            An array of raster pixel indices (default is None).
+        integrationPixels : np.ndarray, optional
+            An array of integration pixel indices (default is None).
+
+        Returns
+        -------
+        None
         """
         
         if ~np.any(rasterPixels):
@@ -60,10 +104,17 @@ class Trace:
     
     def checkMapDims(self, map_):
         """
-        checkMapDims checks and adjusts the dimensions of a map 
-        based on DMD (Digital Micromirror Device) pixel parameters.
-        Returns:
-        - map (adjusted map if its shape was incorrect or inverted)
+        Checks and adjusts the dimensions of a map based on DMD (Digital Micromirror Device) pixel parameters.
+
+        Parameters
+        ----------
+        map_ : np.ndarray
+            The map to check and adjust.
+
+        Returns
+        -------
+        np.ndarray
+            The adjusted map.
         """
         
         dmdPixelsPerRow = self.dataFile.header['dmdPixelsPerRow']
@@ -81,10 +132,19 @@ class Trace:
     # This is a bit different from MatLab version due to the inherent object-oriented programming difference.
     def process(self, windowWidth_lines, expectedWindowWidth_lines):
         """
-        process actually loads the pre-set up TracePixels by calling its sub-functions.
-        It then deconvolve the data to fill the gaps that occurs as highlighted in parse plan.
-        Returns:
-        - trace (convolved version), the parameters used (sumDataWeighted, sumExpected, sumExpectedWeighted)
+        Processes the trace by loading the TracePixels and deconvolving the data.
+
+        Parameters
+        ----------
+        windowWidth_lines : int
+            The width of the convolution window in lines.
+        expectedWindowWidth_lines : int
+            The expected width of the convolution window in lines.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the processed trace, sumDataWeighted, sumExpected, and sumExpectedWeighted.
         """
         
         for i,j in enumerate(self.TracePixels):
@@ -150,9 +210,17 @@ class Trace:
 
     def getRawSuperPixel(self,superpixel=1):
         """
-        getRawSuperPixel obtains the raw data instead of the convolved data.
-        Returns:
-        - rawlist, which contains the raw data from the data file
+        Obtains the raw data for a specific superpixel.
+
+        Parameters
+        ----------
+        superpixel : int, optional
+            The superpixel index to retrieve data for (default is 1).
+
+        Returns
+        -------
+        list
+            A list of raw data for the specified superpixel.
         """
         for j in self.TracePixels:
             if not j.loaded:
@@ -178,12 +246,18 @@ class Trace:
     
     def getRawAverageSuperPixel(self,superpixel=1):
         """
-        getRawAverageSuperPixels only works for volumetric trace. It averages 
-        all superpixels in an ROI together. 
-        Returns:
-        - rawlist, which contains the averaged data from the data file
+        Obtains the averaged raw data for a specific superpixel (volumetric trace only).
+
+        Parameters
+        ----------
+        superpixel : int, optional
+            The superpixel index to retrieve data for (default is 1).
+
+        Returns
+        -------
+        list
+            A list of averaged raw data for the specified superpixel.
         """
-        
         rawlist = []
 
         # Sanity check for inputs
@@ -193,7 +267,7 @@ class Trace:
                 break 
 
             if len(self.TracePixels[superpixel].data[0]) == 1:
-                print("this is not a volumetric trace!")
+                print("This is not a volumetric trace!")
                 break
 
         # Loading the average of the superpixel in volumetric trace
@@ -210,11 +284,11 @@ class Trace:
     # A function that stores the order of the superpixel in an roi. How it is stored and retrieved from the memory is unordered
     def orderadjust(self):
         """
-        orderadjust adjusts how tracepixels are indexed inside the TracePixels field because it could be unordered.
-        The original order is based on size, which creates the case where pixels of (x,y) = (300.400) are indexed 
-        in front of pixels with (x,y) = (200,500), although pixels of 500 in y are examined first in SLAP2.
-        Returns:
-        - TracePixels of sorted order
+        Adjusts the order of the TracePixels based on their y-index.
+
+        Returns
+        -------
+        None
         """
         
         # Here we are using math to calculate the y index of the data
@@ -230,11 +304,17 @@ class Trace:
 
     def getTracePixels(self, pixelIdxs):
         """
-        getTracePixels sets up the initial TracePixel fields, such as how many there should be, its initial
-        fields (like dmdNumPix), loading superpixelIDs in tracepixel, and adds new tracepixels on top of existing
-        superpixels.
-        Returns:
-        - TracePixels with old TracePixels and new TracePixels
+        Sets up the initial TracePixel fields and returns the TracePixels with new and existing TracePixels.
+
+        Parameters
+        ----------
+        pixelIdxs : np.ndarray
+            An array of pixel indices to set up TracePixels for.
+
+        Returns
+        -------
+        list
+            A list of TracePixel objects.
         """
 
         # Get unique pixel indices and adjust for 0-based indexing
