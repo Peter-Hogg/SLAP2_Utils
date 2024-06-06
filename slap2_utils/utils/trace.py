@@ -4,8 +4,7 @@ from .trace_pixel import TracePixel
 import copy
 
 class Trace:
-    def __init__(self, dataFile, zIdx=0, chIdx=0):
-        """
+    """
         A class used to read raw data and generate traces from a SLAP2 data file.
 
         Attributes
@@ -40,6 +39,7 @@ class Trace:
         getTracePixels(pixelIdxs)
             Sets up the initial TracePixel fields and returns the TracePixels with new and existing TracePixels.
     """
+    def __init__(self, dataFile, zIdx=0, chIdx=0):
         # Initializes the Trace object with provided parameters.
         # Sets default values for TracePixels and pixelIdxs.
         self.dataFile = dataFile
