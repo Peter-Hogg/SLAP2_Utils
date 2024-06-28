@@ -34,7 +34,7 @@ git clone https://github.com/Peter-Hogg/SLAP2_Utils.git
 ```
 ## Contributing
 
-Contributions are welcome! If you'd like to contribute, please fork the repository and use a new branch for your contributions. Pull requests welcome. Please report bugs as we're still refining this library
+Contributions are welcome! If you'd like to contribute, please fork the repository and use a new branch for your contributions. Pull requests are welcome. Please report bugs, as we're still refining this library over time.
 
 ## License
 
