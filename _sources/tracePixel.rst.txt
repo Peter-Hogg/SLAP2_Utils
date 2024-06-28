@@ -1,4 +1,4 @@
-Trace Pixel
+TracePixel
 ===========
 
 Documentation for the attributes and methods in the `TracePixel` subclass.
