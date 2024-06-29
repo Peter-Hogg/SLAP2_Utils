@@ -52,7 +52,7 @@ class DataFile():
                 The number of cycles in the data file.
 
             
-            Here are the descriptions for the methods
+            Descriptions for methods:
             ----------
 
             
@@ -62,7 +62,7 @@ class DataFile():
                 Loads the data and metadata files, and populates the attributes.
 
             Returns
-            ----------
+            -------
                 Self with populated fields. This includes filename, metadataFileName, datFileName, fastZs, lineSuperPixelZIdxs, lineSuperPixelIDS, zPixelReplacementMap2, lineNumSuperPixels, lineSuperPixelIDs, lineFastZIdxs, rawData and header.
             
             Methods
