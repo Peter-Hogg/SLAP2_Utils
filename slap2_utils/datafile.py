@@ -61,15 +61,30 @@ class DataFile():
             _load_file() :
                 Loads the data and metadata files, and populates the attributes.
 
-            Returns
+            Parameters
+            ----------
+                Self
+
+            Return
             -------
                 Self with populated fields. This includes filename, metadataFileName, datFileName, fastZs, lineSuperPixelZIdxs, lineSuperPixelIDS, zPixelReplacementMap2, lineNumSuperPixels, lineSuperPixelIDs, lineFastZIdxs, rawData and header.
             
             Methods
             ----------
-            load_file_header(rawData) : rawData
+            load_file_header(rawData) :
                 Loads the file header and validates the data format.
+
+            Parameters
+            ----------
+                rawData (which is also in self)
+
+            Return
+            -------
+                Return header and edited self with populated fields, including lineDataStartIdxs, lineDataNumElements, lineDataNumElements 
+                
             """
+
+    
     def __init__(self, datfile):
         
 
@@ -95,18 +110,7 @@ class DataFile():
          
         
     def _load_file(self):
-        """
-        Load the various fields (mentioned in object) with values.
-    
-        Parameters
-        ----------
-        _load_file():
-            Self (object itself need to created first)
-    
-        Returns
-        -------
-            Fields in self will be edited and loaded. This includes filename, metadataFileName, datFileName, fastZs, lineSuperPixelZIdxs, lineSuperPixelIDS, zPixelReplacementMap2, lineNumSuperPixels, lineSuperPixelIDs, lineFastZIdxs, rawData and header.
-        """
+
         
         # Loading file names and check whether file is found
         base_dir, filename = os.path.split(self.filename)
