@@ -84,11 +84,7 @@ class DataFile():
         
     def _load_file(self):
         """
-        Performs smoothing on each row using the Exponentially Weighted Moving Average (EWMA) method.
-    
-        EWMA:  Exponentially Weighted Moving Average
-        https://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average
-        Performs smoothing on each row, given how strongly to weight new values (vs existing average)
+        Load the various fields (mentioned in object) with values.
     
         Parameters
         ----------
