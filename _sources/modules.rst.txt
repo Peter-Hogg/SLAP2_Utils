@@ -9,3 +9,6 @@ Here is an overview of the core modules and their functions.
    datafile
    trace
    tracePixel
+   fileheader
+   metadata
+   acquisitioncontainer
