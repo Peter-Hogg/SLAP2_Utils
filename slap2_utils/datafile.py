@@ -51,9 +51,11 @@ class DataFile():
             numCycles : int
                 The number of cycles in the data file.
 
-            ----------
+            
             Here are the descriptions for the methods
-        
+            ----------
+
+            
             Methods
             ----------
             _load_file() :
@@ -62,6 +64,9 @@ class DataFile():
             Returns
             ----------
                 Self with populated fields. This includes filename, metadataFileName, datFileName, fastZs, lineSuperPixelZIdxs, lineSuperPixelIDS, zPixelReplacementMap2, lineNumSuperPixels, lineSuperPixelIDs, lineFastZIdxs, rawData and header.
+            
+            Methods
+            ----------
             load_file_header(rawData) : rawData
                 Loads the file header and validates the data format.
             """
