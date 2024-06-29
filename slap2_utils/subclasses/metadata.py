@@ -48,7 +48,7 @@ class MetaData():
 
 
                 
-            """
+     """
     def __init__(self, metadatafile):
         self.metadatafile = metadatafile
         self.AcquisitionContainer = None
