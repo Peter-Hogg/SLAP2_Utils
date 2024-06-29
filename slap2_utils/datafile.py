@@ -62,7 +62,7 @@ class DataFile():
                 Loads the data and metadata files, and populates the attributes.
 
             Parameters
-            ----------
+            ----
                 Self
 
             Return
