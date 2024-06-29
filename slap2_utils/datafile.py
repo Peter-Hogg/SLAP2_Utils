@@ -59,11 +59,7 @@ class DataFile():
             Methods
             ----------
             _load_file() :
-                Loads the data and metadata files, and populates the attributes.
-
-            Parameters
-            ----
-                Self
+                Loads the data and metadata files, and populates the attributes. Has no input besides the self object.
 
             Return
             -------
@@ -72,11 +68,7 @@ class DataFile():
             Methods
             ----------
             load_file_header(rawData) :
-                Loads the file header and validates the data format.
-
-            Parameters
-            ----------
-                rawData (which is also in self)
+                Loads the file header and validates the data format. Needs rawData as input with the self object.
 
             Return
             -------
