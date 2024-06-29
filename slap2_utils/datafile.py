@@ -80,26 +80,7 @@ class DataFile():
         self.numCycles=0
 
         self._load_file()
-        
-        
-        """#Attributes to fill in
-        #num_cycles
-        lineHeaderIdxs;
-        lineDataStartIdxs;
-        lineDataNumElements;
-        #fastZs
-        #lineSuperPixelIDs
-        #lineSuperPixelZIdxs
-        #lineNumSuperPixels
-        #zPixelReplacementMaps
-        zPixelReplacementMapsNonRedundant
-        lineFastZIdxs
-        totalNumLines
-        numChannels
-        firstLineTimestamp (1,1) uint64 = 0;
-        """
-        
-        
+         
         
     def _load_file(self):
         """
