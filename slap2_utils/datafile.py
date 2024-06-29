@@ -51,11 +51,14 @@ class DataFile():
             numCycles : int
                 The number of cycles in the data file.
 
+            Here are the descriptions for the methods
+        
             Methods
             -------
-            _load_file():
+            _load_file() :
                 Loads the data and metadata files, and populates the attributes.
-            load_file_header(rawData):
+                Returns: self with populated fields. This includes filename, metadataFileName, datFileName, fastZs, lineSuperPixelZIdxs, lineSuperPixelIDS, zPixelReplacementMap2, lineNumSuperPixels, lineSuperPixelIDs, lineFastZIdxs, rawData and header.
+            load_file_header(rawData) : rawData
                 Loads the file header and validates the data format.
             """
     def __init__(self, datfile):
