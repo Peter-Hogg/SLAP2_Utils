@@ -6,67 +6,53 @@ from .acquisitionContainer import AcquisitionContainer
 class MetaData():
 
     """
-            A class used to load a SLAP2 binary datafile for data processing
+            A class used to load a SLAP2 binary metadatafile for data processing. This is also an attribute for the datafile object
 
             Attributes
             ----------
-            MAGIC_NUMBER : np.uint32
-                A constant used to validate the data file.
-            filename : str
-                The name of the data file.
-            metaDataFileName : str
+            metadatafile : str
                 The name of the metadata file.
-            datFileName : str
-                The name of the data file with the '.dat' extension.
-            rawData : list
-                A list to store the raw data from the file.
-            metaData : MetaData
-                An instance of the MetaData class to handle metadata.
-            StreamId : None
-                A placeholder for stream ID.
-            header : None
-                A placeholder for the file header.
-            lineHeaderIdxs : None
-                A placeholder for the line header indices.
-            fastZs : list
-                A list to store fast Z values.
-            zPixelReplacementMaps : None
-                A placeholder for the Z pixel replacement maps.
-            lineNumSuperPixels : None
-                A placeholder for the number of super pixels per line.
-            lineSuperPixelIDs : list
-                A list to store super pixel IDs for each line.
-            lineSuperPixelZIdxs : list
-                A list to store Z indices for each line's super pixels.
-            lineDataNumElements : list
-                A list to store the number of elements in each line of data.
-            lineDataStartIdxs : list
-                A list to store the start indices of each line of data.
-            numCycles : int
-                The number of cycles in the data file.
+            AcquisitionContainer : AcquisitionContainer
+                An instance of the AcquisitionContainer class that contain information related to the acquisition.
+            acqDurationCycles : list
+                A list containing 2 int values for cycle duration
+            acqDuration_s : int
+                The total time (in seconds) for the whole acquisition.
+            acquisitionPathIdx : int
+                The number that represent the path that the acquisitiion take place (either 1 or 2).
+            acquisitionPathName : str
+                The string that reiterate which path the acquisition takes place (either 'path 1' or 'path 2')  .
+            aomActive : int
+                Binary number that reporesent whether aom is action (0 = false, 1 = yes).
+            aomVoltage : float
+                The number of voltage in aom (in float).
+            channelsSave : int
+                The number that represent which channel saved the data. 
+            dmdPixelsPerColumn : int
+                The number of pixel along the column of the dmd. 
+            dmdPixelsPerRow : int
+                The number of pixel along the row of the dmd.    
+            enableStack : list
+                Binary number that reporesent whether stack is enabled (0 = false, 1 = yes).
+            linePeriod_s : float
+                The time it takes to conduct 1 slice (1/linePeriod_s gives the line rate for the microscope).
+            remoteFocusPosition_um : int
+                A number that represent the remoteFocusPosition for the center of the stack. 
+            samplesPerLine : int
+                The line rate for the microscope (1/samplesPerLine gives the linePeriod_s).
 
             
             Descriptions for methods:
             ----------
 
-            
             Methods
             ----------
-            _load_file() :
-                Loads the data and metadata files, and populates the attributes. Has no input besides the self object.
+            __init__() :
+                Fill the fields mentioned above. The method also loads the AcquisitionContainer using the __init__() method for the AcquisitionContainer
 
             Return
             -------
-                Self with populated fields. This includes filename, metadataFileName, datFileName, fastZs, lineSuperPixelZIdxs, lineSuperPixelIDS, zPixelReplacementMap2, lineNumSuperPixels, lineSuperPixelIDs, lineFastZIdxs, rawData and header.
-            
-            Methods
-            ----------
-            load_file_header(rawData) :
-                Loads the file header and validates the data format. Needs rawData as input with the self object.
-
-            Return
-            -------
-                Return header and edited self with populated fields, including lineDataStartIdxs, lineDataNumElements, lineDataNumElements 
+                Self with populated fields. 
                 
             """
 
@@ -75,7 +61,6 @@ class MetaData():
         self.AcquisitionContainer = None
         self.acqDurationCycles = ''
         self.acqDuration_s = ''
-        self.acqStartTimeReference= ''
         self.acquisitionPathIdx = ''
         self.acquisitionPathName = ''
         self.aomActive = ''
