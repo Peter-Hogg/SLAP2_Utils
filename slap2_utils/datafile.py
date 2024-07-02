@@ -63,7 +63,7 @@ class DataFile():
 
             Return
             -------
-                Self with filled fields.
+                Self with populated fields.
             
             Methods
             ----------
