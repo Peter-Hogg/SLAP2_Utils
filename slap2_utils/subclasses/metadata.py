@@ -5,6 +5,71 @@ from .acquisitionContainer import AcquisitionContainer
 
 class MetaData():
 
+    """
+            A class used to load a SLAP2 binary datafile for data processing
+
+            Attributes
+            ----------
+            MAGIC_NUMBER : np.uint32
+                A constant used to validate the data file.
+            filename : str
+                The name of the data file.
+            metaDataFileName : str
+                The name of the metadata file.
+            datFileName : str
+                The name of the data file with the '.dat' extension.
+            rawData : list
+                A list to store the raw data from the file.
+            metaData : MetaData
+                An instance of the MetaData class to handle metadata.
+            StreamId : None
+                A placeholder for stream ID.
+            header : None
+                A placeholder for the file header.
+            lineHeaderIdxs : None
+                A placeholder for the line header indices.
+            fastZs : list
+                A list to store fast Z values.
+            zPixelReplacementMaps : None
+                A placeholder for the Z pixel replacement maps.
+            lineNumSuperPixels : None
+                A placeholder for the number of super pixels per line.
+            lineSuperPixelIDs : list
+                A list to store super pixel IDs for each line.
+            lineSuperPixelZIdxs : list
+                A list to store Z indices for each line's super pixels.
+            lineDataNumElements : list
+                A list to store the number of elements in each line of data.
+            lineDataStartIdxs : list
+                A list to store the start indices of each line of data.
+            numCycles : int
+                The number of cycles in the data file.
+
+            
+            Descriptions for methods:
+            ----------
+
+            
+            Methods
+            ----------
+            _load_file() :
+                Loads the data and metadata files, and populates the attributes. Has no input besides the self object.
+
+            Return
+            -------
+                Self with populated fields. This includes filename, metadataFileName, datFileName, fastZs, lineSuperPixelZIdxs, lineSuperPixelIDS, zPixelReplacementMap2, lineNumSuperPixels, lineSuperPixelIDs, lineFastZIdxs, rawData and header.
+            
+            Methods
+            ----------
+            load_file_header(rawData) :
+                Loads the file header and validates the data format. Needs rawData as input with the self object.
+
+            Return
+            -------
+                Return header and edited self with populated fields, including lineDataStartIdxs, lineDataNumElements, lineDataNumElements 
+                
+            """
+
     def __init__(self, metadatafile):
         self.metadatafile = metadatafile
         self.AcquisitionContainer = None
