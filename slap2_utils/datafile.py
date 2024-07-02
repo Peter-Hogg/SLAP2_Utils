@@ -54,7 +54,16 @@ class DataFile():
             
             Descriptions for methods:
             ----------
+           
+            
+            Methods
+            ----------
+            __init__() :
+                Initialize the fields with values and call the _load_file() metbod.
 
+            Return
+            -------
+                Self with filled fields.
             
             Methods
             ----------
