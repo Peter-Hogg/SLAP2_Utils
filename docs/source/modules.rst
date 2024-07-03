@@ -10,3 +10,4 @@ Here is an overview of the core modules and their functions.
    trace
    tracePixel
    metadata
+   acquisitioncontainer
