@@ -12,7 +12,7 @@ from skimage.draw import polygon_perimeter
 
 class DataFile():
     """
-            A class used to load a SLAP2 binary datafile for data processing
+            A class used to load a SLAP2 binary datafile for data processing.
 
             Attributes
             ----------
