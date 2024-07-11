@@ -35,10 +35,28 @@ class TracePixel:
     y : int
         An unspecified variable, initialized to -1.
 
+    Descriptions for methods:
+    ----------
+           
+            
     Methods
+    ----------
+    __init__() :
+        Initialize the fields with values.
+
+    Return
     -------
-    load(hMemmap=None)
-        Loads the data for the trace pixel from the specified memory-mapped file.
+        Self with populated fields.
+
+    Methods
+    ----------
+    load(hMemmap=None) :
+        Loads the data for the trace pixel from the specified memory-mapped file, which is given as an input (hMemmap).
+
+    Return
+    -------
+        Self with edited data field and isLoaded changed to true.
+    
     """
 
 
