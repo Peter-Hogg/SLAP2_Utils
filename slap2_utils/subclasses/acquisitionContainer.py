@@ -1,7 +1,7 @@
 import h5py
 from .slapROI import slapROI
 
-class  AcquisitionContainer():
+class AcquisitionContainer():
      """
             A class used to load a SLAP2 binary metadatafile for data processing. This is also an attribute for the datafile object
 
