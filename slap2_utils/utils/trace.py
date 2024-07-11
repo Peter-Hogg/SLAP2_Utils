@@ -19,6 +19,7 @@ class Trace:
             A list of TracePixel objects associated with the trace.
         pixelIdxs : list
             A list of pixel indices for the trace.
+
             
         Descriptions for methods:
         ----------
