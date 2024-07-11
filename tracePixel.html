@@ -65,7 +65,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#slap2_utils.utils.trace_pixel.bytesPerCycle"><code class="docutils literal notranslate"><span class="pre">bytesPerCycle</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#slap2_utils.utils.trace_pixel.linesPerCycle"><code class="docutils literal notranslate"><span class="pre">linesPerCycle</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#slap2_utils.utils.trace_pixel.y"><code class="docutils literal notranslate"><span class="pre">y</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#slap2_utils.utils.trace_pixel.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="metadata.html">MetaData</a></li>
@@ -249,12 +248,38 @@
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Descriptions</span> <span class="pre">for</span> <span class="pre">methods</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">----------</span></span></dt>
+<dd></dd></dl>
+
 <dl class="py method">
-<dt class="sig sig-object py" id="slap2_utils.utils.trace_pixel.load">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.trace_pixel.</span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hMemmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.utils.trace_pixel.load" title="Link to this definition"></a></dt>
-<dd><p>Loads the data for the trace pixel from the specified memory-mapped file.</p>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__()</span> <span class="pre">:</span></span></dt>
+<dd><p>Initialize the fields with values.</p>
 </dd></dl>
 
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Self with populated fields.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">load(hMemmap=None)</span> <span class="pre">:</span></span></dt>
+<dd><p>Loads the data for the trace pixel from the specified memory-mapped file, which is given as an input (hMemmap).</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Self with edited data field and isLoaded changed to true.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
