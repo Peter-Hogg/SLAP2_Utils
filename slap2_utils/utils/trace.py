@@ -23,6 +23,7 @@ class Trace:
         Descriptions for methods:
         ----------
 
+
         Methods
         ---------
         __init__() :
