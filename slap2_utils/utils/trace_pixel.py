@@ -34,13 +34,14 @@ class TracePixel:
         The number of lines per cycle.
     y : int
         An unspecified variable, initialized to -1.
+    
 
     Descriptions for methods:
     ----------
            
             
     Methods
-    ----------
+    ---------
     __init__() :
         Initialize the fields with values.
 
@@ -49,7 +50,7 @@ class TracePixel:
         Self with populated fields.
 
     Methods
-    ----------
+    ---------
     load(hMemmap=None) :
         Loads the data for the trace pixel from the specified memory-mapped file, which is given as an input (hMemmap).
 
