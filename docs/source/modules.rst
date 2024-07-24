@@ -12,3 +12,4 @@ Here is an overview of the core modules and their functions.
    metadata
    acquisitioncontainer
    slapROI
+   file_header
