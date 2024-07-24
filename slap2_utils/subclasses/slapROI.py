@@ -1,36 +1,22 @@
 class slapROI(): 
-    def __init__(self, h5file, roiRef):
+
     """
-        A class used to represent and manipulate a single trace pixel from a SLAP2 data file.
+        A class used to store information related to region of interests.
     
         Attributes
         ----------
-        fileName : str
-            The name of the file to be loaded.
-        superPixelId : int
-            The identifier for the superpixel.
-        superPixelNumPixels : int
-            The number of pixels in the superpixel.
-        superPixelNumPixelsSelected : int
-            The number of selected pixels in the superpixel.
-        byteOffsets : list
-            A list of byte offsets for data extraction.
-        lineIdxs : list
-            A list of line indices for data extraction.
-        data : list
-            The loaded data for the trace pixel.
-        isLoaded : bool
-            A flag indicating whether the data is loaded.
-        firstCycleOffsetBytes : int
-            The offset for the first cycle in bytes.
-        numCycles : int
-            The number of cycles.
-        bytesPerCycle : int
-            The number of bytes per cycle.
-        linesPerCycle : int
-            The number of lines per cycle.
-        y : int
-            An unspecified variable, initialized to -1.
+        constructor : str
+            The constructor of the ROI.
+        roiType : str
+            The type of ROI in question (rectangle vs arbitary ROI).
+        imageMode : str
+            A string that represent how the ROI is imaged (raster vs integrated).
+        targetRate : int
+            The target sample rate that the user inputted (default is 2 kHz).
+        shapeData : list
+            A list that represent the shape of the ROI.
+        z : int
+            An integer that represent the z layer of the ROI in question.
         
     
         Descriptions for methods:
@@ -40,22 +26,15 @@ class slapROI():
         Methods
         ---------
         __init__() :
-            Initialize the fields with values.
+            Initialize all of the fields with values, which takes an input of h5file (a file that is created after recording) and a reference to the ROI in question.
     
         Return
         -------
             Self with populated fields.
     
-        Methods
-        ---------
-        load(hMemmap=None) :
-            Loads the data for the trace pixel from the specified memory-mapped file, which is given as an input (hMemmap).
-    
-        Return
-        -------
-            Self with edited data field and isLoaded changed to true.
-        
         """
+    
+    def __init__(self, h5file, roiRef):
         
         self.constructor = None
         self.roiType = None
