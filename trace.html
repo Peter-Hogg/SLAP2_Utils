@@ -49,7 +49,17 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="datafile.html">DataFile</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Trace</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Trace</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#slap2_utils.utils.trace.Trace"><code class="docutils literal notranslate"><span class="pre">Trace()</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#slap2_utils.utils.trace.dataFile"><code class="docutils literal notranslate"><span class="pre">dataFile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slap2_utils.utils.trace.zIdx"><code class="docutils literal notranslate"><span class="pre">zIdx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slap2_utils.utils.trace.chIdx"><code class="docutils literal notranslate"><span class="pre">chIdx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slap2_utils.utils.trace.TracePixels"><code class="docutils literal notranslate"><span class="pre">TracePixels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slap2_utils.utils.trace.pixelIdxs"><code class="docutils literal notranslate"><span class="pre">pixelIdxs</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="tracePixel.html">TracePixel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="metadata.html">MetaData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="acquisitioncontainer.html">AcquisitionContainer</a></li>
@@ -86,6 +96,169 @@
   <section id="trace">
 <h1>Trace<a class="headerlink" href="#trace" title="Link to this heading"></a></h1>
 <p>Documentation for the attributes and methods in the <cite>Trace</cite> class used to extract traces from the binary file.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="slap2_utils.utils.trace.Trace">
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.trace.</span></span><span class="sig-name descname"><span class="pre">Trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zIdx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chIdx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.utils.trace.Trace" title="Link to this definition"></a></dt>
+<dd><p>A class used to read raw data and generate traces from a SLAP2 data file.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="slap2_utils.utils.trace.dataFile">
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.trace.</span></span><span class="sig-name descname"><span class="pre">dataFile</span></span><a class="headerlink" href="#slap2_utils.utils.trace.dataFile" title="Link to this definition"></a></dt>
+<dd><p>The data file containing raw data to generate the trace from.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataFile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="slap2_utils.utils.trace.zIdx">
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.trace.</span></span><span class="sig-name descname"><span class="pre">zIdx</span></span><a class="headerlink" href="#slap2_utils.utils.trace.zIdx" title="Link to this definition"></a></dt>
+<dd><p>The Z index of the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="slap2_utils.utils.trace.chIdx">
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.trace.</span></span><span class="sig-name descname"><span class="pre">chIdx</span></span><a class="headerlink" href="#slap2_utils.utils.trace.chIdx" title="Link to this definition"></a></dt>
+<dd><p>The channel index of the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="slap2_utils.utils.trace.TracePixels">
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.trace.</span></span><span class="sig-name descname"><span class="pre">TracePixels</span></span><a class="headerlink" href="#slap2_utils.utils.trace.TracePixels" title="Link to this definition"></a></dt>
+<dd><p>A list of TracePixel objects associated with the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="slap2_utils.utils.trace.pixelIdxs">
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.trace.</span></span><span class="sig-name descname"><span class="pre">pixelIdxs</span></span><a class="headerlink" href="#slap2_utils.utils.trace.pixelIdxs" title="Link to this definition"></a></dt>
+<dd><p>A list of pixel indices for the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<section id="descriptions-for-methods">
+<h2>Descriptions for methods:<a class="headerlink" href="#descriptions-for-methods" title="Link to this heading"></a></h2>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__()</span> <span class="pre">:</span></span></dt>
+<dd><p>Fill the fields mentioned above and set default value for the fields.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Self with initialized fields.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">superPixelIds():</span></span></dt>
+<dd><p>The method obtains a list of superpixel IDs for the trace.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Returns a list of superpixel IDs for the trace.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setPixelIdxs(rasterPixels=None,</span> <span class="pre">integrationPixels=None)</span> <span class="pre">:</span></span></dt>
+<dd><p>The method takes an input of rasterPixels and integrationPixels maps and it sets the pixel indices based on the provided raster and integration pixel maps.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Self with edited TracePixels and pixelIDxs fields.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">checkMapDims(map_)</span> <span class="pre">:</span></span></dt>
+<dd><p>The method checks and adjusts the dimensions of a map based on DMD (Digital Micromirror Device) pixel parameters. It takes a <a href="#id1"><span class="problematic" id="id2">map_</span></a> as input to check and adjust.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p>It returns a np.ndarray that represent the adjusted map.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process(windowWidth_lines,</span> <span class="pre">expectedWindowWidth_lines)</span> <span class="pre">:</span></span></dt>
+<dd><p>The method processes the trace by loading the TracePixels and deconvolving the data. It takes windowWidth_lines, which is an integer that represent the width of the convolution window in lines. It also takes expectedWindowWidth_lines as an integer input that represent the expected width of the convolution window in lines.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing the processed trace, sumDataWeighted, sumExpected, and sumExpectedWeighted.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">getRawSuperPixel(superpixel=1)</span> <span class="pre">:</span></span></dt>
+<dd><p>The method obtains the raw data for a specific superpixel, which is provided by the superpixel input.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of raw data for the specified superpixel.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">getRawAverageSuperPixel(superpixel=1)</span> <span class="pre">:</span></span></dt>
+<dd><p>The method obtains the averaged raw data for a specific superpixel (volumetric trace only), which is again provided by the superpixel input.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of averaged raw data for the specified superpixel.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">orderadjust()</span> <span class="pre">:</span></span></dt>
+<dd><p>The method adjusts the order of the TracePixels based on their y-index.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Self with adjusted TracePixel list that is correctly ordered.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">getTracePixels(pixelIdxs)</span> <span class="pre">:</span></span></dt>
+<dd><p>This method sets up the initial TracePixel fields and returns the TracePixels with new and existing TracePixels. It takes pixelIdxs which is a np.ndarray of pixel indices to set up TracePixels for.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of TracePixel objects (unordered if it is not ran through orderadjust method yet.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
 </section>
 
 
