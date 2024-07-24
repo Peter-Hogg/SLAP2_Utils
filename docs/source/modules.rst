@@ -11,3 +11,4 @@ Here is an overview of the core modules and their functions.
    tracePixel
    metadata
    acquisitioncontainer
+   slapROI
