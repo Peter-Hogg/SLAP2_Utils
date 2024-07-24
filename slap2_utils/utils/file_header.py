@@ -1,5 +1,14 @@
 # Utility functions for the Slap2DataFile
 def load_file_header_v2(obj, rawUint32):
+     """
+        A function that does several sanity checks to the integrity and validity of the file. It also translates the raw data that are inputted as raw uint32 array.
+
+       
+        Return
+        -------
+            Translated header and number of cycles (num_cycles)    
+
+    """
     # Data format:
     # uint32_t magic_start          = MAGIC_NUMBER;
     # uint32_t file_version         = 1;
@@ -47,6 +56,15 @@ def load_file_header_v2(obj, rawUint32):
     return header, num_cycles
 
 def translate_field_value_pairs(field_value_pairs):
+    """
+        A function that maps field IDs to names. The input is field value pairs, which are to be translated into a dictionary format.
+
+       
+        Return
+        -------
+            Dictionary that contains the field value pairs
+
+    """
     file_header_fields = [
         "firstCycleOffsetBytes",
         "lineHeaderSizeBytes",
@@ -81,6 +99,15 @@ def translate_field_value_pairs(field_value_pairs):
     return struct_out
 
 def translate_channel_mask(header):
+    """
+        A function that translates the channel mask from the header as the input. It then has various checks that validate the number of channels specified.
+
+       
+        Return
+        -------
+            It returns the header itself if it indeed passed all checks.
+
+    """
     assert 'channelMask' in header
     channels = [bit for bit in range(32) if (int(header['channelMask']) & (1 << bit)) != 0]
     header['channels'] = channels
@@ -89,6 +116,15 @@ def translate_channel_mask(header):
     return header
 
 def translate_reference_timestamp(header):
+    """
+        A function that function combines the lower and upper parts of the reference timestamp if it does exist. 
+
+       
+        Return
+        -------
+            It returns the header that has the combined reference timestamp in it.
+
+    """
     if 'referenceTimestamp_lower' in header and 'referenceTimestamp_upper' in header:
         reference_timestamp_lower = header['referenceTimestamp_lower']
         reference_timestamp_upper = int(header['referenceTimestamp_upper']) << 32
