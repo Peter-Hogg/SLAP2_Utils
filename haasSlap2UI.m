@@ -1,6 +1,7 @@
 function haasSlap2UI(localSlap, localGUI)
     
     % temp edit, original: 'C:\Users\haasl\Documents\SLAP2_Utils'
+    shift_record = [0;0;0];
     slap2PythonPath = 'C:\Users\haasl\Documents\SLAP2_Utils';
     setenv('PYTHONPATH', slap2PythonPath);    setenv('PYTHONPATH', slap2PythonPath);
     P = py.sys.path;
@@ -295,8 +296,10 @@ function ShiftAdjustmentUI(btn,txtFilePath1,localSlap,localGUI)
     % Using str as output, and result is converted, order is z, y, x
     shift_list = str2num (result);
     for i = 1:length(shift_list)
-        shift_list(i)=round(shift_list(i));
+        shift_list(i)=round(shift_list(i)) - shift_record(i);
+        shift_record(i)=shift_list(i);        
     end
+    
     if newestdate == -100
         % Change local variable
      
