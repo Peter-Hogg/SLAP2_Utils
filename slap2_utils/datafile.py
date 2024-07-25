@@ -11,11 +11,8 @@ from skimage.draw import polygon_perimeter
 
 
 class DataFile():
-
     
-    def __init__(self, datfile):
-        
-        
+    def __init__(self, datfile):  
 
         self.MAGIC_NUMBER = np.uint32(322379495)
         self.filename = datfile
