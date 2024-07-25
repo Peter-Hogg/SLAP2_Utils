@@ -11,7 +11,10 @@ from skimage.draw import polygon_perimeter
 
 
 class DataFile():
-    """
+
+    
+    def __init__(self, datfile):
+        """
         A class used to load a SLAP2 binary datafile for data processing.
 
         Attributes
@@ -84,9 +87,6 @@ class DataFile():
             Return header and edited self with populated fields, including lineDataStartIdxs, lineDataNumElements, lineDataNumElements 
                 
     """
-
-    
-    def __init__(self, datfile):
         
 
         self.MAGIC_NUMBER = np.uint32(322379495)
