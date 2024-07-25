@@ -1,18 +1,22 @@
 import numpy as np
 
 def roiImg(datafile, idx):
-    """ Returns ROI coords as a 2D array
+    """Return ROI coordinates as a 2D array.
 
-    Args:
-        datafile: SLAP2_Utils Datafile Object
-            height of all peaks
+    The function returns a 2D array where pixels belonging to the ROI are marked with 1, 
+    and all other pixels are marked with 0.
 
-        idx: int 
-            index value of roi in the roi list
+    Parameters
+    ----------
+    datafile : SLAP2_Utils Datafile Object
+        The datafile containing metadata and header information.
+    idx : int
+        Index value of the ROI in the ROI list.
 
-    Returns:
-        img: array
-            ints either 0 or 1 for pixels belonging to the roi
+    Returns
+    -------
+    img : array
+        A 2D array with integers 0 or 1 indicating pixels belonging to the ROI.
     """
 
 
@@ -25,18 +29,22 @@ def roiImg(datafile, idx):
 
 
 def roiBoolean(datafile, idx):
-    """ Returns ROI coords as a 2D array of booleans, format used in trace function
+    """Return ROI coordinates as a 2D array of booleans.
 
-    Args:
-        datafile: SLAP2_Utils Datafile Object
-            height of all peaks
+    The function returns a 2D array where pixels belonging to the ROI are marked with True,
+    and all other pixels are marked with False. This format is used in the trace function.
 
-        idx: int 
-            index value of roi in the roi list
+    Parameters
+    ----------
+    datafile : SLAP2_Utils Datafile Object
+        The datafile containing metadata and header information.
+    idx : int
+        Index value of the ROI in the ROI list.
 
-    Returns:
-        booleanPixels: array
-            ints either False or True for pixels belonging to the roi
+    Returns
+    -------
+    booleanPixels : array
+        A 2D array with booleans indicating pixels belonging to the ROI.
     """
     roi_shape = datafile.metaData.AcquisitionContainer.ROIs[idx].shapeData
     booleanPixels=np.full((int(datafile.header['dmdPixelsPerColumn']),
@@ -47,7 +55,23 @@ def roiBoolean(datafile, idx):
     return booleanPixels
 
 def roiLabels(datafile, refstack=None):
-    #TODO have version which uses a refrence stack 
+    """Return ROI labels as a 3D array with each plane representing a Z-stack.
+
+    The function returns a 3D array where each plane represents a Z-stack, and labels indicate different ROIs. 
+    If a reference stack is provided, the function can use it for generating ROI labels.
+
+    Parameters
+    ----------
+    datafile : SLAP2_Utils Datafile Object
+        The datafile containing metadata and header information.
+    refstack : optional
+        Reference stack to use for generating ROI labels. Default is None.
+
+    Returns
+    -------
+    roiLabels : array
+        A 3D array with each plane representing a Z-stack and labels indicating different ROIs.
+    """
     if refstack == None:
         roiLabels = np.zeros((len(datafile.fastZs),
                             int(datafile.header['dmdPixelsPerColumn']),
@@ -59,4 +83,6 @@ def roiLabels(datafile, refstack=None):
             roiLabels[plane, :, :][roi_shape[0].astype('int')-1,roi_shape[1].astype('int')-1]= lbl+1
         return  roiLabels
     else:
+        #TODO have version which uses a refrence stack 
+
         return

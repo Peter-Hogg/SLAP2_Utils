@@ -22,6 +22,30 @@ from segment_anything import sam_model_registry, SamPredictor
 
 
 def masked_sliding_window_inference(image, mask, segmenter, window_size=(256, 256), stride=128, ):
+    """Perform masked sliding window inference on an image.
+
+    This function applies a sliding window over the image, using the given mask to limit the
+    area of inference and a segmenter model to predict within each window.
+
+    Parameters
+    ----------
+    image : array
+        The input image array with shape (z, y, x).
+    mask : array
+        A binary mask indicating the regions to include in the inference.
+    segmenter : object
+        The segmentation model to apply on each patch.
+    window_size : tuple of int, optional
+        The size of the sliding window (default is (256, 256)).
+    stride : int, optional
+        The stride of the sliding window (default is 128).
+
+    Returns
+    -------
+    output : array
+        The segmented output image.
+    """
+    
     h, w = image.shape[1:]
     output = np.zeros((image.shape[0], image.shape[1], image.shape[2]))
     for y in range(0, h-window_size[1]+1, stride):
@@ -37,6 +61,23 @@ def masked_sliding_window_inference(image, mask, segmenter, window_size=(256, 25
     return output
 
 def find_skeleton_3Dpoints(skelly_image):
+    """Identify end points and junction points in a 3D skeleton image.
+
+    This function finds end points and junction points in a binary skeletonized image.
+
+    Parameters
+    ----------
+    skelly_image : array
+        A 3D binary skeleton image.
+
+    Returns
+    -------
+    end_points : list of tuple
+        List of coordinates for end points.
+    y_points : list of tuple
+        List of coordinates for junction points.
+    """
+
     # Force binary image
     skelly_image[skelly_image>0]=1
 
@@ -58,7 +99,28 @@ def find_skeleton_3Dpoints(skelly_image):
 
 
 def find_bounding_box(data, label):
+    """Find the bounding box of a specific label in a 2D array.
 
+    This function calculates the bounding box coordinates of a given label in a 2D array.
+
+    Parameters
+    ----------
+    data : array
+        The input 2D array.
+    label : int
+        The label for which to find the bounding box.
+
+    Returns
+    -------
+    min_y : int
+        Minimum y-coordinate of the bounding box.
+    min_x : int
+        Minimum x-coordinate of the bounding box.
+    max_y : int
+        Maximum y-coordinate of the bounding box.
+    max_x : int
+        Maximum x-coordinate of the bounding box.
+    """
     rows, cols = np.where(data == label)
 
     if rows.size == 0 or cols.size == 0:
@@ -70,6 +132,22 @@ def find_bounding_box(data, label):
     return min_y, min_x, max_y, max_x
 
 def cutlabel(array, label):
+    """Recursively split labels in an array based on certain conditions.
+
+    This function modifies the input array by splitting the regions of a given label.
+
+    Parameters
+    ----------
+    array : array
+        The input 2D array with labels.
+    label : int
+        The label to be split.
+
+    Returns
+    -------
+    array : array
+        The modified array with split labels.
+    """
     labelMod = random.randint(3, 10)
     
     min_y, min_x, max_y, max_x = find_bounding_box(array, label)
@@ -96,6 +174,22 @@ def cutlabel(array, label):
     return array
 
 def returnSomaRoi(maskSAM, RFPix):
+    """Extract the region of interest (ROI) for the soma based on SAM and RFPix masks.
+
+    This function calculates the center of mass of the ROI and extracts the corresponding region.
+
+    Parameters
+    ----------
+    maskSAM : array
+        Binary mask from SAM.
+    RFPix : array
+        The mask representing the region of interest in RFPix.
+
+    Returns
+    -------
+    somaLabel : array
+        The binary mask of the extracted soma ROI.
+    """
     RFPix = RFPix.copy()
     RFPix[RFPix > 0] = 1
     maskSAM[maskSAM > 0] = 1
@@ -107,6 +201,19 @@ def returnSomaRoi(maskSAM, RFPix):
     return somaLabel.astype(int)
 
 def genDendriticRoi(imagepath):
+    """Generate dendritic ROIs using a segmentation pipeline.
+
+    This function performs segmentation on a reference stack image to identify and label dendritic ROIs.
+
+    Parameters
+    ----------
+    imagepath : str
+        Path to the input image file.
+
+    Returns
+    -------
+    None
+    """
     cl_filename = "test_object_segmenter_from_folders.cl"
 
     # Load Reference Stack to segment

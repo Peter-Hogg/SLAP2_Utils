@@ -4,21 +4,25 @@ from matplotlib import cm
 from ..roi_utils import roiImg
 
 def roiOverlaySuperPix(datafile, refimg, roiIdx, display=True):
-    """ Plots contours of an SLAP2 ROI over a reference image
-        Plots Super Pixes Color Coded
+    """Plot contours of an SLAP2 ROI over a reference image with color-coded super pixels.
 
-    Args:
-        datafile: SLAP2_Utils Datafile Object
-            height of all peaks
-        
-        refimg: reference image (t,x,y) or (x,y)
-        
-        roiIdx: int or list
-            int or list of ints for the ROI indices
+    This function plots the contours of specified ROIs over a reference image. The super pixels are color-coded.
 
-    Returns:
-        ax: matplotlib ax object
-            
+    Parameters
+    ----------
+    datafile : SLAP2_Utils Datafile Object
+        The datafile containing metadata and header information.
+    refimg : array
+        Reference image, can be 3D (t, x, y) or 2D (x, y).
+    roiIdx : int or list
+        Integer or list of integers for the ROI indices.
+    display : bool, optional
+        If True, display the plot. Default is True.
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        Matplotlib axes object with the plotted contours.
     """
     assert type(roiIdx) == int or type(roiIdx) == list
     if type(roiIdx) == int:
@@ -41,22 +45,26 @@ def roiOverlaySuperPix(datafile, refimg, roiIdx, display=True):
         plt.show()
     return ax 
 
-    def roiOverlaySuperPix(datafile, refimg, roiIdx, display=True):
-    """ Plots contours of an SLAP2 ROI over a reference image
-        Plots Super Pixes Color Coded
+def roiOverlaySuperPix(datafile, refimg, roiIdx, display=True):
+    """Plot pixel-wise traces of fluorescence changes over time.
 
-    Args:
-        datafile: SLAP2_Utils Datafile Object
-            height of all peaks
-        
-        refimg: reference image (t,x,y) or (x,y)
-        
-        roiIdx: int 
-            int for the ROI indices
+    This function plots the traces of fluorescence changes for each super pixel over a specified time period.
 
-    Returns:
-        ax: matplotlib ax object
-            
+    Parameters
+    ----------
+    dffData : array
+        The delta F/F data of super pixels.
+    hz : float
+        Sampling rate in Hertz.
+    start : int
+        Start frame index.
+    end : int
+        End frame index.
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        Matplotlib axes object with the plotted contours
     """
     assert type(roiIdx) == int
     if type(roiIdx) == int:
@@ -100,9 +108,28 @@ def roiOverlaySuperPix(datafile, refimg, roiIdx, display=True):
     return ax
 
 def plotPixTrace(dffData, hz, start, end):
+    """Plot pixel-wise traces of fluorescence changes over time.
+
+    This function plots the traces of fluorescence changes for each super pixel over a specified time period.
+
+    Parameters
+    ----------
+    dffData : array
+        The delta F/F data of super pixels.
+    hz : float
+        Sampling rate in Hertz.
+    start : int
+        Start frame index.
+    end : int
+        End frame index.
+
+    Returns
+    -------
+    None
+    """
     plt.figure(figsize=(24, 16))
     time = np.arange(0, int(end-start)/hz, 1/hz)
     for j in range(dffSuperPix.shape[0]):
         _traceColor = mpl.colors.rgb2hex(cm.Spectral(j/dffSuperPix.shape[0]))
         plt.plot(time, dffSuperPix[j, start:end]+(.15*j), color=_traceColor, alpha=.8, zorder=dffSuperPix.shape[0]-j+5)
- 
+    plt.show()

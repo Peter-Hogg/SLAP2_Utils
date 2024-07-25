@@ -15,6 +15,21 @@ import json
 
 # Functions for generating an image stack from slice data without loading the tiff file into memory
 def averageStack(path):
+    """Compute the average stack of a TIFF file using CPU.
+
+    This function reads a multi-frame TIFF file, computes the average of each slice, 
+    and saves the resulting average stack as a new TIFF file.
+
+    Parameters
+    ----------
+    path : str
+        Path to the input TIFF file.
+
+    Returns
+    -------
+    newFilePath : str
+        Path to the saved average stack TIFF file.
+    """
     _data = tifffile.tiffcomment(path)
     _stackInfo = json.loads(_data)
     store = tifffile.imread(path, aszarr=True)
@@ -44,6 +59,21 @@ def averageStack(path):
     tifffile.imwrite(newFilePath, avgStack, metadata=_stackInfo)
 
 def averageStackGPU(path):
+    """Compute the average stack of a TIFF file using GPU.
+
+    This function reads a multi-frame TIFF file, computes the average of each slice using GPU, 
+    and saves the resulting average stack as a new TIFF file.
+
+    Parameters
+    ----------
+    path : str
+        Path to the input TIFF file.
+
+    Returns
+    -------
+    newFilePath : str
+        Path to the saved average stack TIFF file.
+    """
     _data = tifffile.tiffcomment(path)
     _stackInfo = json.loads(_data)
     store = tifffile.imread(path, aszarr=True)
