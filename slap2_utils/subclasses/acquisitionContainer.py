@@ -22,7 +22,7 @@ class AcquisitionContainer():
             
             
         Descriptions for methods:
-        ----------
+        --------------------------
 
         Methods
         ----------

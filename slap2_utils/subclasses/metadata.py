@@ -43,7 +43,7 @@ class MetaData():
 
             
             Descriptions for methods:
-            ----------
+            --------------------------
 
             Methods
             ----------

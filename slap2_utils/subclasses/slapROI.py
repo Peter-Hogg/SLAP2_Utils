@@ -20,7 +20,7 @@ class slapROI():
         
     
         Descriptions for methods:
-        ----------
+        --------------------------
                
                 
         Methods
