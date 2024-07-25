@@ -83,7 +83,7 @@ class DataFile():
         -------
             Return header and edited self with populated fields, including lineDataStartIdxs, lineDataNumElements, lineDataNumElements 
                 
-        """
+    """
 
     
     def __init__(self, datfile):
