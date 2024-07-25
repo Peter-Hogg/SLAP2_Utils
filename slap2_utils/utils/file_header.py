@@ -1,6 +1,6 @@
 # Utility functions for the Slap2DataFile
 def load_file_header_v2(obj, rawUint32):
-     """
+    """
         A function that does several sanity checks to the integrity and validity of the file. It also translates the raw data that are inputted as raw uint32 array.
 
         Return
@@ -57,7 +57,11 @@ def load_file_header_v2(obj, rawUint32):
 def translate_field_value_pairs(field_value_pairs):
     """
         A function that maps field IDs to names. The input is field value pairs, which are to be translated into a dictionary format.
-       
+        Parameters
+        ----------
+        field_value_pairs : numpy array 
+        pairs of field names and values from the file header
+        
         Return
         -------
             Dictionary that contains the field value pairs
@@ -99,7 +103,11 @@ def translate_field_value_pairs(field_value_pairs):
 def translate_channel_mask(header):
     """
         A function that translates the channel mask from the header as the input. It then has various checks that validate the number of channels specified.
-
+        Parameters
+        ----------
+        header : memap 
+        Header of SLAP2 binary file read as Uint32
+        
         Return
         -------
             It returns the header itself if it indeed passed all checks.
@@ -115,7 +123,12 @@ def translate_channel_mask(header):
 def translate_reference_timestamp(header):
     """
         A function that function combines the lower and upper parts of the reference timestamp if it does exist. 
-       
+        Parameters
+        ----------
+        header : memap 
+        Header of SLAP2 binary file read as Uint32
+        
+    
         Return
         -------
             It returns the header that has the combined reference timestamp in it.

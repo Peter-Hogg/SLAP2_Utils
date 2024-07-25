@@ -21,6 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Modules" href="modules/index.html" />
     <link rel="prev" title="Welcome to SLAP2 Utils’s documentation!" href="index.html" /> 
 </head>
 
@@ -46,6 +47,8 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#installing-cupy">Installing Cupy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/index.html">Modules</a></li>
 </ul>
 
         </div>
@@ -78,6 +81,28 @@
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>SLAP2-UTILS
 </pre></div>
 </div>
+<p>You can also clone this repository by typing the following on the command prompt (provided that you have GitHub installed):</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Peter-Hogg/SLAP2_Utils.git
+</pre></div>
+</div>
+<p>All dependencies for <cite>SLAP2 Utils</cite> will be installed during installation with the exception of Cupy.
+Users must manually install Cupy for GPU accelerated functions to work.</p>
+</section>
+<section id="installing-cupy">
+<h1>Installing Cupy<a class="headerlink" href="#installing-cupy" title="Link to this heading"></a></h1>
+<p>GPU Supported functions use the Python Library Cupy. This library has the following requirements:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>NVIDIA CUDA GPU with the Compute Capability 3.0 or larger.</p></li>
+<li><p>CUDA Toolkit: v11.2 / v11.3 / v11.4 / v11.5 / v11.6 / v11.7 / v11.8 / v12.0 / v12.1 / v12.2 / v12.3 / v12.4</p></li>
+</ul>
+</div></blockquote>
+<p>Try installing Cupy using a wheel that matches your CUDA Toolkit version ie:
+.. code-block:: shell</p>
+<blockquote>
+<div><p>pip install cupy-cuda12x</p>
+</div></blockquote>
+<p>For more information on installing Cupy see the installation documentation <a class="reference external" href="https://docs.cupy.dev/en/stable/install.html">HERE</a>.</p>
 </section>
 
 
@@ -85,6 +110,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Welcome to SLAP2 Utils’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules/index.html" class="btn btn-neutral float-right" title="Modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
