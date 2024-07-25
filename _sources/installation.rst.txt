@@ -13,4 +13,23 @@ You can also clone this repository by typing the following on the command prompt
 
    git clone https://github.com/Peter-Hogg/SLAP2_Utils.git
 
-The toolkit utilized many libraries. The user would need other libraries including `numpy`, `scipy`. `h5py`, and `scikit-image`. Some functions in the toolkit would not work if these libraries are not installed, and all of the dependencies should be installed using pip. The installation of `cupy` is also highly recommended, and it is not installed using the pip command. It is a library that enables many Python functions to run in GPU. Using `cupy` would speeds up the runtime of some functions (including motion correction). This is optional for non-GPU users. 
+All dependencies for `SLAP2 Utils` will be installed during installation with the exception of Cupy.
+Users must manually install Cupy for GPU accelerated functions to work.
+
+Installing Cupy
+================
+
+GPU Supported functions use the Python Library Cupy. This library has the following requirements:
+
+   * NVIDIA CUDA GPU with the Compute Capability 3.0 or larger.
+
+   * CUDA Toolkit: v11.2 / v11.3 / v11.4 / v11.5 / v11.6 / v11.7 / v11.8 / v12.0 / v12.1 / v12.2 / v12.3 / v12.4
+
+
+Try installing Cupy using a wheel that matches your CUDA Toolkit version ie:
+.. code-block:: shell
+   
+   pip install cupy-cuda12x
+
+
+For more information on installing Cupy see the installation documentation `HERE <https://docs.cupy.dev/en/stable/install.html>`_.

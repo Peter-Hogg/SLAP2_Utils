@@ -11,7 +11,7 @@ Welcome to SLAP2 Utils's documentation!
    :caption: Contents:
 
    installation
-   modules
+   modules/index
 
 Overview
 =======================================
@@ -29,5 +29,4 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
