@@ -1,6 +1,6 @@
 [project]
 name = "SLAP2_UTILS"
-version = "0.0.6"
+version = "0.1.6"
 authors = [
   { name="Peter Hogg", email="peter.hogg@ubc.ca" },
   { name="Jerry Tong", email="jerrytong0810@gmail.com" }
@@ -18,7 +18,7 @@ dependencies = [
     "scipy",
     "h5py",
     "scikit-image",
-    "cupy"
+    
 ]
 [project.urls]
 Homepage = "https://github.com/Peter-Hogg/SLAP2_Utils"
