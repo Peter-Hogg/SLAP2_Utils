@@ -107,7 +107,7 @@ def superPixelTraces(datafile, roiIdx, zIdx=1, chIdx=1):
             An array of floats of a raw signal for each super pixel
     """
 
-    traceObject = Trace(datafile,zIdx,chIdx)
+    traceObject = trace.Trace(datafile,zIdx,chIdx)
  
     integrationPixels = roi_utils.roiBoolean(datafile, roiIdx)
     rasterPixels      = np.full(integrationPixels.shape, False)
