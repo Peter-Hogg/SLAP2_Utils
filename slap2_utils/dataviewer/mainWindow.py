@@ -1,9 +1,10 @@
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QFileDialog, QLabel, QHBoxLayout, QLineEdit
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QGroupBox, QWidget, QFileDialog, QLabel, QHBoxLayout, QLineEdit
 from PyQt6.QtCore import Qt
 import sys
 import os
 
 from pixelTraces import tracePixelSelector
+from roiTraces import roiSelector
  
 
 
@@ -22,7 +23,7 @@ class FileSelector(QWidget):
         self.filepath = 'No file selected'
 
     def browse_file(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, "Select File")
+        file_name, _ = QFileDialog.getOpenFileName(self, "Select File", "",  self.file_filter)
         if file_name:
             self.label.setText(os.path.basename(file_name))
         self.filepath = file_name
@@ -39,34 +40,70 @@ class MainWindow(QMainWindow):
         self.StackPath = FileSelector("No file selected (Stack)", "Stack (*.tif)")
         self.StimPath = FileSelector("No Stim Log", "Stimlog (*.h5)")
 
-        self.run_button = QPushButton("Run Scripts")
-        self.run_button.clicked.connect(self.viewSuperPixelTraces)
+        # Create buttons
+        self.superPixButton = QPushButton("Super Pixel Traces")
+        self.superPixButton.clicked.connect(self.viewSuperPixelTraces)
 
-        layout = QVBoxLayout()
-        layout.addWidget(self.DataFilePath)
-        layout.addWidget(self.StackPath)
-        layout.addWidget(self.StimPath)
-        layout.addWidget(self.run_button)
+        self.roiTraceButton = QPushButton("ROI Traces")
+        self.roiTraceButton.clicked.connect(self.viewROITraces)
+
+        self.plotROIButton = QPushButton("ROI Inspector")
+        self.plotROIButton.clicked.connect(self.viewSuperPixelTraces)
+
+
+
+        # Organize buttons in a QVBoxLayout
+        button_layout = QVBoxLayout()
+        button_layout.addWidget(self.superPixButton)
+        button_layout.addWidget(self.roiTraceButton)
+        button_layout.addWidget(self.plotROIButton)
+        
+
+        # Group buttons in a QGroupBox for neat organization
+        button_group = QGroupBox("Actions")
+        button_group.setLayout(button_layout)
+
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(self.DataFilePath)
+        main_layout.addWidget(self.StackPath)
+        main_layout.addWidget(self.StimPath)
+        main_layout.addWidget(button_group)
+
 
         container = QWidget()
-        container.setLayout(layout)
+        container.setLayout(main_layout)
         self.setCentralWidget(container)
         self.setStyleSheet("QPushButton { color: black; }")
 
     def viewSuperPixelTraces(self):
         datFile = self.DataFilePath.get_selected_file()
         stim = self.StimPath.get_selected_file()
-        print(datFile)
+        if datFile.startswith("No file selected"):
+            print("Please select all files before launching the second window.")
+            return
+        print('Plotting data from acquisition', os.path.basename(datFile))
+
+        if stim.startswith("No file selected"):
+            stim = None
+        
+        # Launch the second window with the selected file paths
+        self.superPixSel = tracePixelSelector([datFile, stim])
+        self.superPixSel.show()
+
+    def viewROITraces(self):
+        datFile = self.DataFilePath.get_selected_file()
+        stim = self.StimPath.get_selected_file()
         if datFile.startswith("No file selected"):
             print("Please select all files before launching the second window.")
             return
         if stim.startswith("No file selected"):
             stim = None
         
-        print('SuperPixViwer')
+        print('Plotting data from acquisition', os.path.basename(datFile))
         # Launch the second window with the selected file paths
-        self.superPixSel = tracePixelSelector([datFile, stim])
+        self.superPixSel = roiSelector([datFile, stim])
         self.superPixSel.show()
+
 
 
 

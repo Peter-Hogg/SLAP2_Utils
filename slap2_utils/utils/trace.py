@@ -150,6 +150,14 @@ class Trace:
         None
         """
         
+        # Replace None with empty arrays
+        if rasterPixels == None:
+            rasterPixels = np.array([])
+
+        if integrationPixels == None:
+            integrationPixels = np.array([])
+
+
         if ~np.any(rasterPixels):
             rasterPixels = np.array([])
             

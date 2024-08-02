@@ -9,8 +9,8 @@ import matplotlib as mpl
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.cm as cm
 import sys
-
-from slap2_utils.functions.tracefunctions  import superPixelTraces
+from tqdm import tqdm
+from slap2_utils.functions.tracefunctions  import returnAllTrace, returnVolumeTrace
 
 
 def plotPixTrace(ax, dffData, hz, start, end, stim_times):#, y_min, y_max):
@@ -110,11 +110,11 @@ class PlotCanvas(FigureCanvas):
     def update_plot(self, dffData, hz, ix, window_size, stim_times):
         plotPixTrace(self.ax, dffData, hz, ix, ix + window_size, stim_times)
 
-class superPixelPlot(QMainWindow):
-    def __init__(self, roi_index, channel, hdatafile, stimTimes):
+class roiTraces(QMainWindow):
+    def __init__(self, channel, hdatafile, stimTimes):
         super().__init__()
 
-        self.setWindowTitle(f"Plot for ROI {roi_index}")
+        self.setWindowTitle(f"All ROI Traces")
 
         layout = QVBoxLayout()
 
@@ -122,11 +122,15 @@ class superPixelPlot(QMainWindow):
         self.canvas = PlotCanvas(self, width=24, height=16)
         layout.addWidget(self.canvas)
 
-        self.z = hdatafile.fastZs.index(hdatafile.metaData.AcquisitionContainer.ROIs[roi_index].z)
-        self.superPixData = superPixelTraces(hdatafile, roi_index, self.z, channel)
-        hz = self.superPixData.shape[0] / hdatafile.metaData.acqDuration_s
+        traces = []
+        for i, roi in enumerate(tqdm(hdatafile.metaData.AcquisitionContainer.ROIs, desc="Processing ROIs", unit="ROI")):
+            _, _trace = returnVolumeTrace(hdatafile, i, channel)
+            traces.append(_trace)
+        traces = np.array(traces)
+        self.roiTrace = traces
 
-        dffTraces = filters.deltaFOverF0(self.superPixData.transpose(), hz, .2, .10, 3)
+        hz = self.roiTrace.shape[1] / hdatafile.metaData.acqDuration_s
+        dffTraces = filters.deltaFOverF0(self.roiTrace, hz, .2, .10, 3)
         self.hz = hz
         self.dffTraces = dffTraces
         self.window_size = 500

@@ -44,8 +44,12 @@ setup(
     keywords='python two photon microscope', 
 
     
-    packages=find_packages(exclude=['*.test']), 
-
+    packages=find_packages(exclude=['visual_stim', 'experiments', '*.test']), 
+    entry_points={
+        'console_scripts': [
+            'pySLAP2Viewer=slap2_utils.dataviewer.cli:main',
+        ],
+    },
 
     install_requires=required,  
 

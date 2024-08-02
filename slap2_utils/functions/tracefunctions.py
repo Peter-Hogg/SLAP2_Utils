@@ -4,7 +4,32 @@ from skimage.draw import polygon_perimeter
  
 from ..utils import trace
 from ..utils import roi_utils
+
+
 def returnAllTrace(datafile, chIdx=1,  zIdx=1, window=10, expectedWindowWidth=100):
+    """Return a dictionary of traces for all ROIs in the datafile.
+
+    This function iterates through all ROIs in the datafile metadata and processes traces for each ROI.
+
+    Parameters
+    ----------
+    datafile : SLAP2_Utils Datafile Object
+        The datafile containing metadata and header information.
+    chIdx : int, optional
+        Channel index (default is 1).
+    zIdx : int, optional
+        Z index (default is 1).
+    window : int, optional
+        Window size for processing the trace (default is 10).
+    expectedWindowWidth : int, optional
+        Expected window width for processing the trace (default is 100).
+
+    Returns
+    -------
+    traces : dict
+        Dictionary of traces where the key is the ROI index.
+    """
+
     # Returns dictionary of traces. Key is ROI index.
     traces  = {}
     hTrace = trace.Trace(datafile, zIdx, chIdx)
@@ -22,7 +47,7 @@ def returnAllTrace(datafile, chIdx=1,  zIdx=1, window=10, expectedWindowWidth=10
         
         # Process the trace and adjust the order
         _trace, _, _, _ = hTrace.process(window, expectedWindowWidth)
-        hTrace = hTrace.orderadjust()
+        hTrace.orderadjust()
         
         # Store the trace in the dictionary with the ROI index as the key
         traces[_roi] = _trace
@@ -30,6 +55,25 @@ def returnAllTrace(datafile, chIdx=1,  zIdx=1, window=10, expectedWindowWidth=10
     return traces
 
 def cleanVolumeTrace(datafile, zId, rawTrace):
+    """Clean the raw trace data by averaging over slices.
+
+    This function extracts the slice index information and averages the raw trace data for the given zId.
+
+    Parameters
+    ----------
+    datafile : SLAP2_Utils Datafile Object
+        The datafile containing metadata and header information.
+    zId : int
+        Z index to be cleaned.
+    rawTrace : array
+        The raw trace data.
+
+    Returns
+    -------
+    cleanTrace : array
+        The cleaned trace data.
+    """
+
     # Extract the slice index information from the datafile metadata
     sliceIdx = datafile.metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['sliceIdx']
     dataIndex = []
@@ -54,6 +98,27 @@ def cleanVolumeTrace(datafile, zId, rawTrace):
     return np.array(cleanTrace)
 
 def returnVolumeTrace(datafile, roiIndex, chIdx=1):
+    """Return volume traces for a given ROI.
+
+    This function processes and cleans the volume trace data for a specified ROI.
+
+    Parameters
+    ----------
+    datafile : SLAP2_Utils Datafile Object
+        The datafile containing metadata and header information.
+    roiIndex : int
+        Index of the ROI.
+    chIdx : int, optional
+        Channel index (default is 1).
+
+    Returns
+    -------
+    _trace1 : array
+        The raw trace data.
+    _trace : array
+        The cleaned trace data.
+    """
+
     # Get the ROI from the datafile metadata
     ROI = datafile.metaData.AcquisitionContainer.ROIs[roiIndex]
     
@@ -76,15 +141,15 @@ def returnVolumeTrace(datafile, roiIndex, chIdx=1):
     hTrace.setPixelIdxs(rasterPixels, integrationPixels)
     
     # Process the trace
-    _trace1, _, _, _ = hTrace.process(1, 1)
+    _rawTrace, _, _, _ = hTrace.process(1, 1)
     
     # Adjust the order of the trace
     hTrace = hTrace.orderadjust()
     
     # Clean the volume trace
-    _trace = cleanVolumeTrace(datafile, zIdx, _trace1)
+    cleanTrace = cleanVolumeTrace(datafile, zIdx, _rawTrace)
     
-    return _trace1, _trace
+    return _rawTrace, _cleanTrace
 
 
 

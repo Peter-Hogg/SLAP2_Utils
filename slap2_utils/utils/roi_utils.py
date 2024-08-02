@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 def roiImg(datafile, idx):
     """Return ROI coordinates as a 2D array.
@@ -54,16 +55,16 @@ def roiBoolean(datafile, idx):
     
     return booleanPixels
 
-def roiLabels(datafile, refstack=None):
+def roiLabels(datafile, refStackPath=None):
     """Return ROI labels as a 3D array with each plane representing a Z-stack.
 
-    The function returns a 3D array where each plane represents a Z-stack, and labels indicate different ROIs. 
+    The function returns a 3D array where each plane represents a slice in a Z-stack, and labels indicate different ROIs. 
     If a reference stack is provided, the function can use it for generating ROI labels.
 
     Parameters
     ----------
     datafile : SLAP2_Utils Datafile Object
-        The datafile containing metadata and header information.
+        The datafile containing metadata and ROI information.
     refstack : optional
         Reference stack to use for generating ROI labels. Default is None.
 
@@ -72,17 +73,32 @@ def roiLabels(datafile, refstack=None):
     roiLabels : array
         A 3D array with each plane representing a Z-stack and labels indicating different ROIs.
     """
-    if refstack == None:
+    if type(refStackPath)==type(None):
         roiLabels = np.zeros((len(datafile.fastZs),
                             int(datafile.header['dmdPixelsPerColumn']),
                             int(datafile.header['dmdPixelsPerRow'])))
 
         for lbl, roi in enumerate(datafile.metaData.AcquisitionContainer.ROIs):
-            z = roi.shapeData
+            roi_shape = roi.shapeData
+            z = roi.z
             plane = datafile.fastZs.index(roi.z)
             roiLabels[plane, :, :][roi_shape[0].astype('int')-1,roi_shape[1].astype('int')-1]= lbl+1
+        roiLabels = roiLabels.astype(int)
         return  roiLabels
     else:
-        #TODO have version which uses a refrence stack 
+        try:
+            _stackData = tifffile.tiffcomment(refStackTif[0])
+            _stackInfo = json.loads(_stackData)
+            zPosition = _stackInfo['zsAbsolute']
 
-        return
+        except:
+            print('Not a SLAP2 Ref Stack')
+        roiLabels = np.zeros(_stackInfo['shape'][1:])
+        for lbl, roi in enumerate(datafile.metaData.AcquisitionContainer.ROIs):
+            roi_shape = roi.shapeData
+            z = roi.z
+            plane = zPosition.index(roi.z)
+            roiLabels[plane, :, :][roi_shape[0].astype('int')-1,roi_shape[1].astype('int')-1]= lbl+1
+            roiLabels = roiLabels.astype(int)
+        return roiLabels
+

@@ -121,8 +121,6 @@ class DataFile():
         if not os.path.isfile(self.metaDataFileName):
             raise FileNotFoundError('Metadata file not found.')
         self.metaData = MetaData(self.metaDataFileName)
-        print('MetaData Loaded')
-
         # Subfunction of loading parse plan
         def load_parse_plan(self, metaData):   
             def filter_z_pixel_replacement_maps(z_maps):

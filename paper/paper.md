@@ -55,6 +55,6 @@ All the code and scripts mentioned above are publicly available on the GitHub re
 
 # Acknowledgements
 
-The development of this Python library was supported by funds from the Canadian Institutes of Health Research (CIHR) Foundation Award (FDN-148468). 
+The development of this Python library was supported by funds from the Canadian Institutes of Health Research (CIHR) Foundation Award (FDN-148468) and  NSF Award 2019976, "AccelNet: International network for brain-inspired computation". 
 
 # References

@@ -10,29 +10,28 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.cm as cm
 import sys
 
-from slap2_utils.functions.tracefunctions  import superPixelTraces
+from slap2_utils.functions.tracefunctions  import returnAllTrace, returnVolumeTrace
 
 
-def plotPixTrace(ax, dffData, hz, start, end, stim_times):#, y_min, y_max):
+def plotROITrace(ax, dffData, hz, start, end, stim_times):#, y_min, y_max):
     ax.clear()
  
     time = np.arange(0, int(end - start) / hz, 1 / hz) + (start / hz)
 
     y_min, y_max = -.05, 1
 
-    for j in range(dffData.shape[0]):
-        data_slice = dffData[j, start:end]
-        if len(time) != len(data_slice):
-                time = np.linspace(start / hz, end / hz, len(data_slice))
+    data_slice = dffData[start:end]
+    if len(time) != len(data_slice):
+            time = np.linspace(start / hz, end / hz, len(data_slice))
 
-        _traceColor = mpl.colors.rgb2hex(cm.Spectral(j / dffData.shape[0]))
+    _traceColor = mpl.colors.rgb2hex(cm.Spectral(1))
 
-        if data_slice.size > 0:
-            line, = ax.plot(time, data_slice + (.15 * j), color=_traceColor, alpha=.8)# zorder=dffData.shape[0] - j + 5)
+    if data_slice.size > 0:
+        line, = ax.plot(time, data_slice, color=_traceColor, alpha=.8)
 
-            y_max_slice = (data_slice + (.15 * j)).max()
-            if not np.isnan(y_max_slice) and not np.isinf(y_max_slice):
-                y_max = max(y_max, y_max_slice)
+        y_max_slice = (data_slice + (.15)).max()
+        if not np.isnan(y_max_slice) and not np.isinf(y_max_slice):
+            y_max = max(y_max, y_max_slice)
 
 
     if y_min == float('inf') or y_max == float('-inf') or np.isnan(y_min) or np.isinf(y_min) or np.isnan(y_max) or np.isinf(y_max):
@@ -62,32 +61,31 @@ class PlotCanvas(FigureCanvas):
         if not self.initialized:
             self.initialize_plot(dffData, hz, start, end, stim_time)
         else:
-            plotPixTrace(self.ax, dffData, hz, start, end, stim_time)
+            plotROITrace(self.ax, dffData, hz, start, end, stim_time)
 
     def initialize_plot(self, dffData, hz, start, end, stim_times):
         time = np.arange(0, int(end - start) / hz, 1 / hz) + (start+1 / hz)
         self.ax.clear()
         y_min, y_max = -0.05, 1
-        for j in range(dffData.shape[0]):
         
-            data_slice = dffData[j, start:end]
-            if len(time) != len(data_slice):
-                time = np.linspace(start / hz, end / hz, len(data_slice))
+        data_slice = dffData[start:end]
+        if len(time) != len(data_slice):
+            time = np.linspace(start / hz, end / hz, len(data_slice))
 
-            _traceColor = mpl.colors.rgb2hex(cm.Spectral(j / dffData.shape[0]))
+        _traceColor = mpl.colors.rgb2hex(cm.Spectral(1))
 
-            if data_slice.size > 0:
-                line, = self.ax.plot(time, data_slice + (.15 * j), color=_traceColor, alpha=.8)# zorder=dffData.shape[0] - j + 5)
-                y_min_slice = (data_slice + (.15 * j)).min()
-                y_max_slice = (data_slice + (.15 * j)).max()
-                if not np.isnan(y_min_slice) and not np.isinf(y_min_slice):
-                    y_min = min(y_min, y_min_slice)
-                if not np.isnan(y_max_slice) and not np.isinf(y_max_slice):
-                    y_max = max(y_max, y_max_slice)
-            else:
-                # Handle case where the slice is empty
-                line, = self.ax.plot([], [], color=_traceColor, alpha=.8, zorder=dffData.shape[0] - j + 5)
-            self.ax.add_line(line)
+        if data_slice.size > 0:
+            line, = self.ax.plot(time, data_slice, color=_traceColor, alpha=.8)
+            y_min_slice = (data_slice-.05).min()
+            y_max_slice = (data_slice + (.15)).max()
+            if not np.isnan(y_min_slice) and not np.isinf(y_min_slice):
+                y_min = min(y_min, y_min_slice)
+            if not np.isnan(y_max_slice) and not np.isinf(y_max_slice):
+                y_max = max(y_max, y_max_slice)
+        else:
+            # Handle case where the slice is empty
+            line, = self.ax.plot([], [], color=_traceColor, alpha=.8)
+        self.ax.add_line(line)
         if y_min == float('inf') or y_max == float('-inf') or np.isnan(y_min) or np.isinf(y_min) or np.isnan(y_max) or np.isinf(y_max):
             y_min, y_max = -0.05, 1  # Default values if no valid data
         
@@ -108,9 +106,9 @@ class PlotCanvas(FigureCanvas):
         self.ax.figure.canvas.draw()
 
     def update_plot(self, dffData, hz, ix, window_size, stim_times):
-        plotPixTrace(self.ax, dffData, hz, ix, ix + window_size, stim_times)
+        plotROITrace(self.ax, dffData, hz, ix, ix + window_size, stim_times)
 
-class superPixelPlot(QMainWindow):
+class roiPlot(QMainWindow):
     def __init__(self, roi_index, channel, hdatafile, stimTimes):
         super().__init__()
 
@@ -123,10 +121,10 @@ class superPixelPlot(QMainWindow):
         layout.addWidget(self.canvas)
 
         self.z = hdatafile.fastZs.index(hdatafile.metaData.AcquisitionContainer.ROIs[roi_index].z)
-        self.superPixData = superPixelTraces(hdatafile, roi_index, self.z, channel)
-        hz = self.superPixData.shape[0] / hdatafile.metaData.acqDuration_s
+        _, self.roiTrace = returnVolumeTrace(hdatafile, roi_index, channel)
+        hz = self.roiTrace.shape[0] / hdatafile.metaData.acqDuration_s
 
-        dffTraces = filters.deltaFOverF0(self.superPixData.transpose(), hz, .2, .10, 3)
+        dffTraces = filters.deltaFOverF0(self.roiTrace, hz, .2, .10, 3)
         self.hz = hz
         self.dffTraces = dffTraces
         self.window_size = 500
@@ -136,8 +134,7 @@ class superPixelPlot(QMainWindow):
 
         # Create a QSlider for updating frames
         self.slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
-        print(dffTraces.shape[1] - self.window_size)
-        self.slider.setMaximum(dffTraces.shape[1] - self.window_size)
+        self.slider.setMaximum(dffTraces.shape[0] - self.window_size)
         self.slider.setMinimum(0)
         self.slider.valueChanged.connect(self.update_frame)
         
@@ -152,6 +149,6 @@ class superPixelPlot(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = superPixelPlot(roi_index=0, channel=1, hdatafile=None, stim_times=None)
+    window = roiPlot(roi_index=0, channel=1, hdatafile=None, stim_times=None)
     window.show()
     sys.exit(app.exec())
