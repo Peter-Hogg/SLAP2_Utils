@@ -22,7 +22,7 @@ def returnAllTrace(datafile, chIdx=1,  zIdx=1, window=10, expectedWindowWidth=10
         
         # Process the trace and adjust the order
         _trace, _, _, _ = hTrace.process(window, expectedWindowWidth)
-        hTrace = hTrace.orderadjust()
+        hTrace.orderadjust()
         
         # Store the trace in the dictionary with the ROI index as the key
         traces[_roi] = _trace
