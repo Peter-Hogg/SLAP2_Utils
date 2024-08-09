@@ -151,10 +151,10 @@ class Trace:
         """
         
         # Replace None with empty arrays
-        if rasterPixels == None:
+        if type(rasterPixels) == type(None):
             rasterPixels = np.array([])
 
-        if integrationPixels == None:
+        if type(integrationPixels) == type(None):
             integrationPixels = np.array([])
 
 
