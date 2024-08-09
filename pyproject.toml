@@ -14,7 +14,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "numpy",
+    "numpy==1.23.5",
     "scipy",
     "h5py",
     "scikit-image",

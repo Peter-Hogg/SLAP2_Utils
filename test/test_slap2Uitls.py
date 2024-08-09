@@ -1,6 +1,15 @@
+import os
 from slap2_utils.datafile import DataFile
 
 def test_datafile():
+    filename = 'testFile.dat'
+    file_size = os.path.getsize(filename)
+    print(f"File size of {filename}: {file_size} bytes")
+
+    # Check if the file can be opened and read
+    with open(filename, 'rb') as f:
+        first_bytes = f.read(16)  # read the first few bytes
+        print(f"First 16 bytes of the file: {first_bytes}")
 
     refHeader = {'firstCycleOffsetBytes': 136.0,
                  'lineHeaderSizeBytes': 40.0,
