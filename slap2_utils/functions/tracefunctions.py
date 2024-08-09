@@ -147,7 +147,7 @@ def returnVolumeTrace(datafile, roiIndex, chIdx=1):
     hTrace = hTrace.orderadjust()
     
     # Clean the volume trace
-    cleanTrace = cleanVolumeTrace(datafile, zIdx, _rawTrace)
+    _cleanTrace = cleanVolumeTrace(datafile, zIdx, _rawTrace)
     
     return _rawTrace, _cleanTrace
 
