@@ -159,6 +159,7 @@ class DataFile():
             raise FileNotFoundError('Data file not found.')
         self.rawData = np.memmap(self.filename, dtype='uint32')
         self.header = self.load_file_header(self.rawData)
+        print('DataFile Created')
 
     # Function for loading file header:
     def load_file_header(self, rawData):
