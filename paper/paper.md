@@ -12,7 +12,7 @@ authors:
     equal-contrib: true 
     affiliation: 1
 
-  - name: Jerry Tong
+  - name: Shijie Jerry Tong
     orcid: 0009-0007-4141-556X
     equal-contrib: true
     affiliation: 1 
