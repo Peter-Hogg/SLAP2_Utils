@@ -5,6 +5,7 @@ import os
 
 from pixelTraces import tracePixelSelector
 from roiTraces import roiSelector
+from roiPlot import roiInspector
  
 
 
@@ -48,7 +49,7 @@ class MainWindow(QMainWindow):
         self.roiTraceButton.clicked.connect(self.viewROITraces)
 
         self.plotROIButton = QPushButton("ROI Inspector")
-        self.plotROIButton.clicked.connect(self.viewSuperPixelTraces)
+        self.plotROIButton.clicked.connect(self.roiViewerWindow)
 
 
 
@@ -103,7 +104,21 @@ class MainWindow(QMainWindow):
         # Launch the second window with the selected file paths
         self.superPixSel = roiSelector([datFile, stim])
         self.superPixSel.show()
-
+    
+    
+    def roiViewerWindow(self):
+        datFile = self.DataFilePath.get_selected_file()
+        imgPath = self.StackPath.get_selected_file()
+        if datFile.startswith("No file selected"):
+            print("Please select all files before launching the second window.")
+            return
+        if imgPath.startswith("No file selected"):
+            imgPath = None
+        
+        print('Viewing ROIs from acquisition', os.path.basename(datFile))
+        # Launch the second window with the selected file paths
+        self.superPixSel = roiInspector([datFile, imgPath])
+        self.superPixSel.show()
 
 
 
