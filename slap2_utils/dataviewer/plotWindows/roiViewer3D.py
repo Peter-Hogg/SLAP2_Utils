@@ -1,65 +1,57 @@
 import sys
-import tifffile
-from slap2_utils.utils.roi_utils import roiLabels
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton
-import napari
+import numpy as np
+from vispy import scene
+from vispy.color import Colormap
+from vispy.scene import visuals
+from matplotlib import cm
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+
+
 
 class ROIViewer3D(QMainWindow):
     def __init__(self, img_path, hdatafile):
         super().__init__()
 
-        self.setWindowTitle("3D ROI Viewer")
-        
-        # Load the image stack if provided
-        self.img = tifffile.imread(img_path) if img_path is not None else None
+        self.setWindowTitle("3D Volume and ROI Viewer")
 
-        # Generate ROI labels
-        self.labels = roiLabels(hdatafile, img_path)
+        # Create a Vispy canvas
+        canvas = scene.SceneCanvas(keys='interactive', show=True)
+        view = canvas.central_widget.add_view()
 
-        # Get z positions excluding the first (invalid) value
-        # Set up the main layout
+        # Create a grayscale colormap for the volume
+        grayscale_cmap = Colormap([(0, 0, 0, 0), (1, 1, 1, 1)])
+
+        # Add the volume with the grayscale colormap
+        volume = visuals.Volume(volume_data, parent=view.scene, threshold=0.225,
+                                cmap=grayscale_cmap, clim=[np.min(volume_data), np.max(volume_data)])
+
+        # Add ROI as separate isosurfaces, each with a different color from the spectral colormap
+        unique_labels = np.unique(roi_data)
+        spectral_cmap = cm.get_cmap('Spectral', len(unique_labels))
+
+        for i, label in enumerate(unique_labels):
+            if label == 0:
+                continue  # Skip background
+            mask = (roi_data == label).astype(np.float32)
+            color = spectral_cmap(i)[:3]  # Get RGB color from colormap
+            iso = visuals.Isosurface(mask, level=0.5, color=color + (0.5,), parent=view.scene)
+
+        # Set the camera to view the volume
+        view.camera = scene.cameras.TurntableCamera(fov=60, azimuth=180)
+
+        # Embed the Vispy canvas into the Qt layout
         layout = QVBoxLayout()
-
-        # Create a Napari viewer
-        self.viewer = napari.Viewer()
-        self.viewer.dims.ndisplay = 3
-        if self.img != None:
-            self.viewer.add_image(self.img)
-
-        self.viewer.add_labels(self.labels, name="ROI Labels", color={i: cmap for i, cmap in enumerate(plt.cm.Spectral.colors)})
-        self.viewer.window._qt_viewer.dockLayerControls.close()
-        self.viewer.window._qt_viewer.dockLayerList.close()
-
-        # Embed the Napari viewer in a QWidget
-        viewer_container = QWidget()
-        viewer_container.setLayout(QVBoxLayout())
-        viewer_container.layout().addWidget(self.viewer.window._qt_window)
-
-        # Add the Napari viewer to the main layout
-        layout.addWidget(viewer_container)
-        # Create a toggle button
-        self.toggle_button = QPushButton("Toggle 2D/3D")
-        self.toggle_button.clicked.connect(self.toggle_display_mode)
-        layout.addWidget(self.toggle_button)
-
-        # Set the central widget
-        container = QWidget()
-        container.setLayout(layout)
-        self.setCentralWidget(container)
-
-    def toggle_display_mode(self):
-        # Toggle between 2D (ndisplay=2) and 3D (ndisplay=3) modes
-        if self.viewer.dims.ndisplay == 3:
-            self.viewer.dims.ndisplay = 2
-        else:
-            self.viewer.dims.ndisplay = 3
+        widget = QWidget()
+        widget.setLayout(layout)
+        layout.addWidget(canvas.native)
+        self.setCentralWidget(widget)
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-
+    #app = QApplication(sys.argv)
+    print(app)
     # Create and show the main window
     window = ROIViewer3D()
-    window.show()
+    #window.show()
 
     # Start the Qt event loop
     sys.exit(app.exec())

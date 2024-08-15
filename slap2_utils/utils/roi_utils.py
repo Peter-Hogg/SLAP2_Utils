@@ -1,4 +1,5 @@
 import numpy as np
+import tifffile
 import json
 
 def roiImg(datafile, idx):
@@ -87,7 +88,7 @@ def roiLabels(datafile, refStackPath=None):
         return  roiLabels
     else:
         try:
-            _stackData = tifffile.tiffcomment(refStackTif[0])
+            _stackData = tifffile.tiffcomment(refStackPath)
             _stackInfo = json.loads(_stackData)
             zPosition = _stackInfo['zsAbsolute']
 
