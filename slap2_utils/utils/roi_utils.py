@@ -91,15 +91,18 @@ def roiLabels(datafile, refStackPath=None):
             _stackData = tifffile.tiffcomment(refStackPath)
             _stackInfo = json.loads(_stackData)
             zPosition = _stackInfo['zsAbsolute']
-
+            print(len(zPosition))
+            
         except:
             print('Not a SLAP2 Ref Stack')
             return None
         roiLabels = np.zeros(_stackInfo['shape'][1:])
+        print(roiLabels.shape)
         for lbl, roi in enumerate(datafile.metaData.AcquisitionContainer.ROIs):
             roi_shape = roi.shapeData
             z = roi.z
             plane = zPosition.index(roi.z)
+            print(zPosition[zPosition.index(roi.z)], roi.z, plane)
             roiLabels[plane, :, :][roi_shape[0].astype('int')-1,roi_shape[1].astype('int')-1]= lbl+1
             roiLabels = roiLabels.astype(int)
         return roiLabels

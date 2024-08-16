@@ -5,18 +5,31 @@ from vispy.color import Colormap
 from vispy.scene import visuals
 from matplotlib import cm
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
-
+from slap2_utils.utils.roi_utils import roiLabels
 
 
 class ROIViewer3D(QMainWindow):
     def __init__(self, img_path, hdatafile):
         super().__init__()
 
-        self.setWindowTitle("3D Volume and ROI Viewer")
+        self.setWindowTitle("3D ROI Viewer")
+        
+        # Load the image stack if provided
+        self.img = tifffile.imread(img_path) if img_path is not None else None
 
-        # Create a Vispy canvas
-        canvas = scene.SceneCanvas(keys='interactive', show=True)
-        view = canvas.central_widget.add_view()
+        # Generate ROI labels
+        self.labels = roiLabels(hdatafile, img_path)
+
+        # Set up the main layout
+        layout = QVBoxLayout()
+
+        # Create a Napari viewer
+
+        if self.img is not None:
+            volume_data = self.img
+
+        #self.viewer.add_labels(self.labels, name="ROI Labels")
+
 
         # Create a grayscale colormap for the volume
         grayscale_cmap = Colormap([(0, 0, 0, 0), (1, 1, 1, 1)])
@@ -47,11 +60,10 @@ class ROIViewer3D(QMainWindow):
         self.setCentralWidget(widget)
 
 if __name__ == "__main__":
-    #app = QApplication(sys.argv)
+    app = QApplication(sys.argv)
     print(app)
-    # Create and show the main window
+
     window = ROIViewer3D()
-    #window.show()
 
     # Start the Qt event loop
     sys.exit(app.exec())

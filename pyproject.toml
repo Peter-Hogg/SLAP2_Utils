@@ -1,6 +1,6 @@
 [project]
 name = "SLAP2_UTILS"
-version = "0.2.4"
+version = "0.2.5"
 authors = [
   { name="Peter Hogg", email="peter.hogg@ubc.ca" },
   { name="Jerry Tong", email="jerrytong0810@gmail.com" }
