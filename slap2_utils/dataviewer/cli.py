@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication
 from slap2_utils.dataviewer.mainWindow import MainWindow
 
 def main():

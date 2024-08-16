@@ -1,3 +1,5 @@
+from vispy import app
+app.use_app('pyqt6')
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QGroupBox, QWidget, QFileDialog, QLabel, QHBoxLayout, QLineEdit
 from PyQt6.QtCore import Qt
 import sys

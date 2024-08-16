@@ -1,15 +1,16 @@
 from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import pyneurotrace.gpu.filters as filters
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.cm as cm
 import sys
-from tifffile import imread
+import json
+from tifffile import imread, tiffcomment
 from slap2_utils.utils.roi_utils import roiLabels
 
 
@@ -18,7 +19,7 @@ def plotROI(ax, labels, stack, z, z_positions):
 
     # Plot the image stack if provided
     if stack is not None:
-        ax.imshow(stack[z, :, :], cmap='gray')
+        ax.imshow(stack[0, z, :, :], cmap='gray')
     else:
         ax.imshow(np.zeros(labels[z, :, :].shape), cmap='gray')
     # Create contours from ROI labels and plot them
@@ -41,7 +42,11 @@ def plotROI(ax, labels, stack, z, z_positions):
             ax.text(x, y, str(i), color='white', fontsize=8, ha='center', va='center', weight='bold')
 
     # Add Z-position text in the lower-left corner
-    z_position_text = f"Z: {z_positions[z+1]:.2f} µm"  # Skip the first value in z_positions
+    if stack is not None:
+        z_position_text = f"Z: {z_positions[z]:.2f} µm"  # Skip the first value in z_positions
+    else:
+        z_position_text = f"Z: {z_positions[z+1]:.2f} µm"  # Skip the first value in z_positions
+    
     ax.text(0.02, 0.02, z_position_text, color='white', fontsize=10, ha='left', va='bottom', transform=ax.transAxes)
 
 
@@ -86,8 +91,17 @@ class roiViewer(QMainWindow):
             self.img = None
         else:
             self.img = imread(imgPath)
+        
         self.labels = roiLabels(hdatafile, imgPath)
-        self.z_positions = hdatafile.fastZs[1:]
+
+        if imgPath == None:
+            self.z_positions = hdatafile.fastZs[1:]
+        else:
+            _stackData = tiffcomment(imgPath)
+            _stackInfo = json.loads(_stackData)
+            self.z_positions = _stackInfo['zsAbsolute']
+            
+            
         self.canvas.plot(self.labels, self.img, self.z_positions)
 
         # Create a QSlider for updating frames
@@ -101,11 +115,10 @@ class roiViewer(QMainWindow):
                 layout.addWidget(self.slider)
 
         else:
-            print(self.img.shape)
             z = self.img.shape[1]
             if z > 1:
                 self.slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
-                self.slider.setMaximum(z - 1)
+                self.slider.setMaximum(z-1)
                 self.slider.setMinimum(0)
                 self.slider.valueChanged.connect(self.update_frame)
                 layout.addWidget(self.slider)

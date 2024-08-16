@@ -1,12 +1,12 @@
 from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import pyneurotrace.gpu.filters as filters
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.cm as cm
 import sys
 
@@ -129,7 +129,6 @@ class roiPlot(QMainWindow):
         self.dffTraces = dffTraces
         self.window_size = 500
         self.stimTimes = stimTimes
-        print(self.window_size)
         self.canvas.plot(dffTraces, hz, 0, self.window_size, self.stimTimes)
 
         # Create a QSlider for updating frames
