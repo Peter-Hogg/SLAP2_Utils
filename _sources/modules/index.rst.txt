@@ -4,7 +4,7 @@ Modules
 Here is an overview of the core modules and their functions.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Modules:
 
    datafile
@@ -14,4 +14,10 @@ Here is an overview of the core modules and their functions.
    slapROI
    trace
    tracePixel
+   stim
+   imagestacks
+   tracefunctions
+   roi_utils
+   plots.slap2Plots
+
 
