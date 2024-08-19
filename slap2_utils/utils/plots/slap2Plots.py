@@ -1,9 +1,10 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib import cm
 from ..roi_utils import roiImg
 
-def roiOverlaySuperPix(datafile, refimg, roiIdx, display=True):
+def roiOverlay(datafile, refimg, roiIdx, display=True):
     """Plot contours of an SLAP2 ROI over a reference image with color-coded super pixels.
 
     This function plots the contours of specified ROIs over a reference image. The super pixels are color-coded.

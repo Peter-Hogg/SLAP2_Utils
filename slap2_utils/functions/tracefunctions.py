@@ -124,17 +124,12 @@ def returnVolumeTrace(datafile, roiIndex, chIdx=1):
     
     # Find the z index corresponding to the ROI
     zIdx = datafile.fastZs.index(ROI.z)
-    
-    # Initialize the trace object
-    hTrace = trace.Trace(datafile, zIdx, chIdx)
-    
+       
     # Create boolean arrays of raster and  integration pixels
-    rasterPixels = np.full((int(datafile.header['dmdPixelsPerColumn']),
-                            int(datafile.header['dmdPixelsPerRow'])),
-                            False)
+    rasterPixels = None
     integrationPixels = roi_utils.roiBoolean(datafile, roiIndex)
     
-    # Initialize the trace object again (redundant initialization)
+    # Initialize the trace object
     hTrace = trace.Trace(datafile, zIdx, chIdx)
     
     # Set the pixels for the trace object
@@ -142,9 +137,7 @@ def returnVolumeTrace(datafile, roiIndex, chIdx=1):
     
     # Process the trace
     _rawTrace, _, _, _ = hTrace.process(1, 1)
-    
-    # Adjust the order of the trace
-    hTrace = hTrace.orderadjust()
+   
     
     # Clean the volume trace
     _cleanTrace = cleanVolumeTrace(datafile, zIdx, _rawTrace)
