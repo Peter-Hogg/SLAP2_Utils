@@ -79,7 +79,7 @@ def roiOverlaySuperPix(datafile, refimg, roiIdx, display=True):
     ax.imshow(refimg, cmap='Greys_r', vmax=np.max(refimg)*.45)
     
     for _roiIdx in roiIdx:
-        img = SP2roi.roiImg(datafile, _roiIdx)
+        img = roiImg(datafile, _roiIdx)
         _roiColor = mpl.colors.rgb2hex(cm.Spectral(_roiIdx/len(datafile.metaData.AcquisitionContainer.ROIs)))
         ax.contour(img, colors=_roiColor)
 

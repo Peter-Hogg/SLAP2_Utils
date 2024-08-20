@@ -14,7 +14,7 @@ authors:
 
   - name: Shijie Jerry Tong
     orcid: 0009-0007-4141-556X
-    equal-contrib: true
+    equal-contrib: false
     affiliation: 1 
 
   - name: Kurt Haas
