@@ -45,7 +45,7 @@ def plotROI(ax, labels, stack, z, z_positions):
     if stack is not None:
         z_position_text = f"Z: {z_positions[z]:.2f} µm"  # Skip the first value in z_positions
     else:
-        z_position_text = f"Z: {z_positions[z+1]:.2f} µm"  # Skip the first value in z_positions
+        z_position_text = f"Z: {z_positions[z]:.2f} µm"  # Skip the first value in z_positions
     
     ax.text(0.02, 0.02, z_position_text, color='white', fontsize=10, ha='left', va='bottom', transform=ax.transAxes)
 
@@ -101,7 +101,6 @@ class roiViewer(QMainWindow):
             _stackInfo = json.loads(_stackData)
             self.z_positions = _stackInfo['zsAbsolute']
             
-            
         self.canvas.plot(self.labels, self.img, self.z_positions)
 
         # Create a QSlider for updating frames
@@ -109,7 +108,7 @@ class roiViewer(QMainWindow):
             if len(hdatafile.fastZs) > 2:
             
                 self.slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
-                self.slider.setMaximum(len(hdatafile.fastZs))
+                self.slider.setMaximum(len(hdatafile.fastZs)-2)
                 self.slider.setMinimum(0)
                 self.slider.valueChanged.connect(self.update_frame)
                 layout.addWidget(self.slider)

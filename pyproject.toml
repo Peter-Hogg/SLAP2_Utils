@@ -1,6 +1,6 @@
 [project]
 name = "SLAP2_UTILS"
-version = "0.2.8"
+version = "0.2.9"
 authors = [
   { name="Peter Hogg", email="peter.hogg@ubc.ca" },
   { name="Jerry Tong", email="jerrytong0810@gmail.com" }
@@ -18,8 +18,19 @@ dependencies = [
     "scipy",
     "h5py",
     "scikit-image",
-    
+    "PyQT6",
+    "matplotlib",
+    "vispy",
+    "notebook"
+        
 ]
+
+[project.optional-dependencies]
+CUPY = ["cupy"]
+cuda11x = ["cupy-cuda11x"]
+cuda12x = ["cupy-cuda12x"]
+
+
 [project.urls]
 Homepage = "https://github.com/Peter-Hogg/SLAP2_Utils"
 Issues = "https://github.com/Peter-Hogg/SLAP2_Utils/issues"
