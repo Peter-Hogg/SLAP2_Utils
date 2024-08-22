@@ -22,6 +22,7 @@ dependencies = [
     "matplotlib",
     "vispy",
     "notebook"
+    "pyneurotrace"
         
 ]
 
