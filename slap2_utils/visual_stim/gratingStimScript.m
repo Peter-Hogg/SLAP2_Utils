@@ -50,9 +50,11 @@ function listenForRisingEdge(daqDevice, channel, threshold, callback, window)
     function myCallbackFunction()
         disp('Rising edge detected!'); % Replace with your desired action
         delete(lh)
-    
+
+        % First test: grating, but will move on to others laters
         %[t, sType, angle, speed] = 
         gratingProbing(window, DAQ6001)
+        
         pause(4)
     end
 end
