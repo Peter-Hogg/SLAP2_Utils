@@ -114,7 +114,7 @@ write(daq, 3);
 pause(.001);
 write(daq, 0);       
 % Leave Stim Screen Blank
-Screen('Fillrect', win, [0, 0, 255]);
+Screen('Fillrect', win, [0, 0, 128]);
 Screen('Flip', win);
 
 sType = 'GenGrating';
