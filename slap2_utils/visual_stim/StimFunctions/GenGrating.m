@@ -1,4 +1,4 @@
-function [startTime, sType] = GenGrating(win, angle, cyclespersecond, freq, gratingsize, internalRotation, daq)
+function [startTime, sType] = GenGrating(win, angle, cyclespersecond, freq, gratingsize, internalRotation, daq, presentation_time)
 % Display an animated grating, using the new Screen('DrawTexture') command.
 % This demo demonstrates fast drawing of such a grating via use of procedural
 % texture mapping. It only works on hardware with support for the GLSL
@@ -90,7 +90,7 @@ endTime = (datetime - startTime);
 write(daq, 3);
 pause(.001);
 write(daq, 0);
-while endTime < duration([0,0,1.5]);
+while endTime < duration([0,0,presentation_time]);
 
     % Update some grating animation parameters:
     
