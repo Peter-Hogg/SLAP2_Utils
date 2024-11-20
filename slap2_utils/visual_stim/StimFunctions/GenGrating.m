@@ -37,7 +37,7 @@ end
 
 % res is the total size of the patch in x- and y- direction, i.e., the
 % width and height of the mathematical support:
-res = [gratingsize gratingsize];
+res = [gratingsize 1080];
 
 if nargin < 3 || isempty(freq)
     % Frequency of the grating in cycles per pixel: Here 0.01 cycles per pixel:
