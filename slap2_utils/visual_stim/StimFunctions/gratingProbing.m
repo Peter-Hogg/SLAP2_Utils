@@ -1,6 +1,7 @@
 function gratingProbing(win, daq)
     % original:
-    sizes = [.0034, .00152, .00034];
+    % 0.0052: 10 cycles across screen, 0.004167: 8 cycles 0.003125: 6 cycles, 0.002083: 4 cycles, 0.001042: 2 cycles
+    sizes = [0.0052, 0.004167, 0.003125, 0.002083, 0.001042];
     angles = [180];
     durations = [1.5, 1, 0.5];
     speeds = [10, 8, 6, 4, 2]
