@@ -3,6 +3,7 @@ import numpy as np
 import mmap
 import scipy.io
 import h5py
+import re
 
 from .subclasses.metadata import MetaData
 from .utils.file_header import load_file_header_v2
@@ -113,7 +114,7 @@ class DataFile():
         
         # Loading file names and check whether file is found
         base_dir, filename = os.path.split(self.filename)
-        n_base = os.path.splitext(filename)[0].replace('-TRIAL', '', -1).strip()
+        n_base = re.sub(r'-TRIAL\d+','',os.path.splitext(filename)[0],flags=re.IGNORECASE)
 
         self.metaDataFileName = os.path.join(base_dir, n_base + '.meta')
         self.datFileName = os.path.join(base_dir, filename)
