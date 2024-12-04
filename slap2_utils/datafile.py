@@ -3,6 +3,7 @@ import numpy as np
 import mmap
 import scipy.io
 import h5py
+import re
 
 from .subclasses.metadata import MetaData
 from .utils.file_header import load_file_header_v2
@@ -113,7 +114,7 @@ class DataFile():
         
         # Loading file names and check whether file is found
         base_dir, filename = os.path.split(self.filename)
-        n_base = os.path.splitext(filename)[0].replace('-TRIAL', '', -1).strip()
+        n_base = re.sub(r'-TRIAL\d+','',os.path.splitext(filename)[0],flags=re.IGNORECASE)
 
         self.metaDataFileName = os.path.join(base_dir, n_base + '.meta')
         self.datFileName = os.path.join(base_dir, filename)
@@ -214,4 +215,69 @@ class DataFile():
         #obj.header.referenceTimestamp = first_line_header.timestamp
         return header
 
+    def getLineData(self, lineIndices, cycleIndices, iChannel=None):
+        """Get line data from the data file.
 
+        Parameters
+        ----------
+        lineIndices : array_like
+            Vector of positive integers specifying line indices (matlab indexing)
+        cycleIndices : array_like 
+            Vector of positive integers specifying cycle indices (matlab indexing)
+        iChannel : array_like, optional
+            Vector of positive integers specifying channel indices (matlab indexing) (default is all channels)
+
+        Returns
+        -------
+        lineData : list
+            Line data for the specified indices
+        """
+        # Default to all channels if not specified
+        if iChannel is None:
+            iChannel = np.arange(1, self.header['numChannels'] + 1)
+
+        lineIndices = np.asarray(lineIndices, dtype=np.int64).ravel()
+        cycleIndices = np.asarray(cycleIndices, dtype=np.int64).ravel()
+        iChannel = np.asarray(iChannel, dtype=np.int64).ravel()
+
+        if not np.all(lineIndices > 0) or not np.all(cycleIndices > 0) or not np.all(iChannel > 0):
+            raise ValueError("All indices must be positive integers (Matlab indexing)")
+
+        if np.any(lineIndices > self.header['linesPerCycle']):
+            raise ValueError("Line indices must be <= linesPerCycle")
+
+        if np.any(cycleIndices > self.numCycles):
+            raise ValueError("Cycle indices must be <= numCycles")
+        if len(cycleIndices) != len(lineIndices):
+            raise ValueError("Number of cycle indices must match number of line indices")
+
+        if np.any(iChannel > self.header['numChannels']):
+            raise ValueError("Channel indices must be <= numChannels")
+        
+        hMemmap = np.memmap(self.datFileName, dtype='int16', mode='r')
+        lineData = []
+        
+        try:
+            for idx in range(len(lineIndices)):
+                tmpData = np.zeros((self.lineDataNumElements[lineIndices[idx]-1] // 2, len(iChannel)), dtype=np.int16)
+                for ch in range(len(iChannel)):
+                    byteOffsets = [x*2 for x in range(self.lineDataNumElements[lineIndices[idx]-1] // 2)]
+                    byteOffsets = [x + self.lineDataNumElements[lineIndices[idx]-1]*(iChannel[ch]-1) for x in byteOffsets]
+                    byteOffsets = [x + self.lineDataStartIdxs[lineIndices[idx]-1] * 2 for x in byteOffsets]
+                    byteOffsets = [int(x-self.header['firstCycleOffsetBytes']) for x in byteOffsets]
+
+                    cycleIdxs = cycleIndices[idx] - 1
+                    cycleByteOffsets = self.header['firstCycleOffsetBytes'] + cycleIdxs*self.header['bytesPerCycle']
+                    cycleSampleOffsets = int(cycleByteOffsets//2)
+
+                    sampleOffsets = np.array([int(x//2) + cycleSampleOffsets for x in byteOffsets], dtype=np.uint64)
+
+                    tmpData[:, ch] = hMemmap[sampleOffsets-1]
+                
+                lineData.append(tmpData)
+        finally:
+            if hasattr(hMemmap, '_mmap'):
+                hMemmap._mmap.close()
+            del hMemmap
+    
+        return lineData
