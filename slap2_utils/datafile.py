@@ -125,32 +125,54 @@ class DataFile():
         # Subfunction of loading parse plan
         def load_parse_plan(self, metaData):   
             def filter_z_pixel_replacement_maps(z_maps):
-                # Using list comprehension for simplified logic
-                return [list(filter(lambda x: x[0] != x[1], map_)) for map_ in z_maps]
+                # Filter out redundant mappings where source and destination indices are the same
+                filtered_maps = []
+                for slice_map in z_maps:
+                    redundant_mask = slice_map[0] == slice_map[1]
+                    filtered_maps.append(slice_map[:,~redundant_mask])
+                return filtered_maps
 
-            fastz = metaData.AcquisitionContainer.ParsePlan['zs'][:]
-            final_fastz = [-10203] #initiating with a value thats never found
-            for i in fastz:
-                final_fastz.append(i[0])
+            if not metaData.AcquisitionContainer.newFormat:
+                fastz = metaData.AcquisitionContainer.ParsePlan['zs'][:]
+                final_fastz = [-10203] #initiating with a value thats never found
+                for i in fastz:
+                    final_fastz.append(i[0])
 
-            self.fastZs = final_fastz
+                self.fastZs = final_fastz
 
-            #Check if it breaks
-            self.lineSuperPixelZIdxs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['sliceIdx']
-            self.lineSuperPixelIDs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['superPixelID']
+                #Check if it breaks
+                self.lineSuperPixelZIdxs = metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['sliceIdx']
+                self.lineSuperPixelIDs = [x.T for x in metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['superPixelID']]
+                
+                self.zPixelReplacementMaps = metaData.AcquisitionContainer.ParsePlan['pixelReplacementMaps']
+                
+                #Using list comprehension for simplified logic
+                self.lineNumSuperPixels = [len(ids) for ids in self.lineSuperPixelIDs]
+                self.lineFastZIdxs = np.zeros(len(self.lineSuperPixelZIdxs))
+                for lineIdx in range(len(self.lineSuperPixelZIdxs)):
+                    lineZIdxs_=self.lineSuperPixelZIdxs[lineIdx]
             
-            self.zPixelReplacementMaps = metaData.AcquisitionContainer.ParsePlan['pixelReplacementMaps']
-            
-            #Using list comprehension for simplified logic
-            self.lineNumSuperPixels = [len(ids) for ids in self.lineSuperPixelIDs]
-            self.lineFastZIdxs = np.zeros(len(self.lineSuperPixelZIdxs))
-            for lineIdx in range(len(self.lineSuperPixelZIdxs)):
-                lineZIdxs_=self.lineSuperPixelZIdxs[lineIdx]
-           
-                if len(lineZIdxs_) != 1:
-                    self.lineFastZIdxs[lineIdx] = 0
-                else:
-                    self.lineFastZIdxs[lineIdx] = lineZIdxs_[0][0] + 1
+                    if len(lineZIdxs_) != 1:
+                        self.lineFastZIdxs[lineIdx] = 0
+                    else:
+                        self.lineFastZIdxs[lineIdx] = lineZIdxs_[0][0] + 1
+            else:
+                print('Using new metadata format...')
+
+                self.fastZs = np.unique(np.concatenate([zs for zs in metaData.AcquisitionContainer.AcquisitionPlan['activeZs'] if zs.size > 0]))
+                self.lineSuperPixelIDs = metaData.AcquisitionContainer.AcquisitionPlan['superPixelIDs']
+                self.lineSuperPixelZIdxs = metaData.AcquisitionContainer.AcquisitionPlan['activeZs']
+                self.zPixelReplacementMaps = metaData.AcquisitionContainer.AcquisitionPlan['pixelReplacementMaps']
+                self.zPixelReplacementMapsNonRedudant = filter_z_pixel_replacement_maps(self.zPixelReplacementMaps)
+                self.lineNumSuperPixels = np.prod([ids.size for ids in self.lineSuperPixelIDs])
+
+                self.lineFastZIdxs = np.zeros(len(self.lineSuperPixelZIdxs))
+                for lineIdx in range(len(self.lineSuperPixelZIdxs)):
+                    lineZIdxs_=self.lineSuperPixelZIdxs[lineIdx]
+                    if lineZIdxs_.size == 0:
+                        self.lineFastZIdxs[lineIdx] = 0
+                    else:
+                        self.lineFastZIdxs[lineIdx] = lineZIdxs_[0]
             
         
         # Add additional attributes from the MetaData file
