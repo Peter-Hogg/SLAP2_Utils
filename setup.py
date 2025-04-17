@@ -13,7 +13,7 @@ with open(path.join(here, 'requirements.txt'), 'r') as f:
 setup(
 
     name='slap2_utils', 
-    version='0.3.9',  
+    version='0.4.0',  
 
     
     description='Code to support using a SLAP2 Microscope',  
