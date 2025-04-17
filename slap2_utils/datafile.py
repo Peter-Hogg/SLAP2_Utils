@@ -259,10 +259,10 @@ class DataFile():
         
         try:
             for idx in range(len(lineIndices)):
-                tmpData = np.zeros((self.lineDataNumElements[lineIndices[idx]-1] // 2, len(iChannel)), dtype=np.int16)
+                tmpData = np.zeros((self.lineDataNumElements[lineIndices[idx]-1] // int(self.header['numChannels']), len(iChannel)), dtype=np.int16)
                 for ch in range(len(iChannel)):
-                    byteOffsets = [x*2 for x in range(self.lineDataNumElements[lineIndices[idx]-1] // 2)]
-                    byteOffsets = [x + self.lineDataNumElements[lineIndices[idx]-1]*(iChannel[ch]-1) for x in byteOffsets]
+                    byteOffsets = [x*2 for x in range(self.lineDataNumElements[lineIndices[idx]-1] // int(self.header['numChannels']))]
+                    byteOffsets = [x + self.lineDataNumElements[lineIndices[idx]-1]//int(self.header['numChannels'])*2*(iChannel[ch]-1) for x in byteOffsets]
                     byteOffsets = [x + self.lineDataStartIdxs[lineIndices[idx]-1] * 2 for x in byteOffsets]
                     byteOffsets = [int(x-self.header['firstCycleOffsetBytes']) for x in byteOffsets]
 
