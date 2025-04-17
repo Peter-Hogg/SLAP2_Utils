@@ -1,8 +1,8 @@
 [project]
 name = "SLAP2_UTILS"
-version = "0.3.6"
+version = "0.3.9"
 authors = [
-  { name="Peter Hogg", email="peter.hogg@ubc.ca" },
+  { name="Peter Hogg", email="peterhogg2006@gmail.com" },
   { name="Jerry Tong", email="jerrytong0810@gmail.com" }
 ]
 description = "Code to support using a SLAP2 Microscope"
