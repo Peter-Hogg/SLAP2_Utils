@@ -180,13 +180,16 @@ class DataFile():
 
         if not os.path.isfile(self.datFileName):
             raise FileNotFoundError('Data file not found.')
-        self.rawData = np.memmap(self.filename, dtype='uint32')
+        self.rawData = np.memmap(self.filename, dtype='int16')
         self.header = self.load_file_header(self.rawData)
         
 
     # Function for loading file header:
     def load_file_header(self, rawData):
-        raw_data = np.frombuffer(rawData, dtype=np.uint32)
+        if len(rawData) % 2 != 0:
+            raw_data = np.frombuffer(rawData[:-1], dtype=np.uint32)
+        else:
+            raw_data = np.frombuffer(rawData, dtype=np.uint32)
         if raw_data.dtype != 'uint32':
             raw_data.dtype('uint32')
 
@@ -204,7 +207,7 @@ class DataFile():
             raise ValueError(f'Unknown file format version: {file_format_version}')
 
         # Load Indices
-        raw_data  =  np.frombuffer(raw_data, dtype=np.uint16)
+        raw_data  =  np.frombuffer(rawData, dtype=np.uint16)
         if raw_data.dtype != 'uint16':
             raw_data.astype('uint16')
 
@@ -281,10 +284,10 @@ class DataFile():
         
         try:
             for idx in range(len(lineIndices)):
-                tmpData = np.zeros((self.lineDataNumElements[lineIndices[idx]-1] // 2, len(iChannel)), dtype=np.int16)
+                tmpData = np.zeros((self.lineDataNumElements[lineIndices[idx]-1] // int(self.header['numChannels']), len(iChannel)), dtype=np.int16)
                 for ch in range(len(iChannel)):
-                    byteOffsets = [x*2 for x in range(self.lineDataNumElements[lineIndices[idx]-1] // 2)]
-                    byteOffsets = [x + self.lineDataNumElements[lineIndices[idx]-1]*(iChannel[ch]-1) for x in byteOffsets]
+                    byteOffsets = [x*2 for x in range(self.lineDataNumElements[lineIndices[idx]-1] // int(self.header['numChannels']))]
+                    byteOffsets = [x + self.lineDataNumElements[lineIndices[idx]-1]//int(self.header['numChannels'])*2*(iChannel[ch]-1) for x in byteOffsets]
                     byteOffsets = [x + self.lineDataStartIdxs[lineIndices[idx]-1] * 2 for x in byteOffsets]
                     byteOffsets = [int(x-self.header['firstCycleOffsetBytes']) for x in byteOffsets]
 
