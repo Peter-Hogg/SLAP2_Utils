@@ -1,6 +1,6 @@
 [project]
 name = "SLAP2_UTILS"
-version = "0.4.0"
+version = "0.4.1"
 authors = [
   { name="Peter Hogg", email="peterhogg2006@gmail.com" },
   { name="Jerry Tong", email="jerrytong0810@gmail.com" }
@@ -14,7 +14,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "numpy==1.23.5",
+    "numpy",
     "scipy",
     "h5py",
     "scikit-image",
