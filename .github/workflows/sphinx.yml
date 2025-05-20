@@ -26,6 +26,9 @@ jobs:
         pip install nbsphinx
         pip install ipykernel
 
+    - name: Install Pandoc
+      run: sudo apt-get install -y pandoc
+      
     - name: Build documentation
       run: |
         sphinx-build -n -W -b html docs/source docs/build/html
