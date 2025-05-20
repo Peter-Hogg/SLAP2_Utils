@@ -95,7 +95,7 @@ def roiLabels(datafile, refStackPath=None):
         except:
             print('Not a SLAP2 Ref Stack')
             return None
-        roiLabels = np.zeros(_stackInfo['shape'][1:])
+        roiLabels = np.zeros(shape[1:] if isinstance(shape, (list, tuple)) else default_shape, dtype=int)
         for lbl, roi in enumerate(datafile.metaData.AcquisitionContainer.ROIs):
             roi_shape = roi.shapeData
             z = roi.z

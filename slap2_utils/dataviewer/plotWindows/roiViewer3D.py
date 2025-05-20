@@ -23,7 +23,14 @@ class ROIViewer3D(QMainWindow):
         self.img = tifffile.imread(img_path) if img_path !=None else None
         
         if self.img is not None:
-            self.volume_data = self.img[0,:,:,:].astype('float32')
+            if self.img.ndim == 4:
+                # Shape: (C, Z, Y, X) or (T, Z, Y, X) — select first channel/timepoint
+                self.volume_data = self.img[0, :, :, :].astype('float32')
+            elif self.img.ndim == 3:
+                # Shape: (Z, Y, X)
+                self.volume_data = self.img.astype('float32')
+            else:
+                raise ValueError(f"Unexpected image dimensions: {self.img.shape}")
 
         # Create a Vispy canvas
         self.canvas = scene.SceneCanvas(keys='interactive', show=True)

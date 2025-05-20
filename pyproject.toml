@@ -4,11 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "SLAP2_UTILS"
-version = "0.4.1"
+version = "0.4.5"
 authors = [
   { name="Peter Hogg", email="peterhogg2006@gmail.com" },
   { name="Jerry Tong", email="jerrytong0810@gmail.com" }
 ]
+
 description = "Code to support using a SLAP2 Microscope"
 readme = "README.md"
 requires-python = ">=3.9"
