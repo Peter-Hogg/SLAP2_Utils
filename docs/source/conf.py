@@ -65,3 +65,5 @@ myst_enable_extensions = [
     "substitution",
     "tasklist",
 ]
+
+nbsphinx_execute = 'never'
