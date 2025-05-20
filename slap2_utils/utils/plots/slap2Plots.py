@@ -5,25 +5,24 @@ from matplotlib import cm
 from ..roi_utils import roiImg
 
 def roiOverlay(datafile, refimg, roiIdx, display=True):
-    """Plot contours of an SLAP2 ROI over a reference image with color-coded super pixels.
-
-    This function plots the contours of specified ROIs over a reference image. The super pixels are color-coded.
+    """
+    Plots contours of SLAP2 ROIs over a reference image with color-coded super pixels.
 
     Parameters
     ----------
-    datafile : SLAP2_Utils Datafile Object
+    datafile : ``SLAP2_Utils Datafile Object``
         The datafile containing metadata and header information.
-    refimg : array
-        Reference image, can be 3D (t, x, y) or 2D (x, y).
-    roiIdx : int or list
-        Integer or list of integers for the ROI indices.
-    display : bool, optional
-        If True, display the plot. Default is True.
+    refimg : ``np.ndarray``
+        Reference image; can be 3D (t, x, y) or 2D (x, y).
+    roiIdx : int or list of int
+        Single ROI index or a list of ROI indices to overlay.
+    display : bool, ``optional``
+        Whether to display the plot immediately. Default is True.
 
     Returns
     -------
-    ax : matplotlib.axes.Axes
-        Matplotlib axes object with the plotted contours.
+    ax : ``matplotlib.axes.Axes``
+        Matplotlib Axes object with the plotted contours
     """
     assert type(roiIdx) == int or type(roiIdx) == list
     if type(roiIdx) == int:
@@ -53,7 +52,7 @@ def roiOverlaySuperPix(datafile, refimg, roiIdx, display=True):
 
     Parameters
     ----------
-    dffData : array
+    dffData : ``np.array``
         The delta F/F data of super pixels.
     hz : float
         Sampling rate in Hertz.
@@ -64,7 +63,7 @@ def roiOverlaySuperPix(datafile, refimg, roiIdx, display=True):
 
     Returns
     -------
-    ax : matplotlib.axes.Axes
+    ax : ``matplotlib.axes.Axes``
         Matplotlib axes object with the plotted contours
     """
     assert type(roiIdx) == int
@@ -115,7 +114,7 @@ def plotPixTrace(dffData, hz, start, end):
 
     Parameters
     ----------
-    dffData : array
+    dffData : ``np.array``
         The delta F/F data of super pixels.
     hz : float
         Sampling rate in Hertz.
@@ -130,7 +129,7 @@ def plotPixTrace(dffData, hz, start, end):
     """
     plt.figure(figsize=(24, 16))
     time = np.arange(0, int(end-start)/hz, 1/hz)
-    for j in range(dffSuperPix.shape[0]):
-        _traceColor = mpl.colors.rgb2hex(cm.Spectral(j/dffSuperPix.shape[0]))
-        plt.plot(time, dffSuperPix[j, start:end]+(.15*j), color=_traceColor, alpha=.8, zorder=dffSuperPix.shape[0]-j+5)
+    for j in range(dffData.shape[0]):
+        _traceColor = mpl.colors.rgb2hex(cm.Spectral(j/dffData.shape[0]))
+        plt.plot(time, dffData[j, start:end]+(.15*j), color=_traceColor, alpha=.8, zorder=dffData.shape[0]-j+5)
     plt.show()

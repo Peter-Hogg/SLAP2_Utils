@@ -12,7 +12,7 @@ class MetaData():
             ----------
             metadatafile : str
                 The name of the metadata file.
-            AcquisitionContainer : AcquisitionContainer
+            AcquisitionContainer : ``AcquisitionContainer``
                 An instance of the AcquisitionContainer class that contain information related to the acquisition.
             acqDurationCycles : list
                 A list containing 2 int values for cycle duration

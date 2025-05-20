@@ -10,14 +10,14 @@ def roiImg(datafile, idx):
 
     Parameters
     ----------
-    datafile : SLAP2_Utils Datafile Object
+    datafile : ``SLAP2_Utils Datafile Object``
         The datafile containing metadata and header information.
     idx : int
         Index value of the ROI in the ROI list.
 
     Returns
     -------
-    img : array
+    img : ``np.array``
         A 2D array with integers 0 or 1 indicating pixels belonging to the ROI.
     """
 
@@ -38,14 +38,14 @@ def roiBoolean(datafile, idx):
 
     Parameters
     ----------
-    datafile : SLAP2_Utils Datafile Object
+    datafile : ``SLAP2_Utils Datafile Object``
         The datafile containing metadata and header information.
     idx : int
         Index value of the ROI in the ROI list.
 
     Returns
     -------
-    booleanPixels : array
+    booleanPixels : ``np.array``
         A 2D array with booleans indicating pixels belonging to the ROI.
     """
     roi_shape = datafile.metaData.AcquisitionContainer.ROIs[idx].shapeData
@@ -64,14 +64,14 @@ def roiLabels(datafile, refStackPath=None):
 
     Parameters
     ----------
-    datafile : SLAP2_Utils Datafile Object
+    datafile : ``SLAP2_Utils Datafile Object``
         The datafile containing metadata and ROI information.
-    refstack : optional
+    refstack :  str or ``Path``, ``optional``
         Reference stack to use for generating ROI labels. Default is None.
 
     Returns
     -------
-    roiLabels : array
+    roiLabels : ``np.array``
         A 3D array with each plane representing a Z-stack and labels indicating different ROIs.
     """
     if type(refStackPath)==type(None):

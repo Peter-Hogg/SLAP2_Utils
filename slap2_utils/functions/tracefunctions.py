@@ -13,15 +13,15 @@ def returnAllTrace(datafile, chIdx=1,  zIdx=1, window=10, expectedWindowWidth=10
 
     Parameters
     ----------
-    datafile : SLAP2_Utils Datafile Object
+    datafile : ``SLAP2_Utils Datafile Object``
         The datafile containing metadata and header information.
-    chIdx : int, optional
+    chIdx : int, ``optional``
         Channel index (default is 1).
-    zIdx : int, optional
+    zIdx : int, ``optional``
         Z index (default is 1).
-    window : int, optional
+    window : int, ``optional``
         Window size for processing the trace (default is 10).
-    expectedWindowWidth : int, optional
+    expectedWindowWidth : int, ``optional``
         Expected window width for processing the trace (default is 100).
 
     Returns
@@ -61,16 +61,16 @@ def cleanVolumeTrace(datafile, zId, rawTrace):
 
     Parameters
     ----------
-    datafile : SLAP2_Utils Datafile Object
+    datafile : ``SLAP2_Utils Datafile Object``
         The datafile containing metadata and header information.
     zId : int
         Z index to be cleaned.
-    rawTrace : array
+    rawTrace : ``np.array``
         The raw trace data.
 
     Returns
     -------
-    cleanTrace : array
+    cleanTrace : ``np.array``
         The cleaned trace data.
     """
 
@@ -104,18 +104,18 @@ def returnVolumeTrace(datafile, roiIndex, chIdx=1):
 
     Parameters
     ----------
-    datafile : SLAP2_Utils Datafile Object
+    datafile : ``SLAP2_Utils Datafile Object``
         The datafile containing metadata and header information.
     roiIndex : int
         Index of the ROI.
-    chIdx : int, optional
+    chIdx : int, ``optional``
         Channel index (default is 1).
 
     Returns
     -------
-    _trace1 : array
+    _trace1 : ``np.array``
         The raw trace data.
-    _trace : array
+    _trace : ``np.array``
         The cleaned trace data.
     """
 
@@ -150,7 +150,7 @@ def superPixelTraces(datafile, roiIdx, zIdx=1, chIdx=1):
     """
 
     Args:
-        datafile: SLAP2_Utils Datafile Object
+        datafile: ``SLAP2_Utils Datafile Object``
 
         roiIdx: int 
             index value of roi in the roi list
@@ -161,7 +161,7 @@ def superPixelTraces(datafile, roiIdx, zIdx=1, chIdx=1):
             Index of the channel being recorded
 
     Returns:
-        _pixSignal: array
+        ``_pixSignal``: ``np.array``
             An array of floats of a raw signal for each super pixel
     """
 

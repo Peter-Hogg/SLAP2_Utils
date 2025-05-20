@@ -23,11 +23,12 @@ jobs:
         pip install -r requirements.txt
         pip install sphinx sphinx_rtd_theme
         pip install myst-parser
+        pip install nbsphinx
+        pip install ipykernel
 
     - name: Build documentation
       run: |
-        cd docs  # Change to your documentation directory
-        make html
+        sphinx-build -n -W -b html docs/ docs/build/html
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3

@@ -1,10 +1,6 @@
+# Used for reproducible local installs.
+# Canonical dependencies live in pyproject.toml
 numpy
-scipy
-h5py
-scikit-image
-matplotlib
-vispy
-PyQT6
 scipy
 h5py
 scikit-image
@@ -12,3 +8,8 @@ PyQT6
 matplotlib
 vispy
 notebook
+pyneurotrace
+zarr          
+dask
+napari
+apoc

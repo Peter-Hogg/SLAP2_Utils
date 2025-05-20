@@ -30,9 +30,11 @@ release = '0.8.0'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'myst_parser'  # to parse Markdown files if needed
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
+    "nbsphinx",
+    "myst_parser"  # to parse Markdown files if needed
 ]
 
 templates_path = ['_templates']

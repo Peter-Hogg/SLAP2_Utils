@@ -13,9 +13,9 @@ def returnStimTime(stimFile, distance=250, hz=5000):
     ----------
     stimFile : str
         Path to the HDF5 file containing the TTL trace.
-    distance : int, optional
+    distance : int, ``optional``
         Minimum number of samples between consecutive peaks. Default is 250.
-    hz : int, optional
+    hz : int, ``optional``
         Sampling rate of the TTL trace in Hertz. Default is 5000 Hz.
 
     Returns

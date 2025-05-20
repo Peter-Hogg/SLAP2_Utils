@@ -17,7 +17,7 @@ class DataFile():
 
             Attributes
             ----------
-            MAGIC_NUMBER : np.uint32
+            MAGIC_NUMBER : ``np.uint32``
                 A constant used to validate the data file.
             filename : str
                 The name of the data file.
@@ -27,7 +27,7 @@ class DataFile():
                 The name of the data file with the '.dat' extension.
             rawData : list
                 A list to store the raw data from the file.
-            metaData : MetaData
+            metaData : ``MetaData``
                 An instance of the MetaData class to handle metadata.
             StreamId : None
                 A placeholder for stream ID.

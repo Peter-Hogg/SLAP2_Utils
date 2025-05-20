@@ -1,12 +1,21 @@
 # Utility functions for the Slap2DataFile
 def load_file_header_v2(obj, rawUint32):
     """
-        A function that does several sanity checks to the integrity and validity of the file. It also translates the raw data that are inputted as raw uint32 array.
+    Performs sanity checks on the file header and parses it into usable Python structures.
 
-        Return
-        -------
-            Translated header and number of cycles (num_cycles)    
+    Parameters
+    ----------
+    obj : object
+        An object that contains file-level metadata (e.g., constants like MAGIC_NUMBER).
+    rawUint32 : ``np.ndarray``
+        The raw header data as a uint32 array from the SLAP2 file.
 
+    Returns
+    -------
+    tuple
+        A tuple containing:
+        - `header` (dict): Parsed header metadata.
+        - `num_cycles` (int): Total number of cycles computed from the file size.
     """
     # Data format:
     # uint32_t magic_start          = MAGIC_NUMBER;
@@ -56,15 +65,17 @@ def load_file_header_v2(obj, rawUint32):
 
 def translate_field_value_pairs(field_value_pairs):
     """
-        A function that maps field IDs to names. The input is field value pairs, which are to be translated into a dictionary format.
-        Parameters
-        ----------
-        field_value_pairs : numpy array 
-        pairs of field names and values from the file header
-        
-        Return
-        -------
-            Dictionary that contains the field value pairs
+    Maps integer field IDs to named header fields and assigns their values.
+
+    Parameters
+    ----------
+    field_value_pairs : ``np.ndarray``
+        A (N, 2) array where each row is a field ID and its associated value.
+
+    Returns
+    -------
+    dict
+        A dictionary mapping field names to their parsed float values.
 
     """
     file_header_fields = [
@@ -103,14 +114,16 @@ def translate_field_value_pairs(field_value_pairs):
 def translate_channel_mask(header):
     """
         A function that translates the channel mask from the header as the input. It then has various checks that validate the number of channels specified.
+        
         Parameters
         ----------
-        header : memap 
-        Header of SLAP2 binary file read as Uint32
+        header : dict
+            Header of SLAP2 binary file read as Uint32
         
-        Return
+        Returns
         -------
-            It returns the header itself if it indeed passed all checks.
+        dict
+            The updated header with an added 'channels' list, if validation passes.
 
     """
     assert 'channelMask' in header
@@ -121,19 +134,22 @@ def translate_channel_mask(header):
     return header
 
 def translate_reference_timestamp(header):
+   
     """
-        A function that function combines the lower and upper parts of the reference timestamp if it does exist. 
-        Parameters
-        ----------
-        header : memap 
-        Header of SLAP2 binary file read as Uint32
-        
-    
-        Return
-        -------
-            It returns the header that has the combined reference timestamp in it.
+    Combines the lower and upper parts of the reference timestamp if they exist.
 
+    Parameters
+    ----------
+    header : dict
+        Header dictionary containing fields like 'referenceTimestamp_lower' and 'referenceTimestamp_upper'.
+
+    Returns
+    -------
+    dict
+        The updated header dictionary with a combined 'referenceTimestamp' field.
     """
+
+    
     if 'referenceTimestamp_lower' in header and 'referenceTimestamp_upper' in header:
         reference_timestamp_lower = header['referenceTimestamp_lower']
         reference_timestamp_upper = int(header['referenceTimestamp_upper']) << 32

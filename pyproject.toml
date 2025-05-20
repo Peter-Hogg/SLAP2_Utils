@@ -22,12 +22,15 @@ dependencies = [
     "matplotlib",
     "vispy",
     "notebook",
-    "pyneurotrace"
-        
+    "pyneurotrace",
+    "zarr",          
+    "dask",
+    "napari",
+    "apoc"
 ]
 
 [project.optional-dependencies]
-CUPY = ["cupy"]
+cupy = ["cupy"]
 cuda11x = ["cupy-cuda11x"]
 cuda12x = ["cupy-cuda12x"]
 

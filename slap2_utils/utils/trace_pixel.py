@@ -37,7 +37,7 @@ class TracePixel:
     
 
     Descriptions for methods:
-    ----------
+    ------------------------------
            
             
     Methods

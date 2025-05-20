@@ -5,108 +5,34 @@ import copy
 
 class Trace:
     """
-        A class used to read raw data and generate traces from a SLAP2 data file.
+    A class used to read raw data and generate traces from a SLAP2 data file.
 
-        Attributes
-        ----------
-        dataFile : DataFile
-            The data file containing raw data to generate the trace from.
-        zIdx : int
-            The Z index of the trace.
-        chIdx : int
-            The channel index of the trace.
-        TracePixels : list
-            A list of TracePixel objects associated with the trace.
-        pixelIdxs : list
-            A list of pixel indices for the trace.
+    Parameters
+    ----------
+    dataFile : ``DataFile``
+        The data file containing raw data to generate the trace from.
+    zIdx : int, ``optional``
+        The Z index of the trace (default is 0).
+    chIdx : int, ``optional``
+        The channel index of the trace (default is 0).
 
-            
-        Descriptions for methods:
-        ----------
+    Attributes
+    ----------
+    dataFile : ``DataFile``
+        The data file containing raw data.
+    zIdx : int
+        Z index used in this trace.
+    chIdx : int
+        Channel index.
+    TracePixels : list of ``TracePixel``
+        List of TracePixel objects associated with this trace.
+    pixelIdxs : list of int
+        List of pixel indices for this trace.
 
-
-        Methods
-        ---------
-        __init__() :
-            Fill the fields mentioned above and set default value for the fields.
-            
-        Return
-        -------
-            Self with initialized fields. 
-
-        Methods
-        ---------
-        superPixelIds():
-            The method obtains a list of superpixel IDs for the trace.
-            
-        Return
-        -------
-            Returns a list of superpixel IDs for the trace.
-
-        Methods
-        ---------
-        setPixelIdxs(rasterPixels=None, integrationPixels=None) :
-            The method takes an input of rasterPixels and integrationPixels maps and it sets the pixel indices based on the provided raster and integration pixel maps.
-            
-        Return
-        -------
-            Self with edited TracePixels and pixelIDxs fields. 
-
-        Methods
-        ---------
-        checkMapDims(map_) :
-            The method checks and adjusts the dimensions of a map based on DMD (Digital Micromirror Device) pixel parameters. It takes a map_ as input to check and adjust.
-            
-        Return
-        -------
-            It returns a np.ndarray that represent the adjusted map.
-
-        Methods
-        ---------
-        process(windowWidth_lines, expectedWindowWidth_lines) :
-            The method processes the trace by loading the TracePixels and deconvolving the data. It takes windowWidth_lines, which is an integer that represent the width of the convolution window in lines. It also takes expectedWindowWidth_lines as an integer input that represent the expected width of the convolution window in lines.
-            
-        Return
-        -------
-            A tuple containing the processed trace, sumDataWeighted, sumExpected, and sumExpectedWeighted.
-
-        Methods
-        ---------
-        getRawSuperPixel(superpixel=1) :
-           The method obtains the raw data for a specific superpixel, which is provided by the superpixel input.
-            
-        Return
-        -------
-            A list of raw data for the specified superpixel.
-
-        Methods
-        ---------
-        getRawAverageSuperPixel(superpixel=1) :
-            The method obtains the averaged raw data for a specific superpixel (volumetric trace only), which is again provided by the superpixel input.
-            
-        Return
-        -------
-            A list of averaged raw data for the specified superpixel.
-
-        Methods
-        ---------
-        orderadjust() :
-            The method adjusts the order of the TracePixels based on their y-index.
-            
-        Return
-        -------
-            Self with adjusted TracePixel list that is correctly ordered. 
-
-        Methods
-        ---------
-        getTracePixels(pixelIdxs) :
-            This method sets up the initial TracePixel fields and returns the TracePixels with new and existing TracePixels. It takes pixelIdxs which is a np.ndarray of pixel indices to set up TracePixels for.
-            
-        Return
-        -------
-            A list of TracePixel objects (unordered if it is not ran through orderadjust method yet.
-            
-
+    Notes
+    -----
+    Additional methods allow setting pixel indices, processing traces,
+    and accessing raw or averaged superpixel data.
     """
     
     def __init__(self, dataFile, zIdx=0, chIdx=0):

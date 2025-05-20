@@ -2,10 +2,9 @@ import os
 from slap2_utils.datafile import DataFile
 
 def test_datafile():
-    filename = 'testFile.dat'
-    file_size = os.path.getsize(filename)
-    print(f"File size of {filename}: {file_size} bytes")
 
+    test_dir = os.path.dirname(__file__)
+    filename = os.path.join(test_dir, "testFile.dat")
     # Check if the file can be opened and read
     with open(filename, 'rb') as f:
         first_bytes = f.read(16)  # read the first few bytes
@@ -34,7 +33,7 @@ def test_datafile():
 
 
 
-    hDataFile = DataFile('testFile.dat')
+    hDataFile = DataFile(filename)
     # Test if binary file is read correctly
     assert hDataFile.header == refHeader
 
@@ -50,6 +49,14 @@ def test_datafile():
     assert hDataFile.metaData.AcquisitionContainer.ROIs[0].targetRate == 5000
 
 
+def test_get_line_data():
+    test_dir = os.path.dirname(__file__)
+    filename = os.path.join(test_dir, "testFile.dat")
+    hDataFile = DataFile(filename)
+    out = hDataFile.getLineData([1, 2], [1, 2], iChannel=[1])
+    
+    assert isinstance(out, list)
+    assert len(out) == 2  # one per line
 
 if __name__ == '__main__':
     pytest.main()
