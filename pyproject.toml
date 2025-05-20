@@ -56,4 +56,5 @@ Homepage = "https://github.com/Peter-Hogg/SLAP2_Utils"
 Issues = "https://github.com/Peter-Hogg/SLAP2_Utils/issues"
 
 [tool.setuptools.packages.find]
-include = ["slap2_utils"]
+where = ["."]
+include = ["slap2_utils", "slap2_utils.*"]
