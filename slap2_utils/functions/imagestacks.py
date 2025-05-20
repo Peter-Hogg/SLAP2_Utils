@@ -2,7 +2,10 @@ import sys
 import dask
 import os
 import numpy as np 
-import cupy as cu
+try:
+    import cupy as cu
+except ImportError:
+    cu = None
 import dask.array as da
 import numpy as np
 import matplotlib.pyplot as plt
