@@ -16,6 +16,7 @@
       <script src="../_static/documentation_options.js?v=486e5634"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -71,6 +72,10 @@
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
+</ul>
 
         </div>
       </div>
@@ -104,39 +109,39 @@
 <span id="functions"></span><h2>Functions<a class="headerlink" href="#module-slap2_utils.functions.tracefunctions" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.functions.tracefunctions.cleanVolumeTrace">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.tracefunctions.</span></span><span class="sig-name descname"><span class="pre">cleanVolumeTrace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zId</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rawTrace</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.functions.tracefunctions.cleanVolumeTrace" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.tracefunctions.</span></span><span class="sig-name descname"><span class="pre">cleanVolumeTrace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zId</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rawTrace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/functions/tracefunctions.html#cleanVolumeTrace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.functions.tracefunctions.cleanVolumeTrace" title="Link to this definition"></a></dt>
 <dd><p>Clean the raw trace data by averaging over slices.</p>
 <p>This function extracts the slice index information and averages the raw trace data for the given zId.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>datafile</strong> (<em>SLAP2_Utils Datafile Object</em>) – The datafile containing metadata and header information.</p></li>
+<li><p><strong>datafile</strong> (<code class="docutils literal notranslate"><span class="pre">SLAP2_Utils</span> <span class="pre">Datafile</span> <span class="pre">Object</span></code>) – The datafile containing metadata and header information.</p></li>
 <li><p><strong>zId</strong> (<em>int</em>) – Z index to be cleaned.</p></li>
-<li><p><strong>rawTrace</strong> (<em>array</em>) – The raw trace data.</p></li>
+<li><p><strong>rawTrace</strong> (<code class="docutils literal notranslate"><span class="pre">np.array</span></code>) – The raw trace data.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>cleanTrace</strong> – The cleaned trace data.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">np.array</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.functions.tracefunctions.returnAllTrace">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.tracefunctions.</span></span><span class="sig-name descname"><span class="pre">returnAllTrace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chIdx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zIdx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expectedWindowWidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.functions.tracefunctions.returnAllTrace" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.tracefunctions.</span></span><span class="sig-name descname"><span class="pre">returnAllTrace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chIdx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zIdx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expectedWindowWidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/functions/tracefunctions.html#returnAllTrace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.functions.tracefunctions.returnAllTrace" title="Link to this definition"></a></dt>
 <dd><p>Return a dictionary of traces for all ROIs in the datafile.</p>
 <p>This function iterates through all ROIs in the datafile metadata and processes traces for each ROI.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>datafile</strong> (<em>SLAP2_Utils Datafile Object</em>) – The datafile containing metadata and header information.</p></li>
-<li><p><strong>chIdx</strong> (<em>int</em><em>, </em><em>optional</em>) – Channel index (default is 1).</p></li>
-<li><p><strong>zIdx</strong> (<em>int</em><em>, </em><em>optional</em>) – Z index (default is 1).</p></li>
-<li><p><strong>window</strong> (<em>int</em><em>, </em><em>optional</em>) – Window size for processing the trace (default is 10).</p></li>
-<li><p><strong>expectedWindowWidth</strong> (<em>int</em><em>, </em><em>optional</em>) – Expected window width for processing the trace (default is 100).</p></li>
+<li><p><strong>datafile</strong> (<code class="docutils literal notranslate"><span class="pre">SLAP2_Utils</span> <span class="pre">Datafile</span> <span class="pre">Object</span></code>) – The datafile containing metadata and header information.</p></li>
+<li><p><strong>chIdx</strong> (int, <code class="docutils literal notranslate"><span class="pre">optional</span></code>) – Channel index (default is 1).</p></li>
+<li><p><strong>zIdx</strong> (int, <code class="docutils literal notranslate"><span class="pre">optional</span></code>) – Z index (default is 1).</p></li>
+<li><p><strong>window</strong> (int, <code class="docutils literal notranslate"><span class="pre">optional</span></code>) – Window size for processing the trace (default is 10).</p></li>
+<li><p><strong>expectedWindowWidth</strong> (int, <code class="docutils literal notranslate"><span class="pre">optional</span></code>) – Expected window width for processing the trace (default is 100).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -150,21 +155,21 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.functions.tracefunctions.returnVolumeTrace">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.tracefunctions.</span></span><span class="sig-name descname"><span class="pre">returnVolumeTrace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roiIndex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chIdx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.functions.tracefunctions.returnVolumeTrace" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.tracefunctions.</span></span><span class="sig-name descname"><span class="pre">returnVolumeTrace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roiIndex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chIdx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/functions/tracefunctions.html#returnVolumeTrace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.functions.tracefunctions.returnVolumeTrace" title="Link to this definition"></a></dt>
 <dd><p>Return volume traces for a given ROI.</p>
 <p>This function processes and cleans the volume trace data for a specified ROI.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>datafile</strong> (<em>SLAP2_Utils Datafile Object</em>) – The datafile containing metadata and header information.</p></li>
+<li><p><strong>datafile</strong> (<code class="docutils literal notranslate"><span class="pre">SLAP2_Utils</span> <span class="pre">Datafile</span> <span class="pre">Object</span></code>) – The datafile containing metadata and header information.</p></li>
 <li><p><strong>roiIndex</strong> (<em>int</em>) – Index of the ROI.</p></li>
-<li><p><strong>chIdx</strong> (<em>int</em><em>, </em><em>optional</em>) – Channel index (default is 1).</p></li>
+<li><p><strong>chIdx</strong> (int, <code class="docutils literal notranslate"><span class="pre">optional</span></code>) – Channel index (default is 1).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>_trace1</strong> (<em>array</em>) – The raw trace data.</p></li>
-<li><p><strong>_trace</strong> (<em>array</em>) – The cleaned trace data.</p></li>
+<li><p><strong>_trace1</strong> (<code class="docutils literal notranslate"><span class="pre">np.array</span></code>) – The raw trace data.</p></li>
+<li><p><strong>_trace</strong> (<code class="docutils literal notranslate"><span class="pre">np.array</span></code>) – The cleaned trace data.</p></li>
 </ul>
 </p>
 </dd>
@@ -173,11 +178,11 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.functions.tracefunctions.superPixelTraces">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.tracefunctions.</span></span><span class="sig-name descname"><span class="pre">superPixelTraces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roiIdx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zIdx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chIdx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.functions.tracefunctions.superPixelTraces" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.tracefunctions.</span></span><span class="sig-name descname"><span class="pre">superPixelTraces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roiIdx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zIdx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chIdx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/functions/tracefunctions.html#superPixelTraces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.functions.tracefunctions.superPixelTraces" title="Link to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>datafile</strong> – SLAP2_Utils Datafile Object</p></li>
+<li><p><strong>datafile</strong> – <code class="docutils literal notranslate"><span class="pre">SLAP2_Utils</span> <span class="pre">Datafile</span> <span class="pre">Object</span></code></p></li>
 <li><p><strong>roiIdx</strong> – int
 index value of roi in the roi list</p></li>
 <li><p><strong>zIdx</strong> – Z-Plane Index</p></li>
@@ -187,13 +192,13 @@ Index of the channel being recorded</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><dl class="simple">
-<dt>array</dt><dd><p>An array of floats of a raw signal for each super pixel</p>
+<dt><code class="docutils literal notranslate"><span class="pre">np.array</span></code></dt><dd><p>An array of floats of a raw signal for each super pixel</p>
 </dd>
 </dl>
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>_pixSignal</p>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">_pixSignal</span></code></p>
 </dd>
 </dl>
 </dd></dl>

@@ -1,0 +1,187 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>slap2_utils.subclasses.acquisitionContainer &mdash; SLAP2 Utils 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=486e5634"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SLAP2 Utils
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installing-cupy">Installing Cupy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SLAP2 Utils</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">slap2_utils.subclasses.acquisitionContainer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for slap2_utils.subclasses.acquisitionContainer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.slapROI</span><span class="w"> </span><span class="kn">import</span> <span class="n">slapROI</span>
+
+<div class="viewcode-block" id="AcquisitionContainer">
+<a class="viewcode-back" href="../../../modules/metadata.html#slap2_utils.subclasses.acquisitionContainer.AcquisitionContainer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AcquisitionContainer</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A class used to load a SLAP2 binary metadatafile for data processing. This is also an attribute for the datafile object</span>
+
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        AcquisitionPlan : dict</span>
+<span class="sd">            A dictionary that contains 3 subinstances of [&#39;AcquisitionContainer&#39;], [&#39;ParsePlan&#39;], and [&#39;acqParsePlan&#39;].</span>
+<span class="sd">        DmdPatternSequence : list</span>
+<span class="sd">            A list containing information related to the patterning of the sequences.</span>
+<span class="sd">        ParsePlan : dict</span>
+<span class="sd">            A dictionary that contains various instances related to how region of interest is parsed through.</span>
+<span class="sd">        ROIs : list</span>
+<span class="sd">            A list that contains information related to the region of interests.</span>
+<span class="sd">        ScannerParameters : dict</span>
+<span class="sd">            A dictionary that stores information related to the scanned parameter (not implemented yet, consider removing).</span>
+<span class="sd">        constructor : str</span>
+<span class="sd">            A string that describes how the plan is constructed.</span>
+<span class="sd">            </span>
+<span class="sd">            </span>
+<span class="sd">        Descriptions for methods:</span>
+<span class="sd">        --------------------------</span>
+
+<span class="sd">        Methods</span>
+<span class="sd">        ----------</span>
+<span class="sd">        __init__() :</span>
+<span class="sd">            Fill the fields mentioned above.</span>
+
+<span class="sd">        Return</span>
+<span class="sd">        -------</span>
+<span class="sd">            Self with populated fields. </span>
+<span class="sd">                </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadatafile</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AcquisitionPlan</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DmdPatternSequence</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ParsePlan</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ROIs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ScannerParameters</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constructor</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+
+        <span class="n">acqParsePlan</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">metadatafile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdf_file</span><span class="p">:</span>
+            <span class="c1"># Read the contents of the HDF5 file into the metaData dictionary</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">AcquisitionPlan</span> <span class="o">=</span> <span class="n">hdf_file</span><span class="p">[</span><span class="s1">&#39;AcquisitionContainer&#39;</span><span class="p">][</span><span class="s1">&#39;AcquisitionPlan&#39;</span><span class="p">][:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">DmdPatternSequence</span> <span class="o">=</span> <span class="n">hdf_file</span><span class="p">[</span><span class="s1">&#39;AcquisitionContainer&#39;</span><span class="p">][</span><span class="s1">&#39;DmdPatternSequence&#39;</span><span class="p">][:]</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">[</span><span class="s1">&#39;AcquisitionContainer&#39;</span><span class="p">][</span><span class="s1">&#39;ROIs&#39;</span><span class="p">][</span><span class="s1">&#39;rois&#39;</span><span class="p">][:]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">roi_ref</span> <span class="o">=</span> <span class="n">hdf_file</span><span class="p">[</span><span class="s1">&#39;AcquisitionContainer&#39;</span><span class="p">][</span><span class="s1">&#39;ROIs&#39;</span><span class="p">][</span><span class="s1">&#39;rois&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ROIs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slapROI</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">,</span> <span class="n">roi_ref</span><span class="p">))</span>
+                
+                
+            <span class="k">for</span> <span class="n">_key</span> <span class="ow">in</span> <span class="n">hdf_file</span><span class="p">[</span><span class="s1">&#39;AcquisitionContainer&#39;</span><span class="p">][</span><span class="s1">&#39;ParsePlan&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ParsePlan</span><span class="p">[</span><span class="n">_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">hdf_file</span><span class="p">[</span><span class="s1">&#39;AcquisitionContainer&#39;</span><span class="p">][</span><span class="s1">&#39;ParsePlan&#39;</span><span class="p">][</span><span class="n">_key</span><span class="p">][:]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">_key</span> <span class="o">==</span> <span class="s1">&#39;acqParsePlan&#39;</span><span class="p">:</span>
+                        <span class="n">_data</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="k">for</span> <span class="n">_subkey</span> <span class="ow">in</span> <span class="n">hdf_file</span><span class="p">[</span><span class="s1">&#39;AcquisitionContainer&#39;</span><span class="p">][</span><span class="s1">&#39;ParsePlan&#39;</span><span class="p">][</span><span class="s1">&#39;acqParsePlan&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">_data</span><span class="p">[</span><span class="n">_subkey</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                            <span class="k">for</span> <span class="n">_ref</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">[</span><span class="s1">&#39;AcquisitionContainer&#39;</span><span class="p">][</span><span class="s1">&#39;ParsePlan&#39;</span><span class="p">][</span><span class="s1">&#39;acqParsePlan&#39;</span><span class="p">][</span><span class="n">_subkey</span><span class="p">][:])):</span>
+                                <span class="n">_data</span><span class="p">[</span><span class="n">_subkey</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">[</span><span class="n">_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]][:])</span>
+                            <span class="n">acqParsePlan</span><span class="p">[</span><span class="n">_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_data</span>
+
+            
+            <span class="n">_refs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">[</span><span class="s1">&#39;AcquisitionContainer&#39;</span><span class="p">][</span><span class="s1">&#39;ParsePlan&#39;</span><span class="p">][</span><span class="s1">&#39;pixelReplacementMaps&#39;</span><span class="p">][:])):</span>
+                <span class="n">_refs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">[</span><span class="s1">&#39;AcquisitionContainer&#39;</span><span class="p">][</span><span class="s1">&#39;ParsePlan&#39;</span><span class="p">][</span><span class="s1">&#39;pixelReplacementMaps&#39;</span><span class="p">][:][</span><span class="n">index</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ParsePlan</span><span class="p">[</span><span class="s1">&#39;pixelReplacementMaps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">hdf_file</span><span class="p">[</span><span class="n">_ref</span><span class="p">][:]</span> <span class="k">for</span> <span class="n">_ref</span> <span class="ow">in</span> <span class="n">_refs</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ParsePlan</span><span class="p">[</span><span class="s1">&#39;acqParsePlan&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">acqParsePlan</span><span class="p">[</span><span class="s1">&#39;acqParsePlan&#39;</span><span class="p">]</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Peter William Hogg, Jerry Tong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

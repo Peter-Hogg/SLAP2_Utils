@@ -10,8 +10,16 @@ Welcome to SLAP2 Utils's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+
    installation
    modules/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Examples
+   
+   SLAP2_Utils_example.ipynb
+
 
 Overview
 =======================================

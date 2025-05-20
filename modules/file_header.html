@@ -16,6 +16,7 @@
       <script src="../_static/documentation_options.js?v=486e5634"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -68,6 +69,10 @@
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
+</ul>
 
         </div>
       </div>
@@ -99,53 +104,73 @@
 <p>Documentation for methods in the <cite>file_header</cite> script that are for data translation.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.utils.file_header.load_file_header_v2">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.file_header.</span></span><span class="sig-name descname"><span class="pre">load_file_header_v2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rawUint32</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.utils.file_header.load_file_header_v2" title="Link to this definition"></a></dt>
-<dd><p>A function that does several sanity checks to the integrity and validity of the file. It also translates the raw data that are inputted as raw uint32 array.</p>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.file_header.</span></span><span class="sig-name descname"><span class="pre">load_file_header_v2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rawUint32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/utils/file_header.html#load_file_header_v2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.utils.file_header.load_file_header_v2" title="Link to this definition"></a></dt>
+<dd><p>Performs sanity checks on the file header and parses it into usable Python structures.</p>
 <dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<em>object</em>) – An object that contains file-level metadata (e.g., constants like MAGIC_NUMBER).</p></li>
+<li><p><strong>rawUint32</strong> (<code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – The raw header data as a uint32 array from the SLAP2 file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing:
+- <cite>header</cite> (dict): Parsed header metadata.
+- <cite>num_cycles</cite> (int): Total number of cycles computed from the file size.</p>
+</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Translated header and number of cycles (num_cycles)</p>
+<dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.utils.file_header.translate_field_value_pairs">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.file_header.</span></span><span class="sig-name descname"><span class="pre">translate_field_value_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_value_pairs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.utils.file_header.translate_field_value_pairs" title="Link to this definition"></a></dt>
-<dd><p>A function that maps field IDs to names. The input is field value pairs, which are to be translated into a dictionary format.
-:param field_value_pairs:
-:type field_value_pairs: numpy array
-:param pairs of field names and values from the file header:</p>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.file_header.</span></span><span class="sig-name descname"><span class="pre">translate_field_value_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_value_pairs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/utils/file_header.html#translate_field_value_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.utils.file_header.translate_field_value_pairs" title="Link to this definition"></a></dt>
+<dd><p>Maps integer field IDs to named header fields and assigns their values.</p>
 <dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>field_value_pairs</strong> (<code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – A (N, 2) array where each row is a field ID and its associated value.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary mapping field names to their parsed float values.</p>
+</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dictionary that contains the field value pairs</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.utils.file_header.translate_channel_mask">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.file_header.</span></span><span class="sig-name descname"><span class="pre">translate_channel_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.utils.file_header.translate_channel_mask" title="Link to this definition"></a></dt>
-<dd><p>A function that translates the channel mask from the header as the input. It then has various checks that validate the number of channels specified.
-:param header:
-:type header: memap
-:param Header of SLAP2 binary file read as Uint32:</p>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.file_header.</span></span><span class="sig-name descname"><span class="pre">translate_channel_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/utils/file_header.html#translate_channel_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.utils.file_header.translate_channel_mask" title="Link to this definition"></a></dt>
+<dd><p>A function that translates the channel mask from the header as the input. It then has various checks that validate the number of channels specified.</p>
 <dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>header</strong> (<em>dict</em>) – Header of SLAP2 binary file read as Uint32</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated header with an added ‘channels’ list, if validation passes.</p>
+</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>It returns the header itself if it indeed passed all checks.</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.utils.file_header.translate_reference_timestamp">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.file_header.</span></span><span class="sig-name descname"><span class="pre">translate_reference_timestamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.utils.file_header.translate_reference_timestamp" title="Link to this definition"></a></dt>
-<dd><p>A function that function combines the lower and upper parts of the reference timestamp if it does exist.
-:param header:
-:type header: memap
-:param Header of SLAP2 binary file read as Uint32:</p>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.file_header.</span></span><span class="sig-name descname"><span class="pre">translate_reference_timestamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/utils/file_header.html#translate_reference_timestamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.utils.file_header.translate_reference_timestamp" title="Link to this definition"></a></dt>
+<dd><p>Combines the lower and upper parts of the reference timestamp if they exist.</p>
 <dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>header</strong> (<em>dict</em>) – Header dictionary containing fields like ‘referenceTimestamp_lower’ and ‘referenceTimestamp_upper’.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated header dictionary with a combined ‘referenceTimestamp’ field.</p>
+</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>It returns the header that has the combined reference timestamp in it.</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>

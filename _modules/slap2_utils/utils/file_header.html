@@ -1,0 +1,277 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>slap2_utils.utils.file_header &mdash; SLAP2 Utils 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=486e5634"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SLAP2 Utils
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installing-cupy">Installing Cupy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SLAP2 Utils</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">slap2_utils.utils.file_header</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for slap2_utils.utils.file_header</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Utility functions for the Slap2DataFile</span>
+<div class="viewcode-block" id="load_file_header_v2">
+<a class="viewcode-back" href="../../../modules/file_header.html#slap2_utils.utils.file_header.load_file_header_v2">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_file_header_v2</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">rawUint32</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs sanity checks on the file header and parses it into usable Python structures.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj : object</span>
+<span class="sd">        An object that contains file-level metadata (e.g., constants like MAGIC_NUMBER).</span>
+<span class="sd">    rawUint32 : ``np.ndarray``</span>
+<span class="sd">        The raw header data as a uint32 array from the SLAP2 file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple containing:</span>
+<span class="sd">        - `header` (dict): Parsed header metadata.</span>
+<span class="sd">        - `num_cycles` (int): Total number of cycles computed from the file size.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Data format:</span>
+    <span class="c1"># uint32_t magic_start          = MAGIC_NUMBER;</span>
+    <span class="c1"># uint32_t file_version         = 1;</span>
+    <span class="c1"># uint32_t fileHeaderSize_Bytes = XXXX;</span>
+    <span class="c1">#</span>
+    <span class="c1"># uint32_t fieldId  = XXXX;</span>
+    <span class="c1"># uint32_t fieldVal = XXXX;</span>
+    <span class="c1"># uint32_t fieldId  = XXXX;</span>
+    <span class="c1"># uint32_t fieldVal = XXXX;</span>
+    <span class="c1">#</span>
+    <span class="c1"># ...</span>
+    <span class="c1">#</span>
+    <span class="c1"># uint32_t magic_end           = MAGIC_NUMBER;</span>
+
+    
+    <span class="n">file_magic_number</span> <span class="o">=</span> <span class="n">rawUint32</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">file_magic_number</span> <span class="o">==</span> <span class="n">obj</span><span class="o">.</span><span class="n">MAGIC_NUMBER</span><span class="p">,</span> <span class="s1">&#39;Data format error.&#39;</span>
+
+    <span class="n">file_format_version</span> <span class="o">=</span> <span class="n">rawUint32</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">file_format_version</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Unknown format version&#39;</span>
+
+    <span class="n">file_header_size_bytes</span> <span class="o">=</span> <span class="n">rawUint32</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">file_header_entries</span> <span class="o">=</span> <span class="n">file_header_size_bytes</span> <span class="o">//</span> <span class="mi">4</span>
+
+    
+    <span class="n">header_end_magic_number</span> <span class="o">=</span> <span class="n">rawUint32</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">file_header_entries</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">header_end_magic_number</span> <span class="o">==</span> <span class="n">obj</span><span class="o">.</span><span class="n">MAGIC_NUMBER</span><span class="p">,</span> <span class="s1">&#39;Data corruption in file header.&#39;</span>
+
+    <span class="n">field_value_pairs</span> <span class="o">=</span> <span class="n">rawUint32</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="n">file_header_entries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">field_value_pairs</span> <span class="o">=</span> <span class="n">field_value_pairs</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">header_</span> <span class="o">=</span> <span class="n">translate_field_value_pairs</span><span class="p">(</span><span class="n">field_value_pairs</span><span class="p">)</span>
+    <span class="n">header_</span> <span class="o">=</span> <span class="n">translate_channel_mask</span><span class="p">(</span><span class="n">header_</span><span class="p">)</span>
+    <span class="n">header_</span> <span class="o">=</span> <span class="n">translate_reference_timestamp</span><span class="p">(</span><span class="n">header_</span><span class="p">)</span>
+    <span class="n">header_</span><span class="p">[</span><span class="s1">&#39;file_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_format_version</span>
+    <span class="n">header_</span><span class="p">[</span><span class="s1">&#39;magic_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_magic_number</span>
+    <span class="n">header_</span><span class="p">[</span><span class="s1">&#39;magic_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">header_end_magic_number</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">header_</span>
+
+    <span class="n">file_size_bytes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rawUint32</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span>
+    <span class="n">num_cycles</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">file_size_bytes</span> <span class="o">-</span> <span class="n">header_</span><span class="p">[</span><span class="s1">&#39;firstCycleOffsetBytes&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">header_</span><span class="p">[</span><span class="s1">&#39;bytesPerCycle&#39;</span><span class="p">])</span>
+    
+    <span class="n">total_num_lines</span> <span class="o">=</span> <span class="n">num_cycles</span> <span class="o">*</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;linesPerCycle&#39;</span><span class="p">]</span>
+    <span class="n">num_channels</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;numChannels&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">header</span><span class="p">,</span> <span class="n">num_cycles</span></div>
+
+
+<div class="viewcode-block" id="translate_field_value_pairs">
+<a class="viewcode-back" href="../../../modules/file_header.html#slap2_utils.utils.file_header.translate_field_value_pairs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">translate_field_value_pairs</span><span class="p">(</span><span class="n">field_value_pairs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Maps integer field IDs to named header fields and assigns their values.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    field_value_pairs : ``np.ndarray``</span>
+<span class="sd">        A (N, 2) array where each row is a field ID and its associated value.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary mapping field names to their parsed float values.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file_header_fields</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;firstCycleOffsetBytes&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lineHeaderSizeBytes&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;laserPathIdx&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bytesPerCycle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;linesPerCycle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;superPixelsPerCycle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dmdPixelsPerRow&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dmdPixelsPerColumn&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;numChannels&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;channelMask&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;numSlices&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;channelsInterleave&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fpgaSystemClock_Hz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;referenceTimestamp_lower&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;referenceTimestamp_upper&quot;</span>
+    <span class="p">]</span>
+
+    <span class="nb">map</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">field</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">file_header_fields</span><span class="p">)}</span>
+
+    <span class="n">struct_out</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">field_value_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">field_value_pairs</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">field_value_pairs</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">:</span>
+            <span class="n">field</span> <span class="o">=</span> <span class="nb">map</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+            <span class="n">struct_out</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Warning: Unknown field/value pair in header: fieldID=</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s1"> value=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">struct_out</span></div>
+
+
+<div class="viewcode-block" id="translate_channel_mask">
+<a class="viewcode-back" href="../../../modules/file_header.html#slap2_utils.utils.file_header.translate_channel_mask">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">translate_channel_mask</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A function that translates the channel mask from the header as the input. It then has various checks that validate the number of channels specified.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        header : dict</span>
+<span class="sd">            Header of SLAP2 binary file read as Uint32</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            The updated header with an added &#39;channels&#39; list, if validation passes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="s1">&#39;channelMask&#39;</span> <span class="ow">in</span> <span class="n">header</span>
+    <span class="n">channels</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span> <span class="k">for</span> <span class="n">bit</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;channelMask&#39;</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">bit</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">header</span><span class="p">[</span><span class="s1">&#39;channels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">channels</span>
+    <span class="k">assert</span> <span class="s1">&#39;numChannels&#39;</span> <span class="ow">in</span> <span class="n">header</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span> <span class="o">==</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;numChannels&#39;</span><span class="p">],</span> <span class="s1">&#39;Data integrity error: header field &#39;&#39;numChannels&#39;&#39; does not agree with header field &#39;&#39;channelMask&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">header</span></div>
+
+
+<div class="viewcode-block" id="translate_reference_timestamp">
+<a class="viewcode-back" href="../../../modules/file_header.html#slap2_utils.utils.file_header.translate_reference_timestamp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">translate_reference_timestamp</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+<span class="w">   </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Combines the lower and upper parts of the reference timestamp if they exist.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    header : dict</span>
+<span class="sd">        Header dictionary containing fields like &#39;referenceTimestamp_lower&#39; and &#39;referenceTimestamp_upper&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The updated header dictionary with a combined &#39;referenceTimestamp&#39; field.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    
+    <span class="k">if</span> <span class="s1">&#39;referenceTimestamp_lower&#39;</span> <span class="ow">in</span> <span class="n">header</span> <span class="ow">and</span> <span class="s1">&#39;referenceTimestamp_upper&#39;</span> <span class="ow">in</span> <span class="n">header</span><span class="p">:</span>
+        <span class="n">reference_timestamp_lower</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;referenceTimestamp_lower&#39;</span><span class="p">]</span>
+        <span class="n">reference_timestamp_upper</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;referenceTimestamp_upper&#39;</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="mi">32</span>
+        <span class="n">header</span><span class="p">[</span><span class="s1">&#39;referenceTimestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">reference_timestamp_lower</span><span class="p">)</span> <span class="o">|</span> <span class="n">reference_timestamp_upper</span>
+    <span class="k">return</span> <span class="n">header</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Peter William Hogg, Jerry Tong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

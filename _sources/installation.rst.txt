@@ -27,6 +27,7 @@ GPU Supported functions use the Python Library Cupy. This library has the follow
 
 
 Try installing Cupy using a wheel that matches your CUDA Toolkit version ie:
+
 .. code-block:: shell
    
    pip install cupy-cuda12x

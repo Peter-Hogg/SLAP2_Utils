@@ -1,0 +1,229 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>slap2_utils.functions.imagestacks &mdash; SLAP2 Utils 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=486e5634"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SLAP2 Utils
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installing-cupy">Installing Cupy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SLAP2 Utils</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">slap2_utils.functions.imagestacks</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for slap2_utils.functions.imagestacks</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span> 
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cu</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">cu</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask.array</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">da</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zarr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tifffile</span> 
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+
+
+
+<span class="c1"># Functions for generating an image stack from slice data without loading the tiff file into memory</span>
+<div class="viewcode-block" id="averageStack">
+<a class="viewcode-back" href="../../../modules/imagestacks.html#slap2_utils.functions.imagestacks.averageStack">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">averageStack</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the average stack of a TIFF file using CPU.</span>
+
+<span class="sd">    This function reads a multi-frame TIFF file, computes the average of each slice, </span>
+<span class="sd">    and saves the resulting average stack as a new TIFF file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Path to the input TIFF file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    newFilePath : str</span>
+<span class="sd">        Path to the saved average stack TIFF file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_data</span> <span class="o">=</span> <span class="n">tifffile</span><span class="o">.</span><span class="n">tiffcomment</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">_stackInfo</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_data</span><span class="p">)</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="n">tifffile</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">aszarr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">frameNumber</span> <span class="o">=</span> <span class="n">_stackInfo</span><span class="p">[</span><span class="s1">&#39;numZs&#39;</span><span class="p">]</span>
+    
+    <span class="n">imagedata</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">from_zarr</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+    <span class="n">imagedata</span> <span class="o">=</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">rechunk</span><span class="p">((</span><span class="n">frameNumber</span><span class="p">,</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">avgStack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">frameNumber</span><span class="p">),</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+
+    <span class="n">store</span> <span class="o">=</span> <span class="n">tifffile</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">aszarr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">imagedata</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">from_zarr</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+    <span class="n">framePerSlice</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">frameNumber</span><span class="p">)</span>
+
+    <span class="n">imagedata</span> <span class="o">=</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">rechunk</span><span class="p">((</span><span class="n">framePerSlice</span><span class="p">,</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">avgStack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">frameNumber</span><span class="p">,</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+    <span class="nd">@dask</span><span class="o">.</span><span class="n">delayed</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">returnSlice</span><span class="p">(</span><span class="n">_block</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">_block</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_block</span> <span class="ow">in</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">returnSlice</span><span class="p">(</span><span class="n">_block</span><span class="p">))</span>
+
+    <span class="n">avgStack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
+    <span class="n">newFilePath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;averageCPU_&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="n">tifffile</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">newFilePath</span><span class="p">,</span> <span class="n">avgStack</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">_stackInfo</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="averageStackGPU">
+<a class="viewcode-back" href="../../../modules/imagestacks.html#slap2_utils.functions.imagestacks.averageStackGPU">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">averageStackGPU</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the average stack of a TIFF file using GPU.</span>
+
+<span class="sd">    This function reads a multi-frame TIFF file, computes the average of each slice using GPU, </span>
+<span class="sd">    and saves the resulting average stack as a new TIFF file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Path to the input TIFF file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    newFilePath : str</span>
+<span class="sd">        Path to the saved average stack TIFF file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_data</span> <span class="o">=</span> <span class="n">tifffile</span><span class="o">.</span><span class="n">tiffcomment</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">_stackInfo</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_data</span><span class="p">)</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="n">tifffile</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">aszarr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">frameNumber</span> <span class="o">=</span> <span class="n">_stackInfo</span><span class="p">[</span><span class="s1">&#39;numZs&#39;</span><span class="p">]</span>
+    
+    <span class="n">imagedata</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">from_zarr</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+    <span class="n">framePerSlice</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">frameNumber</span><span class="p">)</span>
+
+    <span class="n">imagedata</span> <span class="o">=</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">rechunk</span><span class="p">((</span><span class="n">framePerSlice</span><span class="p">,</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">avgStack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">frameNumber</span><span class="p">,</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+
+    <span class="nd">@dask</span><span class="o">.</span><span class="n">delayed</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">returnSlice</span><span class="p">(</span><span class="n">_block</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cu</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">_block</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_block</span> <span class="ow">in</span> <span class="n">imagedata</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">returnSlice</span><span class="p">(</span><span class="n">_block</span><span class="p">))</span>
+
+    <span class="n">avgStack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
+    <span class="n">newFilePath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;averageGPU_&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="n">tifffile</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">newFilePath</span><span class="p">,</span> <span class="n">avgStack</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">_stackInfo</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newFilePath</span></div>
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../modules/imagestacks.html#slap2_utils.functions.imagestacks.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No path to tif file given&#39;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">tifPath</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">averageStackGPU</span><span class="p">(</span><span class="n">tifPath</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Peter William Hogg, Jerry Tong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

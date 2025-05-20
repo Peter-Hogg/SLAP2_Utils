@@ -16,6 +16,7 @@
       <script src="../_static/documentation_options.js?v=486e5634"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -70,6 +71,10 @@
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
+</ul>
 
         </div>
       </div>
@@ -103,14 +108,14 @@
 <span id="functions"></span><h2>Functions<a class="headerlink" href="#module-slap2_utils.utils.roi_utils" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.utils.roi_utils.roiBoolean">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.roi_utils.</span></span><span class="sig-name descname"><span class="pre">roiBoolean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.utils.roi_utils.roiBoolean" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.roi_utils.</span></span><span class="sig-name descname"><span class="pre">roiBoolean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/utils/roi_utils.html#roiBoolean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.utils.roi_utils.roiBoolean" title="Link to this definition"></a></dt>
 <dd><p>Return ROI coordinates as a 2D array of booleans.</p>
 <p>The function returns a 2D array where pixels belonging to the ROI are marked with True,
 and all other pixels are marked with False. This format is used in the trace function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>datafile</strong> (<em>SLAP2_Utils Datafile Object</em>) – The datafile containing metadata and header information.</p></li>
+<li><p><strong>datafile</strong> (<code class="docutils literal notranslate"><span class="pre">SLAP2_Utils</span> <span class="pre">Datafile</span> <span class="pre">Object</span></code>) – The datafile containing metadata and header information.</p></li>
 <li><p><strong>idx</strong> (<em>int</em>) – Index value of the ROI in the ROI list.</p></li>
 </ul>
 </dd>
@@ -118,21 +123,21 @@ and all other pixels are marked with False. This format is used in the trace fun
 <dd class="field-even"><p><strong>booleanPixels</strong> – A 2D array with booleans indicating pixels belonging to the ROI.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">np.array</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.utils.roi_utils.roiImg">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.roi_utils.</span></span><span class="sig-name descname"><span class="pre">roiImg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.utils.roi_utils.roiImg" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.roi_utils.</span></span><span class="sig-name descname"><span class="pre">roiImg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/utils/roi_utils.html#roiImg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.utils.roi_utils.roiImg" title="Link to this definition"></a></dt>
 <dd><p>Return ROI coordinates as a 2D array.</p>
 <p>The function returns a 2D array where pixels belonging to the ROI are marked with 1,
 and all other pixels are marked with 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>datafile</strong> (<em>SLAP2_Utils Datafile Object</em>) – The datafile containing metadata and header information.</p></li>
+<li><p><strong>datafile</strong> (<code class="docutils literal notranslate"><span class="pre">SLAP2_Utils</span> <span class="pre">Datafile</span> <span class="pre">Object</span></code>) – The datafile containing metadata and header information.</p></li>
 <li><p><strong>idx</strong> (<em>int</em>) – Index value of the ROI in the ROI list.</p></li>
 </ul>
 </dd>
@@ -140,29 +145,29 @@ and all other pixels are marked with 0.</p>
 <dd class="field-even"><p><strong>img</strong> – A 2D array with integers 0 or 1 indicating pixels belonging to the ROI.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">np.array</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.utils.roi_utils.roiLabels">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.roi_utils.</span></span><span class="sig-name descname"><span class="pre">roiLabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refStackPath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.utils.roi_utils.roiLabels" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.roi_utils.</span></span><span class="sig-name descname"><span class="pre">roiLabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refStackPath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/utils/roi_utils.html#roiLabels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.utils.roi_utils.roiLabels" title="Link to this definition"></a></dt>
 <dd><p>Return ROI labels as a 3D array with each plane representing a Z-stack.</p>
 <p>The function returns a 3D array where each plane represents a slice in a Z-stack, and labels indicate different ROIs.
 If a reference stack is provided, the function can use it for generating ROI labels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>datafile</strong> (<em>SLAP2_Utils Datafile Object</em>) – The datafile containing metadata and ROI information.</p></li>
-<li><p><strong>refstack</strong> (<em>optional</em>) – Reference stack to use for generating ROI labels. Default is None.</p></li>
+<li><p><strong>datafile</strong> (<code class="docutils literal notranslate"><span class="pre">SLAP2_Utils</span> <span class="pre">Datafile</span> <span class="pre">Object</span></code>) – The datafile containing metadata and ROI information.</p></li>
+<li><p><strong>refstack</strong> (str or <code class="docutils literal notranslate"><span class="pre">Path</span></code>, <code class="docutils literal notranslate"><span class="pre">optional</span></code>) – Reference stack to use for generating ROI labels. Default is None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>roiLabels</strong> – A 3D array with each plane representing a Z-stack and labels indicating different ROIs.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">np.array</span></code></p>
 </dd>
 </dl>
 </dd></dl>

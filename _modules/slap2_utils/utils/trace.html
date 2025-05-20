@@ -1,0 +1,566 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>slap2_utils.utils.trace &mdash; SLAP2 Utils 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=486e5634"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SLAP2 Utils
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installing-cupy">Installing Cupy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SLAP2 Utils</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">slap2_utils.utils.trace</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for slap2_utils.utils.trace</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Imports necessary libraries and initializes some variables.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.trace_pixel</span><span class="w"> </span><span class="kn">import</span> <span class="n">TracePixel</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+
+<div class="viewcode-block" id="Trace">
+<a class="viewcode-back" href="../../../modules/trace.html#slap2_utils.utils.trace.Trace">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Trace</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class used to read raw data and generate traces from a SLAP2 data file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataFile : ``DataFile``</span>
+<span class="sd">        The data file containing raw data to generate the trace from.</span>
+<span class="sd">    zIdx : int, ``optional``</span>
+<span class="sd">        The Z index of the trace (default is 0).</span>
+<span class="sd">    chIdx : int, ``optional``</span>
+<span class="sd">        The channel index of the trace (default is 0).</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataFile : ``DataFile``</span>
+<span class="sd">        The data file containing raw data.</span>
+<span class="sd">    zIdx : int</span>
+<span class="sd">        Z index used in this trace.</span>
+<span class="sd">    chIdx : int</span>
+<span class="sd">        Channel index.</span>
+<span class="sd">    TracePixels : list of ``TracePixel``</span>
+<span class="sd">        List of TracePixel objects associated with this trace.</span>
+<span class="sd">    pixelIdxs : list of int</span>
+<span class="sd">        List of pixel indices for this trace.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Additional methods allow setting pixel indices, processing traces,</span>
+<span class="sd">    and accessing raw or averaged superpixel data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataFile</span><span class="p">,</span> <span class="n">zIdx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">chIdx</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># Initializes the Trace object with provided parameters.</span>
+        <span class="c1"># Sets default values for TracePixels and pixelIdxs.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span> <span class="o">=</span> <span class="n">dataFile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zIdx</span> <span class="o">=</span> <span class="n">zIdx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chIdx</span> <span class="o">=</span> <span class="n">chIdx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pixelIdxs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="c1"># Defines a property superPixelIds that returns a list of superpixel IDs.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">superPixelIds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a list of superpixel IDs for the trace.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of superpixel IDs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">pixel</span><span class="o">.</span><span class="n">superPixelId</span> <span class="k">for</span> <span class="n">pixel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">]</span>
+
+    
+    <span class="c1"># Sets pixel indexes based on provided raster and integration pixel maps from the input.</span>
+    <span class="c1"># TracePixels are called after pixelIdxs are provided.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setPixelIdxs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rasterPixels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">integrationPixels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the pixel indices based on the provided raster and integration pixel maps.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rasterPixels : np.ndarray, optional</span>
+<span class="sd">            An array of raster pixel indices (default is None).</span>
+<span class="sd">        integrationPixels : np.ndarray, optional</span>
+<span class="sd">            An array of integration pixel indices (default is None).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c1"># Replace None with empty arrays</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">rasterPixels</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">rasterPixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">integrationPixels</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">integrationPixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+
+        <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">rasterPixels</span><span class="p">):</span>
+            <span class="n">rasterPixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+            
+        <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">rasterPixels</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">rasterPixels</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)):</span>
+            <span class="n">rasterPixels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkMapDims</span><span class="p">(</span><span class="n">rasterPixels</span><span class="p">)</span>
+            <span class="n">rasterPixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rasterPixels</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">integrationPixels</span><span class="p">):</span>
+            <span class="n">integrationPixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+            
+        <span class="k">elif</span>  <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">integrationPixels</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">integrationPixels</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)):</span>
+            <span class="n">integrationPixels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkMapDims</span><span class="p">(</span><span class="n">integrationPixels</span><span class="p">)</span>
+            <span class="n">integrationPixels</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">integrationPixels</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dmdPixelsPerRow&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dmdPixelsPerColumn&#39;</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span>
+
+        <span class="n">pixelIdxs_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">rasterPixels</span><span class="p">,</span> <span class="n">integrationPixels</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+
+        <span class="c1"># Loads up tracepixels using the getTracePixels function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getTracePixels</span><span class="p">(</span><span class="n">pixelIdxs_</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pixelIdxs</span> <span class="o">=</span> <span class="n">pixelIdxs_</span>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">checkMapDims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">map_</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks and adjusts the dimensions of a map based on DMD (Digital Micromirror Device) pixel parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        map_ : np.ndarray</span>
+<span class="sd">            The map to check and adjust.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            The adjusted map.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">dmdPixelsPerRow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dmdPixelsPerRow&#39;</span><span class="p">]</span>
+        <span class="n">dmdPixelsPerColumn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dmdPixelsPerColumn&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Check both ways: if one way does not match up, check whether the shape fits the transposed version</span>
+        <span class="k">if</span> <span class="n">dmdPixelsPerColumn</span> <span class="o">!=</span> <span class="n">dmdPixelsPerRow</span> <span class="ow">and</span> <span class="n">map_</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">dmdPixelsPerColumn</span><span class="p">,</span> <span class="n">dmdPixelsPerRow</span><span class="p">):</span>
+            <span class="n">map_</span> <span class="o">=</span> <span class="n">map_</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="k">assert</span> <span class="n">map_</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">dmdPixelsPerRow</span><span class="p">,</span> <span class="n">dmdPixelsPerColumn</span><span class="p">),</span> \
+            <span class="sa">f</span><span class="s2">&quot;Incorrect map size. Map needs to be size [</span><span class="si">{</span><span class="n">dmdPixelsPerRow</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">dmdPixelsPerColumn</span><span class="si">}</span><span class="s2">]&quot;</span>
+        <span class="k">return</span> <span class="n">map_</span>
+
+    
+    <span class="c1"># This is a bit different from MatLab version due to the inherent object-oriented programming difference.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">windowWidth_lines</span><span class="p">,</span> <span class="n">expectedWindowWidth_lines</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes the trace by loading the TracePixels and deconvolving the data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        windowWidth_lines : int</span>
+<span class="sd">            The width of the convolution window in lines.</span>
+<span class="sd">        expectedWindowWidth_lines : int</span>
+<span class="sd">            The expected width of the convolution window in lines.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A tuple containing the processed trace, sumDataWeighted, sumExpected, and sumExpectedWeighted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">):</span>
+            <span class="n">j</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+        <span class="c1">#Different convolution algorithms are applied to compensate for the inconsistent interval in data</span>
+        <span class="n">tempKernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">windowWidth_lines</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">windowWidth_lines</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">windowWidth_lines</span><span class="p">))</span>
+        <span class="n">tempKernel</span> <span class="o">=</span> <span class="n">tempKernel</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+
+        <span class="n">expectedKernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">expectedWindowWidth_lines</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;linesPerCycle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">numCycles</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">numLines</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">numLines</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;linesPerCycle&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">numCycles</span><span class="p">)</span>
+
+        <span class="c1"># All 3 sum variables here are utilized for deconvolution algorithm</span>
+        <span class="n">sumDataWeighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numLines</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+        <span class="n">sumExpected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numLines</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+        <span class="n">sumExpectedWeighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numLines</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+
+
+        <span class="c1"># Getting the lane data and convolving the data</span>
+        <span class="k">for</span> <span class="n">tracePix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">:</span>
+            <span class="n">lineData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;linesPerCycle&#39;</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">numCycles</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+            <span class="n">sampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;linesPerCycle&#39;</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">numCycles</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+
+            <span class="n">lineData</span><span class="p">[</span><span class="n">tracePix</span><span class="o">.</span><span class="n">lineIdxs</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tracePix</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">sampled</span><span class="p">[</span><span class="n">tracePix</span><span class="o">.</span><span class="n">lineIdxs</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">lineData</span> <span class="o">=</span> <span class="n">lineData</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
+            <span class="n">sampled</span> <span class="o">=</span> <span class="n">sampled</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Calculation are based on expected and expectedN</span>
+            <span class="n">spatialWeight</span> <span class="o">=</span> <span class="n">tracePix</span><span class="o">.</span><span class="n">superPixelNumPixelsSelected</span> <span class="o">/</span> <span class="n">tracePix</span><span class="o">.</span><span class="n">superPixelNumPixels</span>
+            <span class="n">weightedData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">lineData</span><span class="p">,</span> <span class="n">tempKernel</span> <span class="o">*</span> <span class="n">spatialWeight</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;same&#39;</span><span class="p">)</span>
+
+            <span class="n">tempWeights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">sampled</span><span class="p">,</span> <span class="n">tempKernel</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;same&#39;</span><span class="p">)</span>
+            <span class="n">npad</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">expectedKernel</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            
+            <span class="n">expected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">lineData</span><span class="p">,</span> <span class="n">expectedKernel</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)</span>
+            <span class="n">first</span> <span class="o">=</span> <span class="n">npad</span> <span class="o">-</span> <span class="n">npad</span><span class="o">//</span><span class="mi">2</span>
+            <span class="n">expected</span><span class="o">=</span><span class="n">expected</span><span class="p">[</span><span class="n">first</span><span class="p">:</span><span class="n">first</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">lineData</span><span class="p">)]</span>
+
+            <span class="n">npad1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">expectedKernel</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">expectedN</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">sampled</span><span class="p">,</span> <span class="n">expectedKernel</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)</span>
+            <span class="n">first2</span> <span class="o">=</span> <span class="n">npad1</span> <span class="o">-</span> <span class="n">npad1</span><span class="o">//</span><span class="mi">2</span> 
+            <span class="n">expectedN</span><span class="o">=</span><span class="n">expectedN</span><span class="p">[</span><span class="n">first2</span><span class="p">:</span><span class="n">first2</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">sampled</span><span class="p">)]</span>
+
+            <span class="n">expected</span> <span class="o">=</span> <span class="n">expected</span> <span class="o">/</span> <span class="p">(</span><span class="n">expectedN</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
+
+            <span class="n">expectedWeighted</span> <span class="o">=</span> <span class="n">expected</span> <span class="o">*</span> <span class="n">tempWeights</span>
+            <span class="n">sumDataWeighted</span> <span class="o">=</span> <span class="n">sumDataWeighted</span> <span class="o">+</span> <span class="n">weightedData</span>
+            <span class="n">sumExpected</span> <span class="o">+=</span> <span class="n">expected</span>
+            <span class="n">sumExpectedWeighted</span> <span class="o">+=</span> <span class="n">expectedWeighted</span>
+
+        <span class="c1"># Reconstruct the trace here</span>
+        <span class="n">trace</span> <span class="o">=</span> <span class="n">sumDataWeighted</span> <span class="o">/</span> <span class="p">(</span><span class="n">sumExpectedWeighted</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span> <span class="o">*</span> <span class="n">sumExpected</span>
+
+        <span class="c1"># To be added: slap2dataview post-process conditional</span>
+
+        <span class="k">return</span> <span class="n">trace</span><span class="p">,</span> <span class="n">sumDataWeighted</span><span class="p">,</span> <span class="n">sumExpected</span><span class="p">,</span> <span class="n">sumExpectedWeighted</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">getRawSuperPixel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">superpixel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Obtains the raw data for a specific superpixel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        superpixel : int, optional</span>
+<span class="sd">            The superpixel index to retrieve data for (default is 1).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of raw data for the specified superpixel.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">j</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You have not loaded the trace properly!&quot;</span><span class="p">)</span>
+                <span class="k">break</span> 
+
+        <span class="n">rawlist</span><span class="o">=</span><span class="p">[]</span>
+
+        <span class="c1"># Loop through the data, see if it is volumetric or not</span>
+        <span class="c1"># This is for non volumetric</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">[</span><span class="n">superpixel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">[</span><span class="n">superpixel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)):</span>
+                <span class="n">rawlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">[</span><span class="n">superpixel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">rawlist</span>
+
+        <span class="c1"># This is for volumetric</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">[</span><span class="n">superpixel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">[</span><span class="n">superpixel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+                    <span class="n">rawlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">[</span><span class="n">superpixel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">rawlist</span>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">getRawAverageSuperPixel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">superpixel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Obtains the averaged raw data for a specific superpixel (volumetric trace only).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        superpixel : int, optional</span>
+<span class="sd">            The superpixel index to retrieve data for (default is 1).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of averaged raw data for the specified superpixel.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rawlist</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Sanity check for inputs</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">j</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You have not loaded the trace properly!&quot;</span><span class="p">)</span>
+                <span class="k">break</span> 
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">[</span><span class="n">superpixel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This is not a volumetric trace!&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+
+        <span class="c1"># Loading the average of the superpixel in volumetric trace</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">[</span><span class="n">superpixel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)):</span>
+                <span class="n">average</span><span class="o">=</span><span class="mi">0</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">[</span><span class="n">superpixel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+                    <span class="n">average</span><span class="o">+=</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">[</span><span class="n">superpixel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">average</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">average</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+                <span class="n">rawlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">average</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">rawlist</span>
+
+    
+    <span class="c1"># A function that stores the order of the superpixel in an roi. How it is stored and retrieved from the memory is unordered</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">orderadjust</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adjusts the order of the TracePixels based on their y-index.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c1"># Here we are using math to calculate the y index of the data</span>
+        <span class="k">for</span> <span class="n">pixels</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">:</span>
+            <span class="n">pixels</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span><span class="p">(</span><span class="n">pixels</span><span class="o">.</span><span class="n">superPixelId</span> <span class="o">-</span> <span class="mi">1024000</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1280</span>
+
+        <span class="c1"># Sorting the data according to y index</span>
+        <span class="n">ordered_trace</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">trace_pixel</span><span class="p">:</span><span class="n">trace_pixel</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># Replacing nonordered data here</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span> <span class="o">=</span> <span class="n">ordered_trace</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">getTracePixels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pixelIdxs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the initial TracePixel fields and returns the TracePixels with new and existing TracePixels.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pixelIdxs : np.ndarray</span>
+<span class="sd">            An array of pixel indices to set up TracePixels for.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of TracePixel objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get unique pixel indices and adjust for 0-based indexing</span>
+        <span class="n">pixelIDs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">pixelIdxs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pixelIDs</span><span class="p">)):</span>
+            <span class="n">pixelIDs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pixelIDs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="c1"># Load DMD (Digital Micro-mirror Device) pixel data</span>
+        <span class="n">dmdNumPix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dmdPixelsPerRow&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dmdPixelsPerColumn&#39;</span><span class="p">]</span>
+        <span class="n">pixelReplacementMap</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">zPixelReplacementMaps</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">zIdx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Identify pixels that exceed the number of DMD pixels</span>
+        <span class="n">intMask</span> <span class="o">=</span> <span class="n">pixelReplacementMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&gt;=</span> <span class="n">dmdNumPix</span>
+
+        <span class="c1"># Adjust pixelReplacementMap for these identified pixels</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">intMask</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span><span class="p">:</span>
+                <span class="n">pixelReplacementMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">pixelReplacementMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">dmdNumPix</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># Sort pixelReplacementMap by the first column</span>
+        <span class="n">sortIdxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">pixelReplacementMap</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Find superpixel IDs corresponding to the given pixel indices</span>
+        <span class="n">idxs1</span> <span class="o">=</span> <span class="n">ismembc2</span><span class="p">(</span><span class="n">pixelIDs</span><span class="p">,</span> <span class="n">pixelReplacementMap</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">validSuperPixelIDs</span> <span class="o">=</span> <span class="n">pixelReplacementMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">idxs1</span><span class="p">]</span>
+        <span class="n">validSuperPixelIDs</span><span class="p">,</span> <span class="n">validCounts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">validSuperPixelIDs</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Extract existing superpixel IDs from TracePixels</span>
+        <span class="n">existingSuperPixelIDs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pixel</span><span class="o">.</span><span class="n">superPixelId</span> <span class="k">for</span> <span class="n">pixel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">]</span>
+
+        <span class="c1"># Find intersection of valid and existing superpixel IDs</span>
+        <span class="n">C</span><span class="p">,</span> <span class="n">ia</span><span class="p">,</span> <span class="n">ib</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">(</span><span class="n">validSuperPixelIDs</span><span class="p">,</span> <span class="n">existingSuperPixelIDs</span><span class="p">,</span> <span class="n">return_indices</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Remove intersecting IDs from validSuperPixelIDs and validCounts</span>
+        <span class="n">validSuperPixelIDs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">validSuperPixelIDs</span><span class="p">,</span> <span class="n">ia</span><span class="p">)</span>
+        <span class="n">validCounts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">validCounts</span><span class="p">,</span> <span class="n">ia</span><span class="p">)</span>
+
+        <span class="c1"># Retrieve the corresponding existing TracePixels</span>
+        <span class="n">ExistingTracePixels</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">TracePixels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ib</span><span class="p">]</span>
+
+        <span class="c1"># Initialize new TracePixel</span>
+        <span class="n">NewTracePixel</span> <span class="o">=</span> <span class="n">TracePixel</span><span class="p">()</span>
+        <span class="n">NewTracePixel</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">filename</span>
+        <span class="n">NewTracePixel</span><span class="o">.</span><span class="n">bytesPerCycle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;bytesPerCycle&#39;</span><span class="p">]</span>
+        <span class="n">NewTracePixel</span><span class="o">.</span><span class="n">firstCycleOffsetBytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;firstCycleOffsetBytes&#39;</span><span class="p">]</span>
+        <span class="n">NewTracePixel</span><span class="o">.</span><span class="n">numCycles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">numCycles</span>
+        <span class="n">NewTracePixel</span><span class="o">.</span><span class="n">linesPerCycle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;linesPerCycle&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Create a list of new TracePixels based on the valid superpixel IDs</span>
+        <span class="n">NewTracePixels</span> <span class="o">=</span> <span class="p">[</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">NewTracePixel</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">validSuperPixelIDs</span><span class="p">))]</span>
+
+        <span class="c1"># Get the number of pixels per superpixel ID</span>
+        <span class="n">superPixelNumPixelsIDs</span><span class="p">,</span> <span class="n">superPixelNumPixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">pixelReplacementMap</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Filter to include only valid superpixel IDs</span>
+        <span class="n">ia</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">superPixelNumPixelsIDs</span><span class="p">,</span> <span class="n">validSuperPixelIDs</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">superPixelNumPixels</span> <span class="o">=</span> <span class="n">superPixelNumPixels</span><span class="p">[</span><span class="n">ia</span><span class="p">]</span>
+
+        <span class="c1"># Assign superpixel data to new TracePixels</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">NewTracePixels</span><span class="p">)):</span>
+            <span class="n">NewTracePixels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">superPixelId</span> <span class="o">=</span> <span class="n">validSuperPixelIDs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">NewTracePixels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">superPixelNumPixels</span> <span class="o">=</span> <span class="n">superPixelNumPixels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">NewTracePixels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">superPixelNumPixelsSelected</span> <span class="o">=</span> <span class="n">validCounts</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+        <span class="c1"># Iterate over line superpixel IDs and process them</span>
+        <span class="k">for</span> <span class="n">lineIdx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">lineSuperPixelIDs</span><span class="p">)):</span>
+            <span class="n">lineZIdx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">lineFastZIdxs</span><span class="p">[</span><span class="n">lineIdx</span><span class="p">]</span>
+
+            <span class="c1"># Skip lines that do not match the current z-index</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">lineZIdx</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zIdx</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">lineSuperPixelIDs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">lineSuperPixelIDs</span><span class="p">[</span><span class="n">lineIdx</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">validSuperPixelIDs</span><span class="p">,</span> <span class="n">lineSuperPixelIDs</span><span class="p">)</span>
+
+            <span class="n">positions</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mask</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                    <span class="n">firstocc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lineSuperPixelIDs</span> <span class="o">==</span> <span class="n">validSuperPixelIDs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">positions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">firstocc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># Calculate byte offsets for the valid positions</span>
+            <span class="n">byteOffsets</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">]</span>
+            <span class="n">byteOffsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">lineSuperPixelIDs</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chIdx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">byteOffsets</span><span class="p">]</span>
+            <span class="n">byteOffsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">lineDataStartIdxs</span><span class="p">[</span><span class="n">lineIdx</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">byteOffsets</span><span class="p">]</span>
+            <span class="n">byteOffsets</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;firstCycleOffsetBytes&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">byteOffsets</span><span class="p">]</span>
+
+            <span class="n">pixIdxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+            <span class="n">pixIdxs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pixIdxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+            <span class="c1"># Assign byte offsets and line indices to the new TracePixels</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pixIdxs</span><span class="p">):</span>
+                <span class="n">NewTracePixels</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">byteOffsets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">byteOffsets</span><span class="p">[</span><span class="n">pixIdxs</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x</span><span class="p">)])</span>
+                <span class="n">NewTracePixels</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">lineIdxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lineIdx</span><span class="p">)</span>
+
+        <span class="c1"># Append existing TracePixels to the list of new TracePixels</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ExistingTracePixels</span><span class="p">:</span>
+            <span class="n">NewTracePixels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Sort the TracePixels by superPixelId</span>
+        <span class="n">TracePixels</span> <span class="o">=</span> <span class="n">NewTracePixels</span>
+        <span class="n">sorted_trace_pixels</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">TracePixels</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">superPixelId</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">TracePixels</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">ismembc2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fast membership test for 2D arrays based on sorted order.</span>
+<span class="sd">    Returns a boolean array indicating which rows of A are also present in B.</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    - A: 2D numpy array  totest for membership in B</span>
+<span class="sd">    - B: 2D numpy array</span>
+<span class="sd">    Returns:</span>
+<span class="sd">    - boolean numpy array of shape (A.shape[0],)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Ensure A and B are numpy arrays</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+    <span class="c1"># Check dimensions</span>
+
+    <span class="c1"># Sort rows for both A and B</span>
+    <span class="n">sorted_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">sorted_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+    <span class="c1"># Use numpy&#39;s in1d for 1D membership testing</span>
+    <span class="c1"># Convert 2D to 1D by viewing in a structured format</span>
+    <span class="n">flag</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">A</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">B</span><span class="p">:</span>
+            <span class="n">flag</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">B</span><span class="o">==</span><span class="n">element</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">flag</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Peter William Hogg, Jerry Tong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

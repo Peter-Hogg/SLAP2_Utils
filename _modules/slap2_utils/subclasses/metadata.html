@@ -1,0 +1,200 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>slap2_utils.subclasses.metadata &mdash; SLAP2 Utils 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=486e5634"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SLAP2 Utils
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installing-cupy">Installing Cupy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SLAP2 Utils</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">slap2_utils.subclasses.metadata</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for slap2_utils.subclasses.metadata</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Subclasses of the primary SLAP2 Datafile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.slapROI</span><span class="w"> </span><span class="kn">import</span> <span class="n">slapROI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.acquisitionContainer</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionContainer</span>
+
+<div class="viewcode-block" id="MetaData">
+<a class="viewcode-back" href="../../../modules/metadata.html#slap2_utils.subclasses.metadata.MetaData">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MetaData</span><span class="p">():</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            A class used to load a SLAP2 binary metadatafile for data processing. This is also an attribute for the datafile object</span>
+
+<span class="sd">            Attributes</span>
+<span class="sd">            ----------</span>
+<span class="sd">            metadatafile : str</span>
+<span class="sd">                The name of the metadata file.</span>
+<span class="sd">            AcquisitionContainer : ``AcquisitionContainer``</span>
+<span class="sd">                An instance of the AcquisitionContainer class that contain information related to the acquisition.</span>
+<span class="sd">            acqDurationCycles : list</span>
+<span class="sd">                A list containing 2 int values for cycle duration</span>
+<span class="sd">            acqDuration_s : int</span>
+<span class="sd">                The total time (in seconds) for the whole acquisition.</span>
+<span class="sd">            acquisitionPathIdx : int</span>
+<span class="sd">                The number that represent the path that the acquisitiion take place (either 1 or 2).</span>
+<span class="sd">            acquisitionPathName : str</span>
+<span class="sd">                The string that reiterate which path the acquisition takes place (either &#39;path 1&#39; or &#39;path 2&#39;)  .</span>
+<span class="sd">            aomActive : int</span>
+<span class="sd">                Binary number that reporesent whether aom is action (0 = false, 1 = yes).</span>
+<span class="sd">            aomVoltage : float</span>
+<span class="sd">                The number of voltage in aom (in float).</span>
+<span class="sd">            channelsSave : int</span>
+<span class="sd">                The number that represent which channel saved the data. </span>
+<span class="sd">            dmdPixelsPerColumn : int</span>
+<span class="sd">                The number of pixel along the column of the dmd. </span>
+<span class="sd">            dmdPixelsPerRow : int</span>
+<span class="sd">                The number of pixel along the row of the dmd.    </span>
+<span class="sd">            enableStack : list</span>
+<span class="sd">                Binary number that reporesent whether stack is enabled (0 = false, 1 = yes).</span>
+<span class="sd">            linePeriod_s : float</span>
+<span class="sd">                The time it takes to conduct 1 slice (1/linePeriod_s gives the line rate for the microscope).</span>
+<span class="sd">            remoteFocusPosition_um : int</span>
+<span class="sd">                A number that represent the remoteFocusPosition for the center of the stack. </span>
+<span class="sd">            samplesPerLine : int</span>
+<span class="sd">                The line rate for the microscope (1/samplesPerLine gives the linePeriod_s).</span>
+
+<span class="sd">            </span>
+<span class="sd">            Descriptions for methods:</span>
+<span class="sd">            --------------------------</span>
+
+<span class="sd">            Methods</span>
+<span class="sd">            ----------</span>
+<span class="sd">            __init__() :</span>
+<span class="sd">                Fill the fields mentioned above. The method also loads the AcquisitionContainer using the __init__() method for the AcquisitionContainer</span>
+
+<span class="sd">            Return</span>
+<span class="sd">            -------</span>
+<span class="sd">                Self with populated fields. </span>
+<span class="sd">                </span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadatafile</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadatafile</span> <span class="o">=</span> <span class="n">metadatafile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AcquisitionContainer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acqDurationCycles</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acqDuration_s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acquisitionPathIdx</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acquisitionPathName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aomActive</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aomVoltage</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channelsSave</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dmdPixelsPerColumn</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dmdPixelsPerRow</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enableStack</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linePeriod_s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="c1">#machineConfiguration &lt;HDF5 group &quot;/machineConfiguration&quot; (3 members)&gt;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remoteFocusPosition_um</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samplesPerLine</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">metadatafile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdf_file</span><span class="p">:</span>
+        <span class="c1"># Read the contents of the HDF5 file into the metaData dictionary</span>
+
+            <span class="n">metaData</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_key</span> <span class="ow">in</span> <span class="n">metaData</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">metaData</span><span class="p">[</span><span class="n">_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">hdf_file</span><span class="p">[</span><span class="n">_key</span><span class="p">][:][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_key</span><span class="p">,</span> <span class="n">hdf_file</span><span class="p">[</span><span class="n">_key</span><span class="p">][:][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">except</span><span class="p">:</span>   
+                    <span class="n">metaData</span><span class="p">[</span><span class="n">_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">hdf_file</span><span class="p">[</span><span class="n">_key</span><span class="p">]</span>
+                    
+                
+            <span class="bp">self</span><span class="o">.</span><span class="n">AcquisitionContainer</span> <span class="o">=</span> <span class="n">AcquisitionContainer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadatafile</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Peter William Hogg, Jerry Tong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -16,6 +16,7 @@
       <script src="../_static/documentation_options.js?v=486e5634"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -68,6 +69,10 @@
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
+</ul>
 
         </div>
       </div>
@@ -101,7 +106,7 @@
 <span id="functions"></span><h2>Functions<a class="headerlink" href="#module-slap2_utils.functions.stim" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.functions.stim.returnStimTime">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.stim.</span></span><span class="sig-name descname"><span class="pre">returnStimTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stimFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">250</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.functions.stim.returnStimTime" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.stim.</span></span><span class="sig-name descname"><span class="pre">returnStimTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stimFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">250</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/functions/stim.html#returnStimTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.functions.stim.returnStimTime" title="Link to this definition"></a></dt>
 <dd><p>Return start and stop times of visual stimuli from a TTL trace.</p>
 <p>This function reads a TTL trace from an HDF5 file and identifies the start and stop times of visual stimuli
 based on peaks in the trace.</p>
@@ -109,8 +114,8 @@ based on peaks in the trace.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stimFile</strong> (<em>str</em>) – Path to the HDF5 file containing the TTL trace.</p></li>
-<li><p><strong>distance</strong> (<em>int</em><em>, </em><em>optional</em>) – Minimum number of samples between consecutive peaks. Default is 250.</p></li>
-<li><p><strong>hz</strong> (<em>int</em><em>, </em><em>optional</em>) – Sampling rate of the TTL trace in Hertz. Default is 5000 Hz.</p></li>
+<li><p><strong>distance</strong> (int, <code class="docutils literal notranslate"><span class="pre">optional</span></code>) – Minimum number of samples between consecutive peaks. Default is 250.</p></li>
+<li><p><strong>hz</strong> (int, <code class="docutils literal notranslate"><span class="pre">optional</span></code>) – Sampling rate of the TTL trace in Hertz. Default is 5000 Hz.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

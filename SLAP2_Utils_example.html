@@ -1,0 +1,524 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SLAP2 Utils Example Notebook &mdash; SLAP2 Utils 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=486e5634"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="plots.slap2plots" href="modules/plots.slap2Plots.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SLAP2 Utils
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#installing-cupy">Installing Cupy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/index.html">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SLAP2 Utils Example Notebook</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Loading-a-Data-File">Loading a Data File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Inspecting-Acquisition-Metadata">Inspecting Acquisition Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Plotting">Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Trace-Extraction">Trace Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Extracting-Line-Data">Extracting Line Data</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SLAP2 Utils</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SLAP2 Utils Example Notebook</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/SLAP2_Utils_example.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="SLAP2-Utils-Example-Notebook">
+<h1>SLAP2 Utils Example Notebook<a class="headerlink" href="#SLAP2-Utils-Example-Notebook" title="Link to this heading"></a></h1>
+<p>This notebook will highlight core features included in <code class="docutils literal notranslate"><span class="pre">SLAP2_Utils</span></code>. The example will demonstrate how to extract useful metadata, extract a trace signal, and use basic plotting. This will give users a better understanding of how to work with the library with their own data. For further information on any functions used in the notebook, please reference the <a class="reference external" href="https://peter-hogg.github.io/SLAP2_Utils/">documentation</a></p>
+<section id="Loading-a-Data-File">
+<h2>Loading a Data File<a class="headerlink" href="#Loading-a-Data-File" title="Link to this heading"></a></h2>
+<p>Loading data from a SLAP2 binary file requires importing the DataFile class from the library. The coorsponding meta data file should be in the same directory with the same file name. If either of these conditions are not met, then an error will be thrown during loading</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">slap2_utils.datafile</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFile</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">binaryFilePath</span> <span class="o">=</span> <span class="s2">&quot;3DExampleScan.dat&quot;</span>
+<span class="n">dataFile</span> <span class="o">=</span> <span class="n">DataFile</span><span class="p">(</span><span class="n">binaryFilePath</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Basic information about the acquisition is stored inside the file header. We can inspect this by accessing the header attribute in the datafile object. This attribute stores information inside a dictionary.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;firstCycleOffsetBytes&#39;: 136.0,
+ &#39;lineHeaderSizeBytes&#39;: 40.0,
+ &#39;laserPathIdx&#39;: 0.0,
+ &#39;bytesPerCycle&#39;: 31270.0,
+ &#39;linesPerCycle&#39;: 302.0,
+ &#39;superPixelsPerCycle&#39;: 9595.0,
+ &#39;dmdPixelsPerRow&#39;: 1280.0,
+ &#39;dmdPixelsPerColumn&#39;: 800.0,
+ &#39;numChannels&#39;: 1.0,
+ &#39;channelMask&#39;: 1.0,
+ &#39;numSlices&#39;: 28.0,
+ &#39;channelsInterleave&#39;: 0.0,
+ &#39;fpgaSystemClock_Hz&#39;: 200000000.0,
+ &#39;referenceTimestamp_lower&#39;: 3670612649.0,
+ &#39;referenceTimestamp_upper&#39;: 197.0,
+ &#39;channels&#39;: [0],
+ &#39;referenceTimestamp&#39;: 849779169961,
+ &#39;file_version&#39;: 2,
+ &#39;magic_start&#39;: 322379495,
+ &#39;magic_end&#39;: 322379495}
+</pre></div></div>
+</div>
+<p>If we wanted to access specific information stored in the header we can do so by using the corresponding key. For this simulated recording we can tell that simulated scan is a single channel volumetric recording with 28 slices.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of imaging planes: &#39;</span><span class="p">,</span> <span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;numSlices&#39;</span><span class="p">],</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">List of recorded channels :&#39;</span><span class="p">,</span><span class="n">dataFile</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;channels&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of imaging planes:  28.0
+List of recorded channels : [0]
+</pre></div></div>
+</div>
+</section>
+<section id="Inspecting-Acquisition-Metadata">
+<h2>Inspecting Acquisition Metadata<a class="headerlink" href="#Inspecting-Acquisition-Metadata" title="Link to this heading"></a></h2>
+<p>Once loaded into Python, the acquisition metadata is stored in the <code class="docutils literal notranslate"><span class="pre">MetaData</span></code> subclass of the <code class="docutils literal notranslate"><span class="pre">DataFile</span></code> object. This object has more detailed information about the microscope settings during the acquisition.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here is an example of import data stored in the `MetaData` object</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The laser AOM was set to: &#39;</span><span class="p">,</span> <span class="n">dataFile</span><span class="o">.</span><span class="n">metaData</span><span class="o">.</span><span class="n">aomVoltage</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The duration of the acquisition was&#39;</span><span class="p">,</span> <span class="n">dataFile</span><span class="o">.</span><span class="n">metaData</span><span class="o">.</span><span class="n">acqDuration_s</span><span class="p">,</span> <span class="s1">&#39;secs&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The laser AOM was set to:  1.9500000000000002
+The duration of the acquisition was 10.0 secs
+</pre></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">MetaData</span></code> object is the parent object of other objects, such as the <code class="docutils literal notranslate"><span class="pre">AcquisitionContainer</span></code>, which stores a list of all regions of interest (ROI). Information for each ROI is stored in <code class="docutils literal notranslate"><span class="pre">slapROI</span></code> objects. Now we’ll look at how to pull out this information</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The number of ROIs in the acquistion is: &#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataFile</span><span class="o">.</span><span class="n">metaData</span><span class="o">.</span><span class="n">AcquisitionContainer</span><span class="o">.</span><span class="n">ROIs</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The number of ROIs in the acquistion is:  643
+</pre></div></div>
+</div>
+<p>Let’s look at the information stored in a <code class="docutils literal notranslate"><span class="pre">slapROI</span></code> object.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">slapROI.imageMode</span></code>: SLAP2 has two types of ROIs, raster and integrated</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slapROI.roiType</span></code>: ROI shapes can be rectangular or arbitrary</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slapROI.shapeData</span></code>: Arbitrary ROI shapes are stored in a series of coordinates</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slapROI.z</span></code>: The remote focusing positiion is stored in the z attribute</p></li>
+</ul>
+<p><a class="reference external" href="https://peter-hogg.github.io/SLAP2_Utils/modules/slapROI.html">‘slapROI’ documentation</a></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ROI Imaging Mode: &quot;</span><span class="p">,</span> <span class="n">dataFile</span><span class="o">.</span><span class="n">metaData</span><span class="o">.</span><span class="n">AcquisitionContainer</span><span class="o">.</span><span class="n">ROIs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imageMode</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ROI Type: &quot;</span><span class="p">,</span> <span class="n">dataFile</span><span class="o">.</span><span class="n">metaData</span><span class="o">.</span><span class="n">AcquisitionContainer</span><span class="o">.</span><span class="n">ROIs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">roiType</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape Data: &quot;</span><span class="p">,</span> <span class="n">dataFile</span><span class="o">.</span><span class="n">metaData</span><span class="o">.</span><span class="n">AcquisitionContainer</span><span class="o">.</span><span class="n">ROIs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shapeData</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Remote focusing position (um): &quot;</span><span class="p">,</span> <span class="n">dataFile</span><span class="o">.</span><span class="n">metaData</span><span class="o">.</span><span class="n">AcquisitionContainer</span><span class="o">.</span><span class="n">ROIs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ROI Imaging Mode:  Integrate
+
+ROI Type:  ArbitraryRoi
+
+Shape Data:  [[375. 376. 374. 375. 376. 377. 374. 375. 376. 377. 374. 375. 376. 375.]
+ [716. 716. 717. 717. 717. 717. 718. 718. 718. 718. 719. 719. 719. 720.]]
+
+Remote focusing position (um):  229.0
+
+</pre></div></div>
+</div>
+<p>‘SLAP2_Utils’ has inbuilt utils for interacting with ROI shape data which may be useful for users building analysis or visualization pipelines. These are stored in <code class="docutils literal notranslate"><span class="pre">slap2_utils.utils.roi_utils</span></code>. Let’s look at these functions</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">slap2_utils.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">roi_utils</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">roi_utils.roiImg</span></code> will return a 2D array of the optical plane the ROI is in (<code class="docutils literal notranslate"><span class="pre">slapROI.z</span></code>). Pixels belonging to the ROI will be set to the value one, while the other pixels will be set to a value of 0.</p>
+<p>`roi_utils.roiBoolean’ returns the same data but as a boolean, which is useful for generating activity traces</p>
+<p>`roi_utils.roiLabels’ returns either a 2D or 3D label array, representing each ROI as an integer. An option argument is a path of a SLAP2 reference TIF file, which will match the ROI position in Z to image slices in the volumetric TIF file.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plotting the pixels belonging to the ROI at index 10 in dataFile.metaData.AcquisitionContainer.ROIs</span>
+<span class="n">roi_utils</span><span class="o">.</span><span class="n">roiImg</span><span class="p">(</span><span class="n">dataFile</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">roi_utils</span><span class="o">.</span><span class="n">roiImg</span><span class="p">(</span><span class="n">dataFile</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># The same data in an boolean array</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">roi_utils</span><span class="o">.</span><span class="n">roiBoolean</span><span class="p">(</span><span class="n">dataFile</span><span class="p">,</span> <span class="mi">10</span><span class="p">)))</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/SLAP2_Utils_example_17_0.png" src="_images/SLAP2_Utils_example_17_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[False  True]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ploting all the ROIs on a particular plane of the acquisition</span>
+<span class="n">roiLabelArray</span> <span class="o">=</span> <span class="n">roi_utils</span><span class="o">.</span><span class="n">roiLabels</span><span class="p">(</span><span class="n">dataFile</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">roiLabelArray</span><span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/SLAP2_Utils_example_18_0.png" src="_images/SLAP2_Utils_example_18_0.png" />
+</div>
+</div>
+</section>
+<section id="Plotting">
+<h2>Plotting<a class="headerlink" href="#Plotting" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">SLAP2_Utils</span></code> has a few basic plotting features to better visualize the data in ROIs</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">slap2_utils.utils.plots</span><span class="w"> </span><span class="kn">import</span> <span class="n">slap2Plots</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We can plot the contours of a given ROI over a reference image</span>
+<span class="c1"># This simulated data does not have a reference image, so we will use an array of zero</span>
+<span class="n">slap2Plots</span><span class="o">.</span><span class="n">roiOverlay</span><span class="p">(</span><span class="n">dataFile</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">roiLabelArray</span><span class="p">),</span> <span class="mi">15</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/SLAP2_Utils_example_21_0.png" src="_images/SLAP2_Utils_example_21_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Axes: &gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Trace-Extraction">
+<h2>Trace Extraction<a class="headerlink" href="#Trace-Extraction" title="Link to this heading"></a></h2>
+<p>Trace extraction can be handled directly using the <code class="docutils literal notranslate"><span class="pre">Trace</span></code> object. However, <code class="docutils literal notranslate"><span class="pre">SLAP2_Utils</span></code> includes helper functions to streamline this process further.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">slap2_utils.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">trace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">slap2_utils.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">tracefunctions</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s extract a trace for ROI 15</span>
+<span class="c1"># we need to get determine what channel, there is only one in this simulated recording</span>
+<span class="n">chIdx</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="c1"># We need to find the ROI&#39;s Z position in the fastz of the DataFile</span>
+<span class="n">roi15</span> <span class="o">=</span> <span class="n">dataFile</span><span class="o">.</span><span class="n">metaData</span><span class="o">.</span><span class="n">AcquisitionContainer</span><span class="o">.</span><span class="n">ROIs</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span>
+<span class="n">zIdx</span> <span class="o">=</span> <span class="n">dataFile</span><span class="o">.</span><span class="n">fastZs</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">roi15</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+
+
+<span class="c1"># Can now initialize the Trace object</span>
+<span class="n">Trace</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">Trace</span><span class="p">(</span><span class="n">dataFile</span><span class="p">,</span> <span class="n">zIdx</span><span class="p">,</span> <span class="n">chIdx</span><span class="p">)</span>
+
+<span class="c1"># We need to set the pixel mask for Trace generation</span>
+<span class="n">roi15Mask</span> <span class="o">=</span> <span class="n">roi_utils</span><span class="o">.</span><span class="n">roiBoolean</span><span class="p">(</span><span class="n">dataFile</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+
+<span class="c1"># Exclude any raster-mode pixels</span>
+<span class="n">rasterPixels</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">Trace</span><span class="o">.</span><span class="n">setPixelIdxs</span><span class="p">(</span><span class="n">rasterPixels</span><span class="p">,</span> <span class="n">roi15Mask</span><span class="p">)</span>
+
+<span class="c1">#We can smooth the trace with temporal weights</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The trace smoothed with a weighted average&#39;</span><span class="p">)</span>
+<span class="n">trace15</span><span class="p">,</span> <span class="n">sumDataWeighted</span><span class="p">,</span> <span class="n">sumExpected</span><span class="p">,</span> <span class="n">sumExpectedWeighted</span>  <span class="o">=</span> <span class="n">Trace</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">trace15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Or we can set the weighted windows to 1 and return the raw trace</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The raw trace&#39;</span><span class="p">)</span>
+<span class="n">rawtrace15</span><span class="p">,</span> <span class="n">sumDataWeighted</span><span class="p">,</span> <span class="n">sumExpected</span><span class="p">,</span> <span class="n">sumExpectedWeighted</span>  <span class="o">=</span> <span class="n">Trace</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rawtrace15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Traces from volumetric acquisitions need to be further processed to remove times when the microscope was focused on a different plane</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The raw trace cleaned to include only data corresponding the correct axial focus&#39;</span><span class="p">)</span>
+<span class="n">volumetricTrace15</span> <span class="o">=</span> <span class="n">tracefunctions</span><span class="o">.</span><span class="n">cleanVolumeTrace</span><span class="p">(</span><span class="n">dataFile</span><span class="p">,</span> <span class="n">zIdx</span><span class="p">,</span> <span class="n">rawtrace15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">volumetricTrace15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The trace smoothed with a weighted average
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/SLAP2_Utils_example_24_1.png" src="_images/SLAP2_Utils_example_24_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The raw trace
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/SLAP2_Utils_example_24_3.png" src="_images/SLAP2_Utils_example_24_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The raw trace cleaned to include only data corresponding the correct axial focus
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/SLAP2_Utils_example_24_5.png" src="_images/SLAP2_Utils_example_24_5.png" />
+</div>
+</div>
+<p>All of these steps can excuted using the <code class="docutils literal notranslate"><span class="pre">returnVolumeTrace</span></code> function</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Returning the raw trace for the ROI with one line</span>
+<span class="n">rawTrace15</span><span class="p">,</span> <span class="n">volumeTrace15</span> <span class="o">=</span> <span class="n">tracefunctions</span><span class="o">.</span><span class="n">returnVolumeTrace</span><span class="p">(</span><span class="n">dataFile</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">volumeTrace15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/SLAP2_Utils_example_26_0.png" src="_images/SLAP2_Utils_example_26_0.png" />
+</div>
+</div>
+</section>
+<section id="Extracting-Line-Data">
+<h2>Extracting Line Data<a class="headerlink" href="#Extracting-Line-Data" title="Link to this heading"></a></h2>
+<p>The ‘getLineData’ can be used to return the recorded data for a specific index, cycle, and channel</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataFile</span><span class="o">.</span><span class="n">getLineData</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[array([], shape=(0, 1), dtype=int16)]
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules/plots.slap2Plots.html" class="btn btn-neutral float-left" title="plots.slap2plots" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Peter William Hogg, Jerry Tong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,394 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>slap2_utils.datafile &mdash; SLAP2 Utils 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=486e5634"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SLAP2 Utils
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installing-cupy">Installing Cupy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/index.html">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SLAP2 Utils</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">slap2_utils.datafile</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for slap2_utils.datafile</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mmap</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.subclasses.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetaData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils.file_header</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_file_header_v2</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">skimage.draw</span><span class="w"> </span><span class="kn">import</span> <span class="n">polygon_perimeter</span>
+
+
+<div class="viewcode-block" id="DataFile">
+<a class="viewcode-back" href="../../modules/datafile.html#slap2_utils.datafile.DataFile">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataFile</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            A class used to load a SLAP2 binary datafile for data processing.</span>
+
+<span class="sd">            Attributes</span>
+<span class="sd">            ----------</span>
+<span class="sd">            MAGIC_NUMBER : ``np.uint32``</span>
+<span class="sd">                A constant used to validate the data file.</span>
+<span class="sd">            filename : str</span>
+<span class="sd">                The name of the data file.</span>
+<span class="sd">            metaDataFileName : str</span>
+<span class="sd">                The name of the metadata file.</span>
+<span class="sd">            datFileName : str</span>
+<span class="sd">                The name of the data file with the &#39;.dat&#39; extension.</span>
+<span class="sd">            rawData : list</span>
+<span class="sd">                A list to store the raw data from the file.</span>
+<span class="sd">            metaData : ``MetaData``</span>
+<span class="sd">                An instance of the MetaData class to handle metadata.</span>
+<span class="sd">            StreamId : None</span>
+<span class="sd">                A placeholder for stream ID.</span>
+<span class="sd">            header : None</span>
+<span class="sd">                A placeholder for the file header.</span>
+<span class="sd">            lineHeaderIdxs : None</span>
+<span class="sd">                A placeholder for the line header indices.</span>
+<span class="sd">            fastZs : list</span>
+<span class="sd">                A list to store fast Z values.</span>
+<span class="sd">            zPixelReplacementMaps : None</span>
+<span class="sd">                A placeholder for the Z pixel replacement maps.</span>
+<span class="sd">            lineNumSuperPixels : None</span>
+<span class="sd">                A placeholder for the number of super pixels per line.</span>
+<span class="sd">            lineSuperPixelIDs : list</span>
+<span class="sd">                A list to store super pixel IDs for each line.</span>
+<span class="sd">            lineSuperPixelZIdxs : list</span>
+<span class="sd">                A list to store Z indices for each line&#39;s super pixels.</span>
+<span class="sd">            lineDataNumElements : list</span>
+<span class="sd">                A list to store the number of elements in each line of data.</span>
+<span class="sd">            lineDataStartIdxs : list</span>
+<span class="sd">                A list to store the start indices of each line of data.</span>
+<span class="sd">            numCycles : int</span>
+<span class="sd">                The number of cycles in the data file.</span>
+
+<span class="sd">            </span>
+<span class="sd">            Descriptions for methods:</span>
+<span class="sd">            --------------------------</span>
+<span class="sd">           </span>
+<span class="sd">            </span>
+<span class="sd">            Methods</span>
+<span class="sd">            ----------</span>
+<span class="sd">            __init__() :</span>
+<span class="sd">                Initialize the fields with values and call the _load_file() metbod.</span>
+
+<span class="sd">            Return</span>
+<span class="sd">            -------</span>
+<span class="sd">                Self with populated fields.</span>
+<span class="sd">            </span>
+<span class="sd">            Methods</span>
+<span class="sd">            ----------</span>
+<span class="sd">            _load_file() :</span>
+<span class="sd">                Loads the data and metadata files, and populates the attributes. Has no input besides the self object.</span>
+
+<span class="sd">            Return</span>
+<span class="sd">            -------</span>
+<span class="sd">                Self with populated fields. This includes filename, metadataFileName, datFileName, fastZs, lineSuperPixelZIdxs, lineSuperPixelIDS, zPixelReplacementMap2, lineNumSuperPixels, lineSuperPixelIDs, lineFastZIdxs, rawData and header.</span>
+<span class="sd">            </span>
+<span class="sd">            Methods</span>
+<span class="sd">            ----------</span>
+<span class="sd">            load_file_header(rawData) :</span>
+<span class="sd">                Loads the file header and validates the data format. Needs rawData as input with the self object.</span>
+
+<span class="sd">            Return</span>
+<span class="sd">            -------</span>
+<span class="sd">                Return header and edited self with populated fields, including lineDataStartIdxs, lineDataNumElements, lineDataNumElements </span>
+<span class="sd">                </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datfile</span><span class="p">):</span>  
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">MAGIC_NUMBER</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">(</span><span class="mi">322379495</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">datfile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metaDataFileName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datFileName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rawData</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metaData</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">StreamId</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineHeaderIdxs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fastZs</span> <span class="o">=</span>  <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zPixelReplacementMaps</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineNumSuperPixels</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineSuperPixelIDs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineSuperPixelZIdxs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineDataNumElements</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineDataStartIdxs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numCycles</span><span class="o">=</span><span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_file</span><span class="p">()</span>
+         
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        
+        <span class="c1"># Loading file names and check whether file is found</span>
+        <span class="n">base_dir</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">n_base</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;-TRIAL\d+&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span><span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">metaDataFileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">n_base</span> <span class="o">+</span> <span class="s1">&#39;.meta&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datFileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metaDataFileName</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;Metadata file not found.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metaData</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metaDataFileName</span><span class="p">)</span>
+        <span class="c1"># Subfunction of loading parse plan</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">load_parse_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metaData</span><span class="p">):</span>   
+            <span class="k">def</span><span class="w"> </span><span class="nf">filter_z_pixel_replacement_maps</span><span class="p">(</span><span class="n">z_maps</span><span class="p">):</span>
+                <span class="c1"># Using list comprehension for simplified logic</span>
+                <span class="k">return</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">map_</span><span class="p">))</span> <span class="k">for</span> <span class="n">map_</span> <span class="ow">in</span> <span class="n">z_maps</span><span class="p">]</span>
+
+            <span class="n">fastz</span> <span class="o">=</span> <span class="n">metaData</span><span class="o">.</span><span class="n">AcquisitionContainer</span><span class="o">.</span><span class="n">ParsePlan</span><span class="p">[</span><span class="s1">&#39;zs&#39;</span><span class="p">][:]</span>
+            <span class="n">final_fastz</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">10203</span><span class="p">]</span> <span class="c1">#initiating with a value thats never found</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fastz</span><span class="p">:</span>
+                <span class="n">final_fastz</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">fastZs</span> <span class="o">=</span> <span class="n">final_fastz</span>
+
+            <span class="c1">#Check if it breaks</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lineSuperPixelZIdxs</span> <span class="o">=</span> <span class="n">metaData</span><span class="o">.</span><span class="n">AcquisitionContainer</span><span class="o">.</span><span class="n">ParsePlan</span><span class="p">[</span><span class="s1">&#39;acqParsePlan&#39;</span><span class="p">][</span><span class="s1">&#39;sliceIdx&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lineSuperPixelIDs</span> <span class="o">=</span> <span class="n">metaData</span><span class="o">.</span><span class="n">AcquisitionContainer</span><span class="o">.</span><span class="n">ParsePlan</span><span class="p">[</span><span class="s1">&#39;acqParsePlan&#39;</span><span class="p">][</span><span class="s1">&#39;superPixelID&#39;</span><span class="p">]</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">zPixelReplacementMaps</span> <span class="o">=</span> <span class="n">metaData</span><span class="o">.</span><span class="n">AcquisitionContainer</span><span class="o">.</span><span class="n">ParsePlan</span><span class="p">[</span><span class="s1">&#39;pixelReplacementMaps&#39;</span><span class="p">]</span>
+            
+            <span class="c1">#Using list comprehension for simplified logic</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lineNumSuperPixels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="k">for</span> <span class="n">ids</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lineSuperPixelIDs</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lineFastZIdxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lineSuperPixelZIdxs</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">lineIdx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lineSuperPixelZIdxs</span><span class="p">)):</span>
+                <span class="n">lineZIdxs_</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lineSuperPixelZIdxs</span><span class="p">[</span><span class="n">lineIdx</span><span class="p">]</span>
+           
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lineZIdxs_</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lineFastZIdxs</span><span class="p">[</span><span class="n">lineIdx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lineFastZIdxs</span><span class="p">[</span><span class="n">lineIdx</span><span class="p">]</span> <span class="o">=</span> <span class="n">lineZIdxs_</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            
+        
+        <span class="c1"># Add additional attributes from the MetaData file</span>
+        <span class="n">load_parse_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metaData</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datFileName</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;Data file not found.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rawData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">memmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;uint32&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_file_header</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rawData</span><span class="p">)</span>
+        
+
+    <span class="c1"># Function for loading file header:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_file_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rawData</span><span class="p">):</span>
+        <span class="n">raw_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">rawData</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="s1">&#39;uint32&#39;</span><span class="p">:</span>
+            <span class="n">raw_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;uint32&#39;</span><span class="p">)</span>
+
+        <span class="c1"># See if magic number matches, returns an error if that is not the case</span>
+        <span class="n">file_magic_number</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">file_magic_number</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAGIC_NUMBER</span><span class="p">,</span> <span class="s1">&#39;Data format error. This is not a SLAP2 data file.&#39;</span>
+        
+        
+        <span class="c1"># Currently, we have only implemented file version 2</span>
+        <span class="n">file_format_version</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">file_format_version</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Unknown format version&#39;</span>
+        <span class="k">if</span> <span class="n">file_format_version</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">header</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">numCycles</span> <span class="o">=</span> <span class="n">load_file_header_v2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown file format version: </span><span class="si">{</span><span class="n">file_format_version</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Load Indices</span>
+        <span class="n">raw_data</span>  <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="s1">&#39;uint16&#39;</span><span class="p">:</span>
+            <span class="n">raw_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Load different fields in the object accordingly</span>
+
+        <span class="n">line_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;linesPerCycle&#39;</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">line_size_bytes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;linesPerCycle&#39;</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+        <span class="n">line_idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;firstCycleOffsetBytes&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">line_size_bytes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="n">line_idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;linesPerCycle&#39;</span><span class="p">])):</span>
+            <span class="n">line_idxs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_idxs</span><span class="p">[</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">line_size_bytes</span><span class="p">[</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="n">line_size_bytes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="n">line_idxs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+
+        <span class="n">line_header_idxs</span> <span class="o">=</span> <span class="n">line_idxs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineDataStartIdxs</span> <span class="o">=</span> <span class="n">line_idxs</span> <span class="o">+</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;lineHeaderSizeBytes&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineDataNumElements</span> <span class="o">=</span> <span class="p">(</span><span class="n">line_size_bytes</span> <span class="o">-</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;lineHeaderSizeBytes&#39;</span><span class="p">])</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineDataNumElements</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lineDataNumElements</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineDataStartIdxs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lineDataStartIdxs</span><span class="p">]</span> 
+
+
+
+        <span class="c1"># May need to update this conditional in the future</span>
+        <span class="c1">#if not &#39;referenceTimestamp&#39; in list(header.keys()):</span>
+        <span class="c1">#    header.referenceTimestamp = np.uint64(0)</span>
+        <span class="c1">#    first_line_header = self.get_line_header(1, 1)</span>
+        <span class="c1">#    self.header.referenceTimestamp = first_line_header.timestamp</span>
+        
+        <span class="c1">#first_line_header = obj.get_line_header(1, 1)</span>
+        <span class="c1">#obj.header.referenceTimestamp = first_line_header.timestamp</span>
+        <span class="k">return</span> <span class="n">header</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">getLineData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lineIndices</span><span class="p">,</span> <span class="n">cycleIndices</span><span class="p">,</span> <span class="n">iChannel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get line data from the data file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lineIndices : array_like</span>
+<span class="sd">            Vector of positive integers specifying line indices (matlab indexing)</span>
+<span class="sd">        cycleIndices : array_like </span>
+<span class="sd">            Vector of positive integers specifying cycle indices (matlab indexing)</span>
+<span class="sd">        iChannel : array_like, optional</span>
+<span class="sd">            Vector of positive integers specifying channel indices (matlab indexing) (default is all channels)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        lineData : list</span>
+<span class="sd">            Line data for the specified indices</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Default to all channels if not specified</span>
+        <span class="k">if</span> <span class="n">iChannel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">iChannel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;numChannels&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">lineIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">lineIndices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">cycleIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cycleIndices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">iChannel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">iChannel</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">lineIndices</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">cycleIndices</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">iChannel</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All indices must be positive integers (Matlab indexing)&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">lineIndices</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;linesPerCycle&#39;</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Line indices must be &lt;= linesPerCycle&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">cycleIndices</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">numCycles</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cycle indices must be &lt;= numCycles&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cycleIndices</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lineIndices</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Number of cycle indices must match number of line indices&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">iChannel</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;numChannels&#39;</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Channel indices must be &lt;= numChannels&quot;</span><span class="p">)</span>
+        
+        <span class="n">hMemmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">memmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datFileName</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int16&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">lineData</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lineIndices</span><span class="p">)):</span>
+                <span class="n">tmpData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">lineDataNumElements</span><span class="p">[</span><span class="n">lineIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;numChannels&#39;</span><span class="p">]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">iChannel</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">iChannel</span><span class="p">)):</span>
+                    <span class="n">byteOffsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lineDataNumElements</span><span class="p">[</span><span class="n">lineIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;numChannels&#39;</span><span class="p">]))]</span>
+                    <span class="n">byteOffsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lineDataNumElements</span><span class="p">[</span><span class="n">lineIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;numChannels&#39;</span><span class="p">])</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">iChannel</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">byteOffsets</span><span class="p">]</span>
+                    <span class="n">byteOffsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lineDataStartIdxs</span><span class="p">[</span><span class="n">lineIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">byteOffsets</span><span class="p">]</span>
+                    <span class="n">byteOffsets</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;firstCycleOffsetBytes&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">byteOffsets</span><span class="p">]</span>
+
+                    <span class="n">cycleIdxs</span> <span class="o">=</span> <span class="n">cycleIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+                    <span class="n">cycleByteOffsets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;firstCycleOffsetBytes&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cycleIdxs</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;bytesPerCycle&#39;</span><span class="p">]</span>
+                    <span class="n">cycleSampleOffsets</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cycleByteOffsets</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+
+                    <span class="n">sampleOffsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">cycleSampleOffsets</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">byteOffsets</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span>
+
+                    <span class="n">tmpData</span><span class="p">[:,</span> <span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">hMemmap</span><span class="p">[</span><span class="n">sampleOffsets</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                
+                <span class="n">lineData</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmpData</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">hMemmap</span><span class="p">,</span> <span class="s1">&#39;_mmap&#39;</span><span class="p">):</span>
+                <span class="n">hMemmap</span><span class="o">.</span><span class="n">_mmap</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">del</span> <span class="n">hMemmap</span>
+    
+        <span class="k">return</span> <span class="n">lineData</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Peter William Hogg, Jerry Tong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

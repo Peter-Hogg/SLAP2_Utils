@@ -16,9 +16,11 @@
       <script src="../_static/documentation_options.js?v=486e5634"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SLAP2 Utils Example Notebook" href="../SLAP2_Utils_example.html" />
     <link rel="prev" title="roi_utils" href="roi_utils.html" /> 
 </head>
 
@@ -69,6 +71,10 @@
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
+</ul>
 
         </div>
       </div>
@@ -102,13 +108,13 @@
 <span id="functions"></span><h2>Functions<a class="headerlink" href="#module-slap2_utils.utils.plots.slap2Plots" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.utils.plots.slap2Plots.plotPixTrace">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.plots.slap2Plots.</span></span><span class="sig-name descname"><span class="pre">plotPixTrace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dffData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.utils.plots.slap2Plots.plotPixTrace" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.plots.slap2Plots.</span></span><span class="sig-name descname"><span class="pre">plotPixTrace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dffData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/utils/plots/slap2Plots.html#plotPixTrace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.utils.plots.slap2Plots.plotPixTrace" title="Link to this definition"></a></dt>
 <dd><p>Plot pixel-wise traces of fluorescence changes over time.</p>
 <p>This function plots the traces of fluorescence changes for each super pixel over a specified time period.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dffData</strong> (<em>array</em>) – The delta F/F data of super pixels.</p></li>
+<li><p><strong>dffData</strong> (<code class="docutils literal notranslate"><span class="pre">np.array</span></code>) – The delta F/F data of super pixels.</p></li>
 <li><p><strong>hz</strong> (<em>float</em>) – Sampling rate in Hertz.</p></li>
 <li><p><strong>start</strong> (<em>int</em>) – Start frame index.</p></li>
 <li><p><strong>end</strong> (<em>int</em>) – End frame index.</p></li>
@@ -122,36 +128,35 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.utils.plots.slap2Plots.roiOverlay">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.plots.slap2Plots.</span></span><span class="sig-name descname"><span class="pre">roiOverlay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refimg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roiIdx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.utils.plots.slap2Plots.roiOverlay" title="Link to this definition"></a></dt>
-<dd><p>Plot contours of an SLAP2 ROI over a reference image with color-coded super pixels.</p>
-<p>This function plots the contours of specified ROIs over a reference image. The super pixels are color-coded.</p>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.plots.slap2Plots.</span></span><span class="sig-name descname"><span class="pre">roiOverlay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refimg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roiIdx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/utils/plots/slap2Plots.html#roiOverlay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.utils.plots.slap2Plots.roiOverlay" title="Link to this definition"></a></dt>
+<dd><p>Plots contours of SLAP2 ROIs over a reference image with color-coded super pixels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>datafile</strong> (<em>SLAP2_Utils Datafile Object</em>) – The datafile containing metadata and header information.</p></li>
-<li><p><strong>refimg</strong> (<em>array</em>) – Reference image, can be 3D (t, x, y) or 2D (x, y).</p></li>
-<li><p><strong>roiIdx</strong> (<em>int</em><em> or </em><em>list</em>) – Integer or list of integers for the ROI indices.</p></li>
-<li><p><strong>display</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, display the plot. Default is True.</p></li>
+<li><p><strong>datafile</strong> (<code class="docutils literal notranslate"><span class="pre">SLAP2_Utils</span> <span class="pre">Datafile</span> <span class="pre">Object</span></code>) – The datafile containing metadata and header information.</p></li>
+<li><p><strong>refimg</strong> (<code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Reference image; can be 3D (t, x, y) or 2D (x, y).</p></li>
+<li><p><strong>roiIdx</strong> (<em>int</em><em> or </em><em>list</em><em> of </em><em>int</em>) – Single ROI index or a list of ROI indices to overlay.</p></li>
+<li><p><strong>display</strong> (bool, <code class="docutils literal notranslate"><span class="pre">optional</span></code>) – Whether to display the plot immediately. Default is True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ax</strong> – Matplotlib axes object with the plotted contours.</p>
+<dd class="field-even"><p><strong>ax</strong> – Matplotlib Axes object with the plotted contours</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>matplotlib.axes.Axes</p>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">matplotlib.axes.Axes</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="slap2_utils.utils.plots.slap2Plots.roiOverlaySuperPix">
-<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.plots.slap2Plots.</span></span><span class="sig-name descname"><span class="pre">roiOverlaySuperPix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refimg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roiIdx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#slap2_utils.utils.plots.slap2Plots.roiOverlaySuperPix" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.utils.plots.slap2Plots.</span></span><span class="sig-name descname"><span class="pre">roiOverlaySuperPix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refimg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roiIdx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/utils/plots/slap2Plots.html#roiOverlaySuperPix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.utils.plots.slap2Plots.roiOverlaySuperPix" title="Link to this definition"></a></dt>
 <dd><p>Plot pixel-wise traces of fluorescence changes over time.</p>
 <p>This function plots the traces of fluorescence changes for each super pixel over a specified time period.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dffData</strong> (<em>array</em>) – The delta F/F data of super pixels.</p></li>
+<li><p><strong>dffData</strong> (<code class="docutils literal notranslate"><span class="pre">np.array</span></code>) – The delta F/F data of super pixels.</p></li>
 <li><p><strong>hz</strong> (<em>float</em>) – Sampling rate in Hertz.</p></li>
 <li><p><strong>start</strong> (<em>int</em>) – Start frame index.</p></li>
 <li><p><strong>end</strong> (<em>int</em>) – End frame index.</p></li>
@@ -161,7 +166,7 @@
 <dd class="field-even"><p><strong>ax</strong> – Matplotlib axes object with the plotted contours</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>matplotlib.axes.Axes</p>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">matplotlib.axes.Axes</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -174,6 +179,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="roi_utils.html" class="btn btn-neutral float-left" title="roi_utils" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../SLAP2_Utils_example.html" class="btn btn-neutral float-right" title="SLAP2 Utils Example Notebook" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

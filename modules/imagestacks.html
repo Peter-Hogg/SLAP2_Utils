@@ -16,6 +16,7 @@
       <script src="../_static/documentation_options.js?v=486e5634"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -56,7 +57,12 @@
 <li class="toctree-l2"><a class="reference internal" href="tracePixel.html">TracePixel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stim.html">stim</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">imagestacks</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-slap2_utils.functions.imagestacks">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#slap2_utils.functions.imagestacks.averageStack"><code class="docutils literal notranslate"><span class="pre">averageStack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slap2_utils.functions.imagestacks.averageStackGPU"><code class="docutils literal notranslate"><span class="pre">averageStackGPU()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slap2_utils.functions.imagestacks.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tracefunctions.html">tracefunctions</a></li>
@@ -64,6 +70,10 @@
 <li class="toctree-l2"><a class="reference internal" href="plots.slap2Plots.html">plots.slap2plots</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
 </ul>
 
         </div>
@@ -94,8 +104,51 @@
   <section id="imagestacks">
 <h1>imagestacks<a class="headerlink" href="#imagestacks" title="Link to this heading"></a></h1>
 <p>This module is designed to handle image stacks produced by SLAP2. It includes tools to load, process, and analyze image data in stack form, facilitating operations like averaging, filtering, and saving the processed stacks.</p>
-<section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<section id="module-slap2_utils.functions.imagestacks">
+<span id="functions"></span><h2>Functions<a class="headerlink" href="#module-slap2_utils.functions.imagestacks" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="slap2_utils.functions.imagestacks.averageStack">
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.imagestacks.</span></span><span class="sig-name descname"><span class="pre">averageStack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/functions/imagestacks.html#averageStack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.functions.imagestacks.averageStack" title="Link to this definition"></a></dt>
+<dd><p>Compute the average stack of a TIFF file using CPU.</p>
+<p>This function reads a multi-frame TIFF file, computes the average of each slice,
+and saves the resulting average stack as a new TIFF file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – Path to the input TIFF file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>newFilePath</strong> – Path to the saved average stack TIFF file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="slap2_utils.functions.imagestacks.averageStackGPU">
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.imagestacks.</span></span><span class="sig-name descname"><span class="pre">averageStackGPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/functions/imagestacks.html#averageStackGPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.functions.imagestacks.averageStackGPU" title="Link to this definition"></a></dt>
+<dd><p>Compute the average stack of a TIFF file using GPU.</p>
+<p>This function reads a multi-frame TIFF file, computes the average of each slice using GPU,
+and saves the resulting average stack as a new TIFF file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – Path to the input TIFF file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>newFilePath</strong> – Path to the saved average stack TIFF file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="slap2_utils.functions.imagestacks.main">
+<span class="sig-prename descclassname"><span class="pre">slap2_utils.functions.imagestacks.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/slap2_utils/functions/imagestacks.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#slap2_utils.functions.imagestacks.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 </section>
 

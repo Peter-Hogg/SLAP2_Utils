@@ -15,6 +15,7 @@
       <script src="_static/documentation_options.js?v=486e5634"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -44,6 +45,10 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installing-cupy">Installing Cupy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/index.html">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="SLAP2_Utils_example.html">SLAP2 Utils Example Notebook</a></li>
 </ul>
 
         </div>
@@ -103,10 +108,10 @@
 </li>
       <li><a href="modules/acquisitioncontainer.html#slap2_utils.subclasses.acquisitionContainer.AcquisitionContainer">AcquisitionContainer() (in module slap2_utils.subclasses.acquisitionContainer)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/metadata.html#slap2_utils.subclasses.metadata.acquisitionPathIdx">acquisitionPathIdx (in module slap2_utils.subclasses.metadata)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/metadata.html#slap2_utils.subclasses.metadata.acquisitionPathName">acquisitionPathName (in module slap2_utils.subclasses.metadata)</a>
 </li>
       <li><a href="modules/acquisitioncontainer.html#slap2_utils.subclasses.acquisitionContainer.AcquisitionPlan">AcquisitionPlan (in module slap2_utils.subclasses.acquisitionContainer)</a>
@@ -114,6 +119,10 @@
       <li><a href="modules/metadata.html#slap2_utils.subclasses.metadata.aomActive">aomActive (in module slap2_utils.subclasses.metadata)</a>
 </li>
       <li><a href="modules/metadata.html#slap2_utils.subclasses.metadata.aomVoltage">aomVoltage (in module slap2_utils.subclasses.metadata)</a>
+</li>
+      <li><a href="modules/imagestacks.html#slap2_utils.functions.imagestacks.averageStack">averageStack() (in module slap2_utils.functions.imagestacks)</a>
+</li>
+      <li><a href="modules/imagestacks.html#slap2_utils.functions.imagestacks.averageStackGPU">averageStackGPU() (in module slap2_utils.functions.imagestacks)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -249,6 +258,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/datafile.html#slap2_utils.datafile.MAGIC_NUMBER">MAGIC_NUMBER (in module slap2_utils.datafile)</a>
 </li>
+      <li><a href="modules/imagestacks.html#slap2_utils.functions.imagestacks.main">main() (in module slap2_utils.functions.imagestacks)</a>
+</li>
       <li><a href="modules/datafile.html#slap2_utils.datafile.metaData">metaData (in module slap2_utils.datafile)</a>
 </li>
       <li><a href="modules/metadata.html#slap2_utils.subclasses.metadata.MetaData">MetaData() (in module slap2_utils.subclasses.metadata)</a>
@@ -263,6 +274,8 @@
     module
 
       <ul>
+        <li><a href="modules/imagestacks.html#module-slap2_utils.functions.imagestacks">slap2_utils.functions.imagestacks</a>
+</li>
         <li><a href="modules/stim.html#module-slap2_utils.functions.stim">slap2_utils.functions.stim</a>
 </li>
         <li><a href="modules/tracefunctions.html#module-slap2_utils.functions.tracefunctions">slap2_utils.functions.tracefunctions</a>
@@ -343,6 +356,13 @@
       <li><a href="modules/slapROI.html#slap2_utils.subclasses.slapROI.shapeData">shapeData (in module slap2_utils.subclasses.slapROI)</a>
 </li>
       <li>
+    slap2_utils.functions.imagestacks
+
+      <ul>
+        <li><a href="modules/imagestacks.html#module-slap2_utils.functions.imagestacks">module</a>
+</li>
+      </ul></li>
+      <li>
     slap2_utils.functions.stim
 
       <ul>
@@ -356,6 +376,8 @@
         <li><a href="modules/tracefunctions.html#module-slap2_utils.functions.tracefunctions">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     slap2_utils.utils.plots.slap2Plots
 
@@ -363,8 +385,6 @@
         <li><a href="modules/plots.slap2Plots.html#module-slap2_utils.utils.plots.slap2Plots">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     slap2_utils.utils.roi_utils
 
