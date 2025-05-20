@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "SLAP2_UTILS"
 version = "0.4.1"
@@ -8,11 +12,20 @@ authors = [
 description = "Code to support using a SLAP2 Microscope"
 readme = "README.md"
 requires-python = ">=3.9"
+license = {text = "MPL-2.0"} 
+
 classifiers = [
-    "Programming Language :: Python :: 3",
     "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
-    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent"
 ]
+
+
 dependencies = [
     "numpy",
     "scipy",
@@ -34,7 +47,12 @@ cupy = ["cupy"]
 cuda11x = ["cupy-cuda11x"]
 cuda12x = ["cupy-cuda12x"]
 
+[project.scripts]
+pySLAP2Viewer = "slap2_utils.dataviewer.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/Peter-Hogg/SLAP2_Utils"
 Issues = "https://github.com/Peter-Hogg/SLAP2_Utils/issues"
+
+[tool.setuptools.packages.find]
+include = ["slap2_utils"]
