@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to `slap2-utils`'s documentation!
-=======================================
+=========================================
 
 .. toctree::
    :maxdepth: 2
