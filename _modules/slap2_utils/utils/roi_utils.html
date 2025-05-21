@@ -45,6 +45,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installing-cupy">Installing Cupy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../viewer.html">SLAP2 Viewer GUI</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
@@ -177,8 +178,9 @@
             <span class="n">_stackData</span> <span class="o">=</span> <span class="n">tifffile</span><span class="o">.</span><span class="n">tiffcomment</span><span class="p">(</span><span class="n">refStackPath</span><span class="p">)</span>
             <span class="n">_stackInfo</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_stackData</span><span class="p">)</span>
             <span class="n">zPosition</span> <span class="o">=</span> <span class="n">_stackInfo</span><span class="p">[</span><span class="s1">&#39;zsAbsolute&#39;</span><span class="p">]</span>
-
-            
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">zPosition</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="n">zPosition</span> <span class="o">=</span> <span class="p">[</span><span class="n">zPosition</span><span class="p">]</span> 
+                        
             <span class="n">stack</span> <span class="o">=</span> <span class="n">tifffile</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">refStackPath</span><span class="p">)</span>
             <span class="n">shape</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">shape</span>
             

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to SLAP2 Utils’s documentation! &mdash; SLAP2 Utils 0.8.0 documentation</title>
+  <title>Welcome to slap2-utils’s documentation! &mdash; SLAP2 Utils 0.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
@@ -49,6 +49,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installing-cupy">Installing Cupy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/index.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="viewer.html">SLAP2 Viewer GUI</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
@@ -69,7 +70,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Welcome to SLAP2 Utils’s documentation!</li>
+      <li class="breadcrumb-item active">Welcome to <cite>slap2-utils</cite>’s documentation!</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -80,7 +81,7 @@
            <div itemprop="articleBody">
              
   <section id="welcome-to-slap2-utils-s-documentation">
-<h1>Welcome to SLAP2 Utils’s documentation!<a class="headerlink" href="#welcome-to-slap2-utils-s-documentation" title="Link to this heading"></a></h1>
+<h1>Welcome to <cite>slap2-utils</cite>’s documentation!<a class="headerlink" href="#welcome-to-slap2-utils-s-documentation" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -101,6 +102,15 @@
 <li class="toctree-l2"><a class="reference internal" href="modules/plots.slap2Plots.html">plots.slap2plots</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="viewer.html">SLAP2 Viewer GUI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="viewer.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer.html#main-interface">Main Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer.html#trace-visualization">Trace Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer.html#d-roi-visualization">3D ROI Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer.html#requirements">Requirements</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
@@ -112,7 +122,7 @@
 </section>
 <section id="overview">
 <h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
-<p>The SLAP2_Utils library is designed to facilitate the reading of SLAP2 (Scanned Line Projection Microscopy version 2) binary files using Python. This utility aims to support researchers and developers working with data from SLAP2 two-photon microscopes by providing an interface to directly manipulate and analyze these files in Python as an alternative a Matlab based workflow. The SLAP2 microscope is a commerically avaliable kit from MBF bioscience (<a class="reference external" href="https://www.mbfbioscience.com/products/slap2">https://www.mbfbioscience.com/products/slap2</a>).
+<p>The <cite>slap2-utils</cite> library is designed to facilitate the reading of SLAP2 (Scanned Line Angular Projection Microscopy 2) binary files using Python. This utility aims to support researchers and developers working with data from SLAP2 two-photon microscopes by providing an interface to directly manipulate and analyze these files in Python as an alternative a Matlab based workflow. The SLAP2 microscope is a commerically avaliable kit from MBF bioscience (<a class="reference external" href="https://www.mbfbioscience.com/products/slap2">https://www.mbfbioscience.com/products/slap2</a>).
 The toolkit includes features such as:</p>
 <blockquote>
 <div><ul class="simple">
@@ -120,8 +130,7 @@ The toolkit includes features such as:</p>
 <li><p>Metadata Parsing: Extract and utilize metadata associated with SLAP2 data files.</p></li>
 <li><p>Data Manipulation: Tools to manipulate and process data points read from the binary file.</p></li>
 <li><p>Trace Extraction: Tools to extract and generate traces from ROIs imaged in integrated scan mode.</p></li>
-<li><p>MatLab-based Visual Stimulus: Different kinds of visual stimulus, from checkers, moving bars, to visual stimulus utilized by the Allen Institute, ready to be imported for a SLAP2-related experiment.</p></li>
-<li><p>Motion Corrections: GPU-based tools that allows calculation of motion drifts, with x, y, z changes applied directly on the ROI inside the SLAP2 software (work in progress).</p></li>
+<li><p>Data Viewer: Quickly inspect collected data with a Python based data viewer.</p></li>
 </ul>
 </div></blockquote>
 </section>
