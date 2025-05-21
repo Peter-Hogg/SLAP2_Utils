@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "SLAP2_UTILS"
-version = "0.4.7"
+version = "0.4.9"
 authors = [
   { name="Peter Hogg", email="peterhogg2006@gmail.com" },
   { name="Jerry Tong", email="jerrytong0810@gmail.com" }
@@ -35,7 +35,6 @@ dependencies = [
     "PyQT6",
     "matplotlib",
     "vispy",
-    "notebook",
     "pyneurotrace",
     "zarr",          
     "dask",
@@ -47,6 +46,7 @@ dependencies = [
 cupy = ["cupy"]
 cuda11x = ["cupy-cuda11x"]
 cuda12x = ["cupy-cuda12x"]
+examples = ["notebook"]
 
 [project.scripts]
 pySLAP2Viewer = "slap2_utils.dataviewer.cli:main"

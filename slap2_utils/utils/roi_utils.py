@@ -91,6 +91,10 @@ def roiLabels(datafile, refStackPath=None):
             _stackData = tifffile.tiffcomment(refStackPath)
             _stackInfo = json.loads(_stackData)
             zPosition = _stackInfo['zsAbsolute']
+
+            
+            stack = tifffile.imread(refStackPath)
+            shape = stack.shape
             
         except:
             print('Not a SLAP2 Ref Stack')
