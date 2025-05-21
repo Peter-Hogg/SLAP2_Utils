@@ -177,6 +177,10 @@
             <span class="n">_stackData</span> <span class="o">=</span> <span class="n">tifffile</span><span class="o">.</span><span class="n">tiffcomment</span><span class="p">(</span><span class="n">refStackPath</span><span class="p">)</span>
             <span class="n">_stackInfo</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_stackData</span><span class="p">)</span>
             <span class="n">zPosition</span> <span class="o">=</span> <span class="n">_stackInfo</span><span class="p">[</span><span class="s1">&#39;zsAbsolute&#39;</span><span class="p">]</span>
+
+            
+            <span class="n">stack</span> <span class="o">=</span> <span class="n">tifffile</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">refStackPath</span><span class="p">)</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">shape</span>
             
         <span class="k">except</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Not a SLAP2 Ref Stack&#39;</span><span class="p">)</span>
