@@ -6,7 +6,6 @@ import pyneurotrace.gpu.filters as filters
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.cm as cm
 import sys
 import json
@@ -17,11 +16,20 @@ from slap2_utils.utils.roi_utils import roiLabels
 def plotROI(ax, labels, stack, z, z_positions):
     ax.clear()
 
-    # Plot the image stack if provided
+    # Determine what to show as background
     if stack is not None:
-        ax.imshow(stack[0, z, :, :], cmap='gray')
+        if stack.ndim == 4:  # (channel, z, y, x)
+            frame = stack[0, z, :, :]
+        elif stack.ndim == 3:  # (z, y, x)
+            frame = stack[z, :, :]
+        elif stack.ndim == 2:  # (y, x)
+            frame = stack
+        else:
+            raise ValueError(f"Unsupported stack shape: {stack.shape}")
     else:
-        ax.imshow(np.zeros(labels[z, :, :].shape), cmap='gray')
+        frame = np.zeros(labels[z, :, :].shape)
+
+    ax.imshow(frame, cmap='gray')
     # Create contours from ROI labels and plot them
     # Normalize the labels to create a color map
     norm = mpl.colors.Normalize(vmin=1, vmax=np.max(labels))
@@ -65,7 +73,7 @@ class PlotCanvas(FigureCanvas):
         if not self.initialized:
             self.initialize_plot(labels, stack, z_positions)
         else:
-            plotROI(self.ax,labels, stack)
+            plotROI(self.ax, labels, stack, 0, z_positions)
 
     def initialize_plot(self, labels, stack, z_positions):
         _z =0
@@ -80,7 +88,7 @@ class roiViewer(QMainWindow):
     def __init__(self, channel, hdatafile, imgPath):
         super().__init__()
 
-        self.setWindowTitle(f"All ROI Traces")
+        self.setWindowTitle(f"ROI Inspector")
 
         layout = QVBoxLayout()
 

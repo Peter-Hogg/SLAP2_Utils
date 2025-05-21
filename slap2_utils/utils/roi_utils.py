@@ -91,8 +91,9 @@ def roiLabels(datafile, refStackPath=None):
             _stackData = tifffile.tiffcomment(refStackPath)
             _stackInfo = json.loads(_stackData)
             zPosition = _stackInfo['zsAbsolute']
-
-            
+            if isinstance(zPosition, float):
+                zPosition = [zPosition] 
+                        
             stack = tifffile.imread(refStackPath)
             shape = stack.shape
             

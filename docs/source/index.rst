@@ -13,11 +13,12 @@ Welcome to SLAP2 Utils's documentation!
 
    installation
    modules/index
-
+   viewer
+   
 .. toctree::
    :maxdepth: 1
    :caption: Examples
-   
+
    SLAP2_Utils_example.ipynb
 
 
