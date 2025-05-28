@@ -14,8 +14,8 @@ def load_file_header_v2(obj, rawUint32):
     -------
     tuple
         A tuple containing:
-        - `header` (dict): Parsed header metadata.
-        - `num_cycles` (int): Total number of cycles computed from the file size.
+        - ``header`` (dict): Parsed header metadata.
+        - ``num_cycles`` (int): Total number of cycles computed from the file size.
     """
     # Data format:
     # uint32_t magic_start          = MAGIC_NUMBER;
