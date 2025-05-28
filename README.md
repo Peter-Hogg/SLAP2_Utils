@@ -8,9 +8,7 @@ The `slap2-utils` library is designed to facilitate the reading of SLAP2 (Scanne
 - **Metadata Parsing**: Extract and utilize metadata associated with SLAP2 data files.
 - **Data Manipulation**: Tools to manipulate and process data points read from the binary file.
 - **Trace Extraction**: Tools to extract and generate traces from ROIs imaged in integrated scan mode.
-- **MatLab-based Visual Stimulus**: Different kinds of visual stimuli, from checkers and moving bars to visual stimuli utilized by the Allen Institute, are ready to be imported for a SLAP2-related experiment.
-- **Motion Corrections**: GPU-based tools that allow calculation of motion drifts, with x, y, and z changes applied directly on the ROI inside the SLAP2 software (work in progress).
-
+- **Data Inspection**: A GUI to inspect and review data stored in the binary file.
 
 ## Installation
 Install with pip

@@ -37,9 +37,7 @@ dependencies = [
     "vispy",
     "pyneurotrace",
     "zarr",          
-    "dask",
-    "napari",
-    "apoc"
+    "dask"
 ]
 
 [project.optional-dependencies]

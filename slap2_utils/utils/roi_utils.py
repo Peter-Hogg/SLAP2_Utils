@@ -96,11 +96,11 @@ def roiLabels(datafile, refStackPath=None):
                         
             stack = tifffile.imread(refStackPath)
             shape = stack.shape
-            
+                        
         except:
             print('Not a SLAP2 Ref Stack')
             return None
-        roiLabels = np.zeros(shape[1:] if isinstance(shape, (list, tuple)) else default_shape, dtype=int)
+        roiLabels = np.zeros((len(zPosition), shape[1], shape[2]) if isinstance(shape, (list, tuple)) else default_shape, dtype=int)
         for lbl, roi in enumerate(datafile.metaData.AcquisitionContainer.ROIs):
             roi_shape = roi.shapeData
             z = roi.z
@@ -108,4 +108,3 @@ def roiLabels(datafile, refStackPath=None):
             roiLabels[plane, :, :][roi_shape[0].astype('int')-1,roi_shape[1].astype('int')-1]= lbl+1
             roiLabels = roiLabels.astype(int)
         return roiLabels
-
