@@ -211,7 +211,7 @@ class DataFile():
         #obj.header.referenceTimestamp = first_line_header.timestamp
         return header
 
-    def getLineData(self, lineIndices, cycleIndices, iChannel=None, useCython=True):
+    def getLineData(self, lineIndices, cycleIndices, iChannel=None, method="Cython"):
         """Get line data from the data file.
 
         Parameters
@@ -222,6 +222,8 @@ class DataFile():
             Vector of positive integers specifying cycle indices (matlab indexing)
         iChannel : array_like, optional
             Vector of positive integers specifying channel indices (matlab indexing) (default is all channels)
+        method : str, optional
+            Method to use for data retrieval, either "Cython" or "Python" or "Numpy" (default is "Cython")
 
         Returns
         -------
@@ -253,7 +255,7 @@ class DataFile():
         hMemmap = np.memmap(self.datFileName, dtype='int16', mode='r')
         
         try:
-            if useCython:
+            if method == "Cython":
                 lineData = fast_get_line_data(
                     hMemmap,
                     self.lineDataNumElements,
@@ -265,6 +267,17 @@ class DataFile():
                     cycleIndices,
                     iChannel
                 )
+            elif method == "Numpy":
+                lineData = []
+                for idx in range(len(lineIndices)):
+                    samples_per_channel = int(self.lineDataNumElements[lineIndices[idx]-1]) // int(self.header['numChannels'])
+                    tmpData = np.empty((samples_per_channel, len(iChannel)), dtype=np.int16)
+                    precomputed_offset = (self.lineDataStartIdxs[lineIndices[idx]-1]
+                                          + (cycleIndices[idx] - 1) * int(self.header['bytesPerCycle']) // 2)
+                    for ch in range(len(iChannel)):
+                        offset = samples_per_channel * (iChannel[ch]-1) + precomputed_offset - 1
+                        tmpData[:, ch] = hMemmap[offset:offset + samples_per_channel]
+                    lineData.append(tmpData)
             else:
                 lineData = []
                 for idx in range(len(lineIndices)):
