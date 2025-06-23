@@ -94,7 +94,11 @@ class AcquisitionContainer():
                     _refs.append(hdf_file['AcquisitionContainer']['AcquisitionPlan']['activeZs'][:][index][0])
                 self.AcquisitionPlan['activeZs'] = [hdf_file[_ref][:].flatten() if len(hdf_file[_ref].shape) == 2 else np.zeros((0,0),dtype=np.uint32) for _ref in _refs]
 
-                self.AcquisitionPlan['pixelDilationXYs'] = hdf_file['AcquisitionContainer']['AcquisitionPlan']['pixelDilationXYs'][:].T
+                self.AcquisitionPlan['pixelDilationX'] = hdf_file['AcquisitionContainer']['AcquisitionPlan']['pixelDilationX'][:]
+                _refs = []
+                for index in range(len(hdf_file['AcquisitionContainer']['AcquisitionPlan']['pixelDilationY'][:])):
+                    _refs.append(hdf_file['AcquisitionContainer']['AcquisitionPlan']['pixelDilationY'][:][index][0])
+                self.AcquisitionPlan['pixelDilationY'] = [hdf_file[_ref][:].flatten() if len(hdf_file[_ref].shape) == 2 else np.zeros((0,0),dtype=np.uint32) for _ref in _refs]
 
                 self.AcquisitionPlan['isSimpleRaster'] = hdf_file['AcquisitionContainer']['AcquisitionPlan']['isSimpleRaster'][:].squeeze()
                 self.AcquisitionPlan['rasterOffsetXY'] = hdf_file['AcquisitionContainer']['AcquisitionPlan']['rasterOffsetXY'][:].squeeze()
