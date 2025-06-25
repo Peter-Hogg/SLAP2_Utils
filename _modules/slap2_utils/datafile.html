@@ -79,15 +79,10 @@
   <h1>Source code for slap2_utils.datafile</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">mmap</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.io</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.subclasses.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetaData</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils.file_header</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_file_header_v2</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">skimage.draw</span><span class="w"> </span><span class="kn">import</span> <span class="n">polygon_perimeter</span>
 
 
 <div class="viewcode-block" id="DataFile">
@@ -296,7 +291,7 @@
         <span class="c1">#obj.header.referenceTimestamp = first_line_header.timestamp</span>
         <span class="k">return</span> <span class="n">header</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">getLineData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lineIndices</span><span class="p">,</span> <span class="n">cycleIndices</span><span class="p">,</span> <span class="n">iChannel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getLineData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lineIndices</span><span class="p">,</span> <span class="n">cycleIndices</span><span class="p">,</span> <span class="n">iChannel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;Cython&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get line data from the data file.</span>
 
 <span class="sd">        Parameters</span>
@@ -307,6 +302,8 @@
 <span class="sd">            Vector of positive integers specifying cycle indices (matlab indexing)</span>
 <span class="sd">        iChannel : array_like, optional</span>
 <span class="sd">            Vector of positive integers specifying channel indices (matlab indexing) (default is all channels)</span>
+<span class="sd">        method : str, optional</span>
+<span class="sd">            Method to use for data retrieval, either &quot;Cython&quot; or &quot;Python&quot; or &quot;Numpy&quot; (default is &quot;Cython&quot;)</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -336,31 +333,37 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Channel indices must be &lt;= numChannels&quot;</span><span class="p">)</span>
         
         <span class="n">hMemmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">memmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datFileName</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int16&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-        <span class="n">lineData</span> <span class="o">=</span> <span class="p">[]</span>
         
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lineIndices</span><span class="p">)):</span>
-                <span class="n">tmpData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">lineDataNumElements</span><span class="p">[</span><span class="n">lineIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;numChannels&#39;</span><span class="p">]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">iChannel</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">iChannel</span><span class="p">)):</span>
-                    <span class="n">byteOffsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lineDataNumElements</span><span class="p">[</span><span class="n">lineIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;numChannels&#39;</span><span class="p">]))]</span>
-                    <span class="n">byteOffsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lineDataNumElements</span><span class="p">[</span><span class="n">lineIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;numChannels&#39;</span><span class="p">])</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">iChannel</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">byteOffsets</span><span class="p">]</span>
-                    <span class="n">byteOffsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lineDataStartIdxs</span><span class="p">[</span><span class="n">lineIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">byteOffsets</span><span class="p">]</span>
-                    <span class="n">byteOffsets</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;firstCycleOffsetBytes&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">byteOffsets</span><span class="p">]</span>
-
-                    <span class="n">cycleIdxs</span> <span class="o">=</span> <span class="n">cycleIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
-                    <span class="n">cycleByteOffsets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;firstCycleOffsetBytes&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cycleIdxs</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;bytesPerCycle&#39;</span><span class="p">]</span>
-                    <span class="n">cycleSampleOffsets</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cycleByteOffsets</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
-
-                    <span class="n">sampleOffsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">cycleSampleOffsets</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">byteOffsets</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span>
-
-                    <span class="n">tmpData</span><span class="p">[:,</span> <span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">hMemmap</span><span class="p">[</span><span class="n">sampleOffsets</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                
-                <span class="n">lineData</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmpData</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">.fast_line_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">fast_get_line_data</span>
+                <span class="n">lineData</span> <span class="o">=</span> <span class="n">fast_get_line_data</span><span class="p">(</span>
+                    <span class="n">hMemmap</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lineDataNumElements</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lineDataStartIdxs</span><span class="p">,</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;numChannels&#39;</span><span class="p">]),</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;firstCycleOffsetBytes&#39;</span><span class="p">]),</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;bytesPerCycle&#39;</span><span class="p">]),</span>
+                    <span class="n">lineIndices</span><span class="p">,</span>
+                    <span class="n">cycleIndices</span><span class="p">,</span>
+                    <span class="n">iChannel</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="n">lineData</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lineIndices</span><span class="p">)):</span>
+                    <span class="n">samples_per_channel</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lineDataNumElements</span><span class="p">[</span><span class="n">lineIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">//</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;numChannels&#39;</span><span class="p">])</span>
+                    <span class="n">tmpData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">samples_per_channel</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">iChannel</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+                    <span class="n">precomputed_offset</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lineDataStartIdxs</span><span class="p">[</span><span class="n">lineIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                                          <span class="o">+</span> <span class="p">(</span><span class="n">cycleIndices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;bytesPerCycle&#39;</span><span class="p">])</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">iChannel</span><span class="p">)):</span>
+                        <span class="n">offset</span> <span class="o">=</span> <span class="n">samples_per_channel</span> <span class="o">*</span> <span class="p">(</span><span class="n">iChannel</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">precomputed_offset</span> <span class="o">-</span> <span class="mi">1</span>
+                        <span class="n">tmpData</span><span class="p">[:,</span> <span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">hMemmap</span><span class="p">[</span><span class="n">offset</span><span class="p">:</span><span class="n">offset</span> <span class="o">+</span> <span class="n">samples_per_channel</span><span class="p">]</span>
+                    <span class="n">lineData</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmpData</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">hMemmap</span><span class="p">,</span> <span class="s1">&#39;_mmap&#39;</span><span class="p">):</span>
                 <span class="n">hMemmap</span><span class="o">.</span><span class="n">_mmap</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">del</span> <span class="n">hMemmap</span>
-    
+
         <span class="k">return</span> <span class="n">lineData</span></div>
 
 </pre></div>
