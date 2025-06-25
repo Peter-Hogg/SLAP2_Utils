@@ -4,6 +4,7 @@ import re
 
 from .subclasses.metadata import MetaData
 from .utils.file_header import load_file_header_v2
+from .fast_line_data import fast_get_line_data
 
 
 class DataFile():
@@ -210,7 +211,7 @@ class DataFile():
         #obj.header.referenceTimestamp = first_line_header.timestamp
         return header
 
-    def getLineData(self, lineIndices, cycleIndices, iChannel=None):
+    def getLineData(self, lineIndices, cycleIndices, iChannel=None, method="Cython"):
         """Get line data from the data file.
 
         Parameters
@@ -221,6 +222,8 @@ class DataFile():
             Vector of positive integers specifying cycle indices (matlab indexing)
         iChannel : array_like, optional
             Vector of positive integers specifying channel indices (matlab indexing) (default is all channels)
+        method : str, optional
+            Method to use for data retrieval, either "Cython" or "Python" or "Numpy" (default is "Cython")
 
         Returns
         -------
@@ -250,18 +253,46 @@ class DataFile():
             raise ValueError("Channel indices must be <= numChannels")
         
         hMemmap = np.memmap(self.datFileName, dtype='int16', mode='r')
-        lineData = []
         
         try:
-            for idx in range(len(lineIndices)):
-                samples_per_channel = int(self.lineDataNumElements[lineIndices[idx]-1]) // int(self.header['numChannels'])
-                tmpData = np.empty((samples_per_channel, len(iChannel)), dtype=np.int16)
-                precomputed_offset = (self.lineDataStartIdxs[lineIndices[idx]-1]
-                                        + (cycleIndices[idx] - 1) * int(self.header['bytesPerCycle']) // 2)
-                for ch in range(len(iChannel)):
-                    offset = samples_per_channel * (iChannel[ch]-1) + precomputed_offset - 1
-                    tmpData[:, ch] = hMemmap[offset:offset + samples_per_channel]
-                lineData.append(tmpData)
+            if method == "Cython":
+                lineData = fast_get_line_data(
+                    hMemmap,
+                    self.lineDataNumElements,
+                    self.lineDataStartIdxs,
+                    int(self.header['numChannels']),
+                    int(self.header['firstCycleOffsetBytes']),
+                    int(self.header['bytesPerCycle']),
+                    lineIndices,
+                    cycleIndices,
+                    iChannel
+                )
+            elif method == "Numpy":
+                lineData = []
+                for idx in range(len(lineIndices)):
+                    samples_per_channel = int(self.lineDataNumElements[lineIndices[idx]-1]) // int(self.header['numChannels'])
+                    tmpData = np.empty((samples_per_channel, len(iChannel)), dtype=np.int16)
+                    precomputed_offset = (self.lineDataStartIdxs[lineIndices[idx]-1]
+                                          + (cycleIndices[idx] - 1) * int(self.header['bytesPerCycle']) // 2)
+                    for ch in range(len(iChannel)):
+                        offset = samples_per_channel * (iChannel[ch]-1) + precomputed_offset - 1
+                        tmpData[:, ch] = hMemmap[offset:offset + samples_per_channel]
+                    lineData.append(tmpData)
+            else:
+                lineData = []
+                for idx in range(len(lineIndices)):
+                    tmpData = np.zeros((self.lineDataNumElements[lineIndices[idx]-1] // int(self.header['numChannels']), len(iChannel)), dtype=np.int16)
+                    for ch in range(len(iChannel)):
+                        byteOffsets = [x*2 for x in range(self.lineDataNumElements[lineIndices[idx]-1] // int(self.header['numChannels']))]
+                        byteOffsets = [x + self.lineDataNumElements[lineIndices[idx]-1]//int(self.header['numChannels'])*2*(iChannel[ch]-1) for x in byteOffsets]
+                        byteOffsets = [x + self.lineDataStartIdxs[lineIndices[idx]-1] * 2 for x in byteOffsets]
+                        byteOffsets = [int(x-self.header['firstCycleOffsetBytes']) for x in byteOffsets]
+                        cycleIdxs = cycleIndices[idx] - 1
+                        cycleByteOffsets = self.header['firstCycleOffsetBytes'] + cycleIdxs*self.header['bytesPerCycle']
+                        cycleSampleOffsets = int(cycleByteOffsets//2)
+                        sampleOffsets = np.array([int(x//2) + cycleSampleOffsets for x in byteOffsets], dtype=np.uint64)
+                        tmpData[:, ch] = hMemmap[sampleOffsets-1]
+                    lineData.append(tmpData)
         finally:
             if hasattr(hMemmap, '_mmap'):
                 hMemmap._mmap.close()
