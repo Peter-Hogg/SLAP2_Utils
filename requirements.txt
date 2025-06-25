@@ -11,4 +11,3 @@ notebook
 pyneurotrace
 zarr          
 dask
-cython
