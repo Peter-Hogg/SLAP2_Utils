@@ -95,7 +95,7 @@ def test_clean_volume_trace(monkeypatch):
     class DummyMetadata:
         def __init__(self):
             self.AcquisitionContainer = type("DummyAC", (), {})()
-            self.AcquisitionContainer.ParsePlan = {
+            self.AcquisitionContainer.AcquisitionPlan = {
                 "acqParsePlan": {"sliceIdx": [np.array([0]), np.array([1]), np.array([0])]}
             }
             self.AcquisitionContainer.ROIs = [FakeROI(z=201)]

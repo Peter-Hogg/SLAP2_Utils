@@ -330,6 +330,25 @@ class Trace:
         dmdNumPix = self.dataFile.header['dmdPixelsPerRow'] * self.dataFile.header['dmdPixelsPerColumn']
         pixelReplacementMap = copy.deepcopy(self.dataFile.zPixelReplacementMaps[self.zIdx - 1])
 
+        # --- Validate and reshape replacement map ---
+        if pixelReplacementMap is None or len(pixelReplacementMap) == 0:
+            pixelReplacementMap = np.zeros((2, 0), dtype=np.uint32)
+
+        elif pixelReplacementMap.ndim == 1:
+            # Assume it was flattened (old style): reshape if even length
+            if pixelReplacementMap.size % 2 == 0:
+                pixelReplacementMap = pixelReplacementMap.reshape((2, -1))
+            else:
+                raise ValueError(f"Unexpected 1D pixelReplacementMap with odd length: {pixelReplacementMap.size}")
+
+        elif pixelReplacementMap.ndim == 2 and pixelReplacementMap.shape[0] != 2:
+            # Transpose if shape is (N, 2) instead of (2, N)
+            if pixelReplacementMap.shape[1] == 2:
+                pixelReplacementMap = pixelReplacementMap.T
+            else:
+                raise ValueError(f"Unexpected shape for pixelReplacementMap: {pixelReplacementMap.shape}")
+
+
         # Identify pixels that exceed the number of DMD pixels
         intMask = pixelReplacementMap[1, :] >= dmdNumPix
 
