@@ -7,7 +7,7 @@ tags:
     - calcium imaging
     - voltage imaging
 authors:
-  - name: Peter Hogg
+  - name: Peter William Hogg
     orid: 0000-0003-2176-4977
     corresponding: true 
     equal-contrib: true 
