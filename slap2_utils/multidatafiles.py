@@ -69,6 +69,7 @@ class MultiDataFiles:
         self.lineSuperPixelIDs = first.lineSuperPixelIDs
         self.lineSuperPixelZIdxs = getattr(first, "lineSuperPixelZIdxs", [])
         self.lineFastZIdxs = first.lineFastZIdxs
+        self.firstLineTimestamp = getattr(first, "firstLineTimestamp", None)
 
         # Aggregates
         self.numCycles = int(np.sum([df.numCycles for df in self.hDataFiles]))
@@ -76,7 +77,10 @@ class MultiDataFiles:
 
     def _sort_files_in_place(self) -> None:
         """
-        Sort constituent `DataFile` instances in-place by cycle/trial index.
+        Sort constituent `DataFile` instances in-place.
+
+        Prefer the same first-line FPGA timestamp used by the MATLAB reader.
+        Fall back to a filename cycle index for older custom DataFile objects.
         """
         def extractCycleIndex(df: DataFile) -> int:
             name = os.path.splitext(os.path.basename(df.datFileName))[0]
@@ -94,7 +98,16 @@ class MultiDataFiles:
                     return 1_000_000_000
             return 1_000_000_000
 
-        self.hDataFiles.sort(key=lambda df: (extractCycleIndex(df), df.datFileName))
+        def sortKey(df: DataFile):
+            timestamp = getattr(df, 'firstLineTimestamp', None)
+            if timestamp is not None:
+                try:
+                    return 0, int(timestamp), df.datFileName
+                except (TypeError, ValueError):
+                    pass
+            return 1, extractCycleIndex(df), df.datFileName
+
+        self.hDataFiles.sort(key=sortKey)
 
     def delete(self) -> None:
         """Placeholder for MATLAB parity (no-op in Python)."""
@@ -187,3 +200,69 @@ class MultiDataFiles:
                 outputs[k] = block[j]
 
         return outputs  # type: ignore[return-value]
+
+    def getLineHeader(self, lineIndices, cycleIndices=None):
+        """Retrieve parsed line headers spanning constituent data files.
+
+        Indices are one-based for compatibility with ``DataFile`` and the
+        MATLAB reader. A scalar cycle index is broadcast across line indices;
+        when ``cycleIndices`` is ``None``, ``lineIndices`` are treated as
+        global one-based line indices across cycles.
+        """
+        lineValues = np.asarray(lineIndices)
+        if cycleIndices is None:
+            scalarResult = lineValues.ndim == 0
+            lineValues = lineValues.ravel()
+            if lineValues.size == 0:
+                return []
+            try:
+                finite = np.all(np.isfinite(lineValues))
+                integral = np.all(lineValues == np.floor(lineValues))
+            except TypeError as exc:
+                raise ValueError("All indices must be finite integers") from exc
+            if not finite or not integral:
+                raise ValueError("All indices must be finite integers")
+            lineValues = lineValues.astype(np.int64)
+            _, _, fileIndices, localCycles = self.getLineDataIdxs(lineValues, None)
+            lines_per_cycle = int(self.header['linesPerCycle'])
+            localLines = ((lineValues - 1) % lines_per_cycle) + 1
+        else:
+            cycleValues = np.asarray(cycleIndices)
+            scalarResult = lineValues.ndim == 0 and cycleValues.ndim == 0
+            lineValues = lineValues.ravel()
+            cycleValues = cycleValues.ravel()
+            if lineValues.size == 0 and cycleValues.size == 0:
+                return []
+            if cycleValues.size == 1 and lineValues.size > 1:
+                cycleValues = np.full(lineValues.shape, cycleValues[0])
+            if lineValues.size != cycleValues.size:
+                raise ValueError("Number of cycle indices must match number of line indices")
+
+            try:
+                finite = np.all(np.isfinite(lineValues)) and np.all(np.isfinite(cycleValues))
+                integral = (np.all(lineValues == np.floor(lineValues)) and
+                            np.all(cycleValues == np.floor(cycleValues)))
+            except TypeError as exc:
+                raise ValueError("All indices must be finite integers") from exc
+            if not finite or not integral:
+                raise ValueError("All indices must be finite integers")
+
+            lineValues = lineValues.astype(np.int64)
+            cycleValues = cycleValues.astype(np.int64)
+            _, _, fileIndices, localCycles = self.getLineDataIdxs(
+                lineValues, cycleValues
+            )
+            localLines = lineValues
+
+        outputs = [None] * localLines.size
+        for fileIndex in np.unique(fileIndices):
+            mask = fileIndices == fileIndex
+            headers = self.hDataFiles[int(fileIndex) - 1].getLineHeader(
+                localLines[mask], localCycles[mask]
+            )
+            if isinstance(headers, dict):
+                headers = [headers]
+            for outputIndex, header in zip(np.flatnonzero(mask), headers):
+                outputs[outputIndex] = header
+
+        return outputs[0] if scalarResult else outputs
