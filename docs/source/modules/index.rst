@@ -8,7 +8,10 @@ Here is an overview of the core modules and their functions.
    :caption: Modules:
 
    datafile
+   multidatafiles
    file_header
+   line_header
+   matlab_datetime
    metadata
    acquisitioncontainer
    slapROI

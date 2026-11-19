@@ -1,3 +1,4 @@
+import datetime as dt
 import os
 
 import numpy as np
@@ -17,6 +18,9 @@ def datafile():
 def test_get_line_header_reads_real_fixture(datafile):
     header = datafile.getLineHeader(1, 1)
 
+    assert datafile.metaData.fpgaTimeReference == dt.datetime(
+        2023, 12, 20, 13, 57, 50, 29553
+    )
     assert header["lineSizeBytes"] == np.uint32(40)
     assert header["magicNumber"] == np.uint32(LINE_HEADER_MAGIC)
     assert header["lineNumber"] == np.uint32(0)
@@ -26,6 +30,51 @@ def test_get_line_header_reads_real_fixture(datafile):
     assert header["timestamp"] == np.uint64(807_174_241_522)
     assert header["zOffset_um"] == np.float32(0)
     assert header["timestamp_s"] == pytest.approx(0.0)
+    assert header["timestamp_date"] == dt.datetime(
+        2023, 12, 20, 15, 5, 5, 900760
+    )
+    assert header["timestamp_date"].tzinfo is None
+
+
+def test_get_line_header_matlab_parity_across_lines_and_example_scan(datafile):
+    headers = datafile.getLineHeader([1, 2, 100], [1, 1, 10])
+    assert headers[0]["timestamp_date"] == dt.datetime(
+        2023, 12, 20, 15, 5, 5, 900760
+    )
+    assert headers[1]["timestamp_date"] == dt.datetime(
+        2023, 12, 20, 15, 5, 5, 900856
+    )
+
+    # Elapsed absolute time between lines matches relative timestamp_s to microsecond precision
+    elapsed_abs = (
+        headers[2]["timestamp_date"] - headers[0]["timestamp_date"]
+    ).total_seconds()
+    elapsed_rel = headers[2]["timestamp_s"] - headers[0]["timestamp_s"]
+    assert elapsed_abs == pytest.approx(elapsed_rel, abs=1e-6)
+
+    # Parity check on second real SLAP2 fixture (3DExampleScan.dat + 3DExampleScan.meta)
+    repo_root = os.path.dirname(os.path.dirname(__file__))
+    example_dat = os.path.join(
+        repo_root, "slap2_utils", "examples", "3DExampleScan.dat"
+    )
+    if os.path.isfile(example_dat):
+        example_df = DataFile(example_dat)
+        assert example_df.metaData.fpgaTimeReference == dt.datetime(
+            2023, 12, 20, 13, 57, 50, 34155
+        )
+        ex_header = example_df.getLineHeader(1, 1)
+        assert ex_header["timestamp_s"] == pytest.approx(0.0)
+        assert ex_header["timestamp_date"] == dt.datetime(
+            2023, 12, 20, 15, 8, 38, 930005
+        )
+
+
+def test_get_line_header_handles_missing_fpga_time_reference(datafile, monkeypatch):
+    monkeypatch.setattr(datafile.metaData, "fpgaTimeReference", None)
+    header = datafile.getLineHeader(2, 1)
+
+    assert header["timestamp_date"] is None
+    assert header["timestamp_s"] == pytest.approx(9.6295e-05)
 
 
 def test_get_line_header_batches_and_broadcasts_cycle(datafile):
@@ -35,6 +84,9 @@ def test_get_line_header_batches_and_broadcasts_cycle(datafile):
     assert [header["lineNumber"] for header in headers] == [0, 1]
     assert [header["timestamp"] for header in headers] == sorted(
         header["timestamp"] for header in headers
+    )
+    assert [header["timestamp_date"] for header in headers] == sorted(
+        header["timestamp_date"] for header in headers
     )
 
 

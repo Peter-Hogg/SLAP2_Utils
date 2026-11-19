@@ -25,12 +25,19 @@ header = multi_file.getLineHeader(1, 1)
 x_pixels = header["xOffset_pix"]
 y_pixels = header["yOffset_pix"]
 z_um = header["zOffset_um"]
+relative_s = header["timestamp_s"]
+absolute_dt = header["timestamp_date"]
 ```
 
 `getLineHeader` uses one-based line-within-cycle and cycle indices for
-compatibility with the existing reader API and MATLAB. It exposes offsets
-recorded by the microscope; analysis packages are responsible for selecting,
-formatting, or applying those offsets.
+compatibility with the existing reader API and MATLAB. `timestamp_s` reports
+seconds relative to `header["referenceTimestamp"]`, while `timestamp_date`
+computes `metaData.fpgaTimeReference + timestamp / fpgaSystemClock_Hz` as a
+Python `datetime.datetime` (naive when the MATLAB `fpgaTimeReference` is
+unzoned, timezone-aware when a MATLAB `TimeZone` is present, or `None` when
+`fpgaTimeReference` is missing or `NaT`). It exposes offsets recorded by the
+microscope; analysis packages are responsible for selecting, formatting, or
+applying those offsets.
 
 ## Installation
 Install with pip

@@ -107,3 +107,31 @@ def test_multidatafiles_get_line_header_accepts_integer_valued_floats():
     header = multifile.getLineHeader(2.0, 3.0)
 
     assert header["xOffset_pix"] == 202
+
+
+def test_multidatafiles_discovers_real_cycle_files_including_relative_path(
+    tmp_path, monkeypatch
+):
+    import os
+    import shutil
+
+    test_dir = os.path.dirname(__file__)
+    shutil.copyfile(
+        os.path.join(test_dir, "testFile.meta"), tmp_path / "rec.meta"
+    )
+    shutil.copyfile(
+        os.path.join(test_dir, "testFile.dat"), tmp_path / "rec-CYCLE1.dat"
+    )
+    shutil.copyfile(
+        os.path.join(test_dir, "testFile.dat"), tmp_path / "rec-CYCLE2.dat"
+    )
+
+    monkeypatch.chdir(tmp_path)
+    multifile = MultiDataFiles("rec-CYCLE1.dat")
+
+    assert len(multifile.hDataFiles) == 2
+    assert multifile.numCycles == 688
+    h1 = multifile.getLineHeader(1, 1)
+    h_second_file = multifile.getLineHeader(1, 345)
+    assert h1["timestamp_date"] is not None
+    assert h1["timestamp_date"] == h_second_file["timestamp_date"]

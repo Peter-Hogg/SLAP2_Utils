@@ -239,6 +239,12 @@ class DataFile():
         headerSizeBytes = int(self.header['lineHeaderSizeBytes'])
         headerSizeElements = headerSizeBytes // self.rawData.itemsize
         bytesPerCycle = int(self.header['bytesPerCycle'])
+        metaData = getattr(self, 'metaData', None)
+        fpgaTimeReference = (
+            getattr(metaData, 'fpgaTimeReference', None)
+            if metaData is not None
+            else None
+        )
         headers = []
         for lineIndex, cycleIndex in zip(lineValues, cycleValues):
             start = (int(self.lineHeaderIdxs[lineIndex - 1]) - 1 +
@@ -248,6 +254,7 @@ class DataFile():
                 rawHeader,
                 fpgaSystemClock_Hz=self.header.get('fpgaSystemClock_Hz'),
                 referenceTimestamp=self.header.get('referenceTimestamp'),
+                fpgaTimeReference=fpgaTimeReference,
             ))
 
         return headers[0] if scalarResult else headers

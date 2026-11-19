@@ -67,3 +67,4 @@ myst_enable_extensions = [
 ]
 
 nbsphinx_execute = 'never'
+autodoc_typehints = 'none'

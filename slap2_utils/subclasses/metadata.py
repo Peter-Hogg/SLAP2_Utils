@@ -3,6 +3,7 @@ import h5py
 import numpy as np
 from .slapROI import slapROI
 from .acquisitionContainer import AcquisitionContainer
+from ..utils.matlab_datetime import decode_matlab_datetime
 
 
 class MetaData():
@@ -37,6 +38,11 @@ class MetaData():
             The number of pixels along the row of the DMD.
         enableStack : int
             Flag representing stack configuration.
+        fpgaTimeReference : datetime.datetime or None
+            Decoded MATLAB ``datetime`` corresponding to FPGA tick 0. Naive
+            ``datetime.datetime`` when the MATLAB value is unzoned, timezone-aware
+            when ``TimeZone`` is set in MATLAB, or ``None`` when missing, empty,
+            or ``NaT``.
         linePeriod_s : float
             The time it takes to conduct 1 line (1/linePeriod_s gives the line rate for the microscope).
         machineConfiguration : list of dict
@@ -61,6 +67,7 @@ class MetaData():
         self.dmdPixelsPerColumn = ''
         self.dmdPixelsPerRow = ''
         self.enableStack = ''
+        self.fpgaTimeReference = None
         self.linePeriod_s = ''
         self.machineConfiguration = []
         self.remoteFocusPosition_um = ''
@@ -128,6 +135,11 @@ class MetaData():
                             self.machineConfiguration.append(device_config_dict)
                 elif _key == 'acqDurationCycles':
                     raw_acq_cycles = hdf_file[_key][:]
+                elif (
+                    _key == 'fpgaTimeReference'
+                    or hdf_file[_key].attrs.get('MATLAB_class') in (b'datetime', 'datetime')
+                ):
+                    setattr(self, _key, decode_matlab_datetime(hdf_file, hdf_file[_key]))
                 else:
                     obj = hdf_file[_key]
                     if isinstance(obj, h5py.Dataset):
