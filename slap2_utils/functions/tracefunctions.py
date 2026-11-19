@@ -75,7 +75,9 @@ def cleanVolumeTrace(datafile, zId, rawTrace):
     """
 
     # Extract the slice index information from the datafile metadata
-    sliceIdx = datafile.metaData.AcquisitionContainer.ParsePlan['acqParsePlan']['sliceIdx']
+    ac = datafile.metaData.AcquisitionContainer
+    plan = getattr(ac, 'ParsePlan', None) or getattr(ac, 'AcquisitionPlan', None)
+    sliceIdx = plan['acqParsePlan']['sliceIdx']
     dataIndex = []
     
     # Adjust zId for Python's 0-based indexing
