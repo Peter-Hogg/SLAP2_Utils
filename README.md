@@ -10,6 +10,35 @@ The `slap2-utils` library is designed to facilitate the reading of SLAP2 (Scanne
 - **Trace Extraction**: Tools to extract and generate traces from ROIs imaged in integrated scan mode.
 - **Data Inspection**: A GUI to inspect and review data stored in the binary file.
 
+## Line headers
+
+SLAP2 line headers contain the microscope's recorded online X/Y motion offsets
+in pixels, Z offset in micrometers, FPGA timestamp, acquisition flags, and line
+identifiers. Use `DataFile` for one `.dat` file or `MultiDataFiles` for a
+recording split across cycle files.
+
+```python
+from slap2_utils.multidatafiles import MultiDataFiles
+
+multi_file = MultiDataFiles("recording-CYCLE1.dat")
+header = multi_file.getLineHeader(1, 1)
+x_pixels = header["xOffset_pix"]
+y_pixels = header["yOffset_pix"]
+z_um = header["zOffset_um"]
+relative_s = header["timestamp_s"]
+absolute_dt = header["timestamp_date"]
+```
+
+`getLineHeader` uses one-based line-within-cycle and cycle indices for
+compatibility with the existing reader API and MATLAB. `timestamp_s` reports
+seconds relative to `header["referenceTimestamp"]`, while `timestamp_date`
+computes `metaData.fpgaTimeReference + timestamp / fpgaSystemClock_Hz` as a
+Python `datetime.datetime` (naive when the MATLAB `fpgaTimeReference` is
+unzoned, timezone-aware when a MATLAB `TimeZone` is present, or `None` when
+`fpgaTimeReference` is missing or `NaT`). It exposes offsets recorded by the
+microscope; analysis packages are responsible for selecting, formatting, or
+applying those offsets.
+
 ## Installation
 Install with pip
 ```bash

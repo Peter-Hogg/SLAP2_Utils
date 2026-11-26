@@ -330,6 +330,20 @@ class Trace:
         dmdNumPix = self.dataFile.header['dmdPixelsPerRow'] * self.dataFile.header['dmdPixelsPerColumn']
         pixelReplacementMap = copy.deepcopy(self.dataFile.zPixelReplacementMaps[self.zIdx - 1])
 
+        # --- Validate and reshape replacement map ---
+        if pixelReplacementMap is None or len(pixelReplacementMap) == 0:
+            pixelReplacementMap = np.zeros((2, 0), dtype=np.uint32)
+        elif pixelReplacementMap.ndim == 1:
+            if pixelReplacementMap.size % 2 == 0:
+                pixelReplacementMap = pixelReplacementMap.reshape((2, -1))
+            else:
+                raise ValueError(f"Unexpected 1D pixelReplacementMap with odd length: {pixelReplacementMap.size}")
+        elif pixelReplacementMap.ndim == 2 and pixelReplacementMap.shape[0] != 2:
+            if pixelReplacementMap.shape[1] == 2:
+                pixelReplacementMap = pixelReplacementMap.T
+            else:
+                raise ValueError(f"Unexpected shape for pixelReplacementMap: {pixelReplacementMap.shape}")
+
         # Identify pixels that exceed the number of DMD pixels
         intMask = pixelReplacementMap[1, :] >= dmdNumPix
 
@@ -393,7 +407,13 @@ class Trace:
             if int(lineZIdx) != self.zIdx:
                 continue
 
-            lineSuperPixelIDs = self.dataFile.lineSuperPixelIDs[lineIdx][0]
+            rawLineSuperPixels = self.dataFile.lineSuperPixelIDs[lineIdx]
+            if isinstance(rawLineSuperPixels, list):
+                lineSuperPixelIDs = rawLineSuperPixels[0] if len(rawLineSuperPixels) > 0 else np.array([], dtype=np.uint32)
+            elif getattr(rawLineSuperPixels, 'ndim', 1) > 1:
+                lineSuperPixelIDs = rawLineSuperPixels[0] if rawLineSuperPixels.size > 0 else np.array([], dtype=np.uint32)
+            else:
+                lineSuperPixelIDs = np.asarray(rawLineSuperPixels).ravel()
             mask = np.isin(validSuperPixelIDs, lineSuperPixelIDs)
 
             positions = []
